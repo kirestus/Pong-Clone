@@ -17,7 +17,7 @@ int main()
 
     sf::Text messageText;
     messageText.setFont(vector);
-    messageText.setString(std::string(path));
+    messageText.setString("pong");
     messageText.setCharacterSize(30);
     messageText.setFillColor(sf::Color::White);
 
