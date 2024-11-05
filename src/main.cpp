@@ -1,12 +1,28 @@
 #include <SFML/Graphics.hpp>
+#include <filesystem>
 
-int main();
+
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1280, 729), "PongClone");
+    auto path = std::filesystem::current_path(); //getting path
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "PongClone");
+    sf::Vector2f screenCetre = (sf::Vector2(float(window.getSize().x/2),float(window.getSize().y/2)));
     sf::CircleShape shape(300.f);
-    shape.setFillColor(sf::Color::Green);
+
+    shape.setFillColor(sf::Color::White);
+    shape.setOrigin(shape.getRadius(),shape.getRadius());
+    shape.setPosition(screenCetre);
+
+    sf::Font vector;
+    vector.loadFromFile("./fonts/Vector.ttf");
+
+    sf::Text messageText;
+    messageText.setFont(vector);
+    messageText.setString(std::string(path));
+    messageText.setCharacterSize(30);
+    messageText.setFillColor(sf::Color::White);
+
 
     while (window.isOpen())
     {
@@ -19,6 +35,7 @@ int main()
 
         window.clear();
         window.draw(shape);
+        window.draw(messageText);
         window.display();
     }
 

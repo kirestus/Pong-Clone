@@ -13,9 +13,22 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
+
+
 add_executable(main src/main.cpp)
-target_link_libraries(main PRIVATE sfml-graphics)
+target_link_libraries(main PRIVATE sfml-graphics sfml-audio)
 target_compile_features(main PRIVATE cxx_std_17)
+
+set (fonts_source "${CMAKE_SOURCE_DIR}/src/fonts/")
+set (fonts_destination "${CMAKE_CURRENT_BINARY_DIR}/bin/fonts")
+
+add_custom_command(
+    TARGET main
+    COMMAND ${CMAKE_COMMAND} -E copy ${fonts_source} ${fonts_destination} 
+    DEPENDS ${fonts_destination}
+    COMMENT "symbolic link resources folder from ${source} => ${destination}"
+)
+
 
 if(WIN32)
     add_custom_command(
