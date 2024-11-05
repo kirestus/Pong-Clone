@@ -1,11 +1,9 @@
 #include <SFML/Graphics.hpp>
-#include <filesystem>
 
 
 
 int main()
 {
-    auto path = std::filesystem::current_path(); //getting path
     sf::RenderWindow window(sf::VideoMode(1280, 720), "PongClone");
     sf::Vector2f screenCetre = (sf::Vector2(float(window.getSize().x/2),float(window.getSize().y/2)));
     sf::CircleShape shape(300.f);
