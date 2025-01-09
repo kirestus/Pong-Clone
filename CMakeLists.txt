@@ -13,21 +13,24 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
+include_directories(
+        ${PROJECT_SOURCE_DIR}/src/fonts
+        ${PROJECT_SOURCE_DIR}/src/
+)
 
 
-add_executable(main src/main.cpp)
+file(GLOB all_SRCS
+        "${PROJECT_SOURCE_DIR}/src/*.h"
+        "${PROJECT_SOURCE_DIR}/src/*.hpp"
+        "${PROJECT_SOURCE_DIR}/src/*.cpp"
+        "${PROJECT_SOURCE_DIR}/src/*.c"
+        "${PROJECT_SOURCE_DIR}/src/fonts/*.ttf"
+        )
+
+add_executable(main ${all_SRCS})
+
 target_link_libraries(main PRIVATE sfml-graphics sfml-audio)
 target_compile_features(main PRIVATE cxx_std_17)
-
-set (fonts_source "${CMAKE_SOURCE_DIR}/src/fonts/")
-set (fonts_destination "${CMAKE_CURRENT_BINARY_DIR}/bin/fonts")
-
-add_custom_command(
-    TARGET main
-    COMMAND ${CMAKE_COMMAND} -E copy ${fonts_source} ${fonts_destination} 
-    DEPENDS ${fonts_destination}
-    COMMENT "symbolic link resources folder from ${source} => ${destination}"
-)
 
 
 if(WIN32)
