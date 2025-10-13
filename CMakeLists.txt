@@ -14,7 +14,6 @@ FetchContent_Declare(SFML
 FetchContent_MakeAvailable(SFML)
 
 include_directories(
-        ${PROJECT_SOURCE_DIR}/src/fonts
         ${PROJECT_SOURCE_DIR}/src/
 )
 
@@ -40,3 +39,9 @@ if(WIN32)
         PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:main>
         VERBATIM)
 endif()
+
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/fonts"
+     DESTINATION "${CMAKE_BINARY_DIR}/")
+
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/sfx"
+        DESTINATION "${CMAKE_BINARY_DIR}/")
