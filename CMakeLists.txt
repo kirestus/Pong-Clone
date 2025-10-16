@@ -19,8 +19,8 @@ include_directories(
 
 
 file(GLOB all_SRCS
-        "${PROJECT_SOURCE_DIR}/src/*.h"
-        "${PROJECT_SOURCE_DIR}/src/*.hpp"
+        "${PROJECT_SOURCE_DIR}/src/headers/*.h"
+        "${PROJECT_SOURCE_DIR}/src/headers/*.hpp"
         "${PROJECT_SOURCE_DIR}/src/*.cpp"
         "${PROJECT_SOURCE_DIR}/src/*.c"
         "${PROJECT_SOURCE_DIR}/src/fonts/*.ttf"
@@ -41,7 +41,7 @@ if(WIN32)
 endif()
 
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/fonts"
-     DESTINATION "${CMAKE_BINARY_DIR}/")
+     DESTINATION "${CMAKE_BINARY_DIR}/bin/")
 
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/sfx"
-        DESTINATION "${CMAKE_BINARY_DIR}/")
+        DESTINATION "${CMAKE_BINARY_DIR}/bin/")

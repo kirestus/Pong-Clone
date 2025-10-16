@@ -1,12 +1,13 @@
 #include <headers/bootscreen.h>
+#include <headers/bat.h>
+#include <headers/tuple.h>
 
-BootScreen::BootScreen(sf::RenderWindow *pRenderWindow){
-
-    SetRenderWindow(pRenderWindow);
-    CreateBootScreen(this);
-    UpdateBootscreen(this,m_hClock);
-
+BootScreen::BootScreen(tuple rTuple)
+{
+    CreateBootScreen(rTuple);
+    UpdateBootscreen(rTuple,m_hClock);
 };
+//-----------------------------------------------------------------
 
 sf::CircleShape BootScreen::CreateCircleShape(BootScreen* pBootScreen,float fradius)
 {
@@ -17,25 +18,17 @@ sf::CircleShape BootScreen::CreateCircleShape(BootScreen* pBootScreen,float frad
 
     return circle;
 }
+//-----------------------------------------------------------------
 
-void BootScreen::CreateBootScreen(BootScreen *pBootScreen)
+void BootScreen::CreateBootScreen(tuple rTuple)
 {
-    sf::RenderWindow *pRenderWindow = pBootScreen->GetRenderWindow();
-    SetScreenCenter(pBootScreen->CalculateScreenCenter(pRenderWindow));
+    SetScreenCenter(CalculateScreenCenter(rTuple.pRenderWindow));
 
-    sf::CircleShape circle = pBootScreen->CreateCircleShape(pBootScreen, 300.0);
+    sf::CircleShape circle = CreateCircleShape(this, 300.0);
     SetCircleShape(circle);
-
-    CreateTextBox(pBootScreen);
 }
 
-void BootScreen::CreateTextBox(BootScreen *pBootScreen)
-{
-    sf::Font vector;
-    vector.loadFromFile("/fonts/Vector.ttf");
-    sf::Text text("Hello SFML", vector, 50);
-
-}
+//-----------------------------------------------------------------
 
 sf::Vector2f BootScreen::CalculateScreenCenter(sf::RenderWindow* pRenderWindow)
 {
@@ -45,6 +38,7 @@ sf::Vector2f BootScreen::CalculateScreenCenter(sf::RenderWindow* pRenderWindow)
 
     return vScreenCenter;
 }
+//-----------------------------------------------------------------
 
 void BootScreen::DetermineEvent(sf::RenderWindow *pRenderWindow)
 {
@@ -59,11 +53,11 @@ void BootScreen::DetermineEvent(sf::RenderWindow *pRenderWindow)
             switch (event.key.code)
             {
                 case sf::Keyboard::W:
-                    m_eDesiredMoveDirection = MoveDirection::UP;
+                    m_eDesiredMoveDirection = eBatMoveDirection::UP;
                 break;
                 
                 case sf::Keyboard::S:
-                    m_eDesiredMoveDirection = MoveDirection::DOWN;
+                    m_eDesiredMoveDirection = eBatMoveDirection::DOWN;
                 break;
                 
                 default:
@@ -71,36 +65,30 @@ void BootScreen::DetermineEvent(sf::RenderWindow *pRenderWindow)
                 break;
             }
         }
-        else if (event.type == event.KeyReleased)
+        else if (event.type == event.KeyReleased && 
+            event.key.code ==  sf::Keyboard::W || event.key.code == sf::Keyboard::S)
         {
-            m_eDesiredMoveDirection = MoveDirection::NONE;
+                m_eDesiredMoveDirection = eBatMoveDirection::NONE;
         }
     }
 }
+//-----------------------------------------------------------------
 
-int BootScreen::UpdateBootscreen(BootScreen *pBootScreen, sf::Clock &rGameClock)
+int BootScreen::UpdateBootscreen(tuple rTuple, sf::Clock &rGameClock)
 {
+    sf::Music wololo;
+    wololo.openFromFile("sfx/song.mp3");
+    wololo.play();
 
-    sf::RenderWindow *pRenderWindow = GetRenderWindow();
-
-    sf::Font vector;
-    vector.loadFromFile("fonts/Vector.ttf");
-    static sf::Text tMessage = pBootScreen->GetMessageText();
-    tMessage.setFont(GetMessageFont());
-    tMessage.setString("Pong");
-    tMessage.setFillColor(sf::Color::White);
-    tMessage.setCharacterSize(52);
-    tMessage.setFont(vector);
-
-    while (pRenderWindow->isOpen())
+    while (rTuple.pRenderWindow->isOpen())
     {
-        DetermineEvent(pRenderWindow);
-        m_vPosition = tMessage.getPosition();
-        if (m_eDesiredMoveDirection == MoveDirection::UP)
+        DetermineEvent(rTuple.pRenderWindow);
+        m_vPosition =  rTuple.pMessage->getPosition();
+        if (m_eDesiredMoveDirection == eBatMoveDirection::UP)
         {
             m_fVelocity -= abs(m_fYaccel);
         }
-        else if (m_eDesiredMoveDirection == MoveDirection::DOWN )
+        else if (m_eDesiredMoveDirection == eBatMoveDirection::DOWN )
         {
             m_fVelocity += abs(m_fYaccel);
         }
@@ -112,11 +100,11 @@ int BootScreen::UpdateBootscreen(BootScreen *pBootScreen, sf::Clock &rGameClock)
         float fSpeed = m_fVelocity * rGameClock.getElapsedTime().asSeconds();
         
         m_vPosition.y += fSpeed;
-        tMessage.setPosition(tMessage.getPosition().x, m_vPosition.y);
-        pRenderWindow->clear();
-        pRenderWindow->draw(GetCircleShape());
-        pRenderWindow->draw(tMessage);
-        pRenderWindow->display();
+        rTuple.pMessage->setPosition( rTuple.pMessage->getPosition().x, m_vPosition.y);
+        rTuple.pRenderWindow->clear();
+        rTuple.pRenderWindow->draw(GetCircleShape());
+        rTuple.pRenderWindow->draw( *rTuple.pMessage );
+        rTuple.pRenderWindow->display();
 
         m_fTimeElapsed += rGameClock.getElapsedTime().asSeconds();
 
