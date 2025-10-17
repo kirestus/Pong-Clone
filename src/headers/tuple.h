@@ -1,11 +1,13 @@
 #pragma once
 
-#include <headers/bat.h>
+#include<SFML/Graphics.hpp>
+#include<headers/bat.h>
 
 struct tuple{
-    Bat* pBat1;
-    Bat* pBat2;
-    sf::Text* pMessage;
-    sf::Font* pFont;
-    sf::RenderWindow* pRenderWindow;
+    Bat* pBat1 = nullptr;
+    Bat* pBat2 = nullptr;
+    sf::Text* pMessage = nullptr;
+    sf::Font* pFont = nullptr;
+    sf::RenderWindow* pRenderWindow = nullptr;
 };
+

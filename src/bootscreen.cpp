@@ -1,6 +1,4 @@
 #include <headers/bootscreen.h>
-#include <headers/bat.h>
-#include <headers/tuple.h>
 
 BootScreen::BootScreen(tuple rTuple)
 {
@@ -40,38 +38,75 @@ sf::Vector2f BootScreen::CalculateScreenCenter(sf::RenderWindow* pRenderWindow)
 }
 //-----------------------------------------------------------------
 
-void BootScreen::DetermineEvent(sf::RenderWindow *pRenderWindow)
+void BootScreen::DetermineEvent(sf::RenderWindow *pRenderWindow, Bat *pBat, ePlayerNumber playerId, sf::Event event)
 {
-    sf::Event event;
-    while (pRenderWindow->pollEvent(event))
+    if(event.type == sf::Event::KeyPressed )
     {
-        if (event.type == sf::Event::Closed)
-            pRenderWindow->close();
-
-        if(event.type == sf::Event::KeyPressed)
+        switch (event.key.code)
         {
-            switch (event.key.code)
+            if ( playerId == ePlayerNumber::PLAYER1 )
             {
                 case sf::Keyboard::W:
-                    m_eDesiredMoveDirection = eBatMoveDirection::UP;
+                    pBat->SetMovementDirection(eBatMoveDirection::UP);
                 break;
-                
+            
                 case sf::Keyboard::S:
-                    m_eDesiredMoveDirection = eBatMoveDirection::DOWN;
-                break;
-                
-                default:
-
+                    pBat->SetMovementDirection(eBatMoveDirection::DOWN);
                 break;
             }
-        }
-        else if (event.type == event.KeyReleased && 
-            event.key.code ==  sf::Keyboard::W || event.key.code == sf::Keyboard::S)
-        {
-                m_eDesiredMoveDirection = eBatMoveDirection::NONE;
+            else if ( playerId == ePlayerNumber::PLAYER2 )
+            {
+                case sf::Keyboard::Up:
+                    pBat->SetMovementDirection(eBatMoveDirection::UP);
+                break;
+            
+                case sf::Keyboard::Down:
+                    pBat->SetMovementDirection(eBatMoveDirection::DOWN);
+                break;
+            }
+            default:
+
+                break;
         }
     }
+    
+    if (event.type == event.KeyReleased)
+    {
+        if ((playerId == ePlayerNumber::PLAYER1 && event.key.code ==  sf::Keyboard::W || event.key.code == sf::Keyboard::S) ||
+            (playerId == ePlayerNumber::PLAYER2 && event.key.code ==  sf::Keyboard::Up || event.key.code == sf::Keyboard::Down))
+        {
+            pBat->SetMovementDirection(eBatMoveDirection::NONE);
+        }
+    } 
+    
 }
+
+//-----------------------------------------------------------------
+
+static void CalculateBatSpeed(sf::RenderWindow *pRenderWindow, Bat *pBat, float fLapsedTime)
+{
+    pBat->UpdateShapeToDesiredTransform();
+
+        if (pBat->GetMovementDirection() == eBatMoveDirection::UP )
+        {
+            pBat->ModifyVelocity( - abs( pBat->GetAccel() ));
+
+        }
+        else if (pBat->GetMovementDirection() == eBatMoveDirection::DOWN )
+        {
+            pBat->ModifyVelocity( abs( pBat->GetAccel() ));
+        }
+        else
+        {
+            pBat->DecayVelocity();
+        }
+
+        float fSpeed = pBat->GetVelocity() * fLapsedTime;
+        
+        pBat->SetPosition(sf::Vector2f(pBat->GetPosition().x, pBat->GetPosition().y + fSpeed));
+        pBat->UpdateShapeToDesiredTransform();
+}
+
 //-----------------------------------------------------------------
 
 int BootScreen::UpdateBootscreen(tuple rTuple, sf::Clock &rGameClock)
@@ -80,30 +115,33 @@ int BootScreen::UpdateBootscreen(tuple rTuple, sf::Clock &rGameClock)
     wololo.openFromFile("sfx/song.mp3");
     wololo.play();
 
+    Bat* pBat1 = rTuple.pBat1;
+    Bat* pBat2 = rTuple.pBat2;
+
     while (rTuple.pRenderWindow->isOpen())
     {
-        DetermineEvent(rTuple.pRenderWindow);
-        m_vPosition =  rTuple.pMessage->getPosition();
-        if (m_eDesiredMoveDirection == eBatMoveDirection::UP)
+        sf::Event event;
+        while (rTuple.pRenderWindow->pollEvent(event))
         {
-            m_fVelocity -= abs(m_fYaccel);
-        }
-        else if (m_eDesiredMoveDirection == eBatMoveDirection::DOWN )
-        {
-            m_fVelocity += abs(m_fYaccel);
-        }
-        else
-        {
-             m_fVelocity *= m_fYdecaySpeed;
+            if (event.type == sf::Event::Closed)
+            {
+                rTuple.pRenderWindow->close();
+            }
+
+            DetermineEvent(rTuple.pRenderWindow, pBat1, ePlayerNumber::PLAYER1, event);
+            DetermineEvent(rTuple.pRenderWindow, pBat2, ePlayerNumber::PLAYER2, event);
         }
 
-        float fSpeed = m_fVelocity * rGameClock.getElapsedTime().asSeconds();
+        float fLapsedTime = rGameClock.getElapsedTime().asSeconds();
+        CalculateBatSpeed(rTuple.pRenderWindow, pBat1, fLapsedTime);
+        CalculateBatSpeed(rTuple.pRenderWindow, pBat2, fLapsedTime);
+
         
-        m_vPosition.y += fSpeed;
-        rTuple.pMessage->setPosition( rTuple.pMessage->getPosition().x, m_vPosition.y);
         rTuple.pRenderWindow->clear();
         rTuple.pRenderWindow->draw(GetCircleShape());
         rTuple.pRenderWindow->draw( *rTuple.pMessage );
+        rTuple.pRenderWindow->draw( pBat1->GetShape());
+        rTuple.pRenderWindow->draw( pBat2->GetShape());
         rTuple.pRenderWindow->display();
 
         m_fTimeElapsed += rGameClock.getElapsedTime().asSeconds();

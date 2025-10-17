@@ -6,14 +6,18 @@
 #include <headers/bat.h>
 #include <headers/tuple.h>
 
+enum ePlayerNumber{
+    PLAYER1,
+    PLAYER2
+};
+
 class BootScreen 
 {
     public:
 
-        void DetermineEvent(sf::RenderWindow *pRenderWindow);
-
         BootScreen( tuple );
-
+        
+        void DetermineEvent(sf::RenderWindow *pRenderWindow, Bat *pBat, ePlayerNumber PlayerId,  sf::Event event );
         sf::CircleShape CreateCircleShape(BootScreen *pBootScreen, float fradius);
 
         sf::Vector2f CalculateScreenCenter(sf::RenderWindow* pRenderWindow);
@@ -30,19 +34,10 @@ class BootScreen
 
         sf::Clock GetGameClock() const {return m_hClock;}
 
-
     private:         
         sf::Vector2f m_vScreenCenter;
         sf::CircleShape m_sCircleShape;
         sf::Clock m_hClock;
-        
-        sf::Vector2f m_vPosition;
-
-        eBatMoveDirection m_eDesiredMoveDirection = eBatMoveDirection::NONE;
-        const float m_fYaccel = 0.55f;
-        const float m_fYtopSpeed = 5.00f;
-        const float m_fYdecaySpeed = 0.9994f;
         float m_fTimeElapsed = 0.00f;
-        float m_fVelocity = 0.0f;
 };
 
