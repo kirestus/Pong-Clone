@@ -42,38 +42,23 @@ void BootScreen::DetermineEvent(sf::RenderWindow *pRenderWindow, Bat *pBat, ePla
 {
     if(event.type == sf::Event::KeyPressed )
     {
-        switch (event.key.code)
+        if (playerId == ePlayerNumber::PLAYER1 && (event.key.code ==  sf::Keyboard::W) 
+        || playerId == ePlayerNumber::PLAYER2 && (event.key.code ==  sf::Keyboard::Up))
         {
-            if ( playerId == ePlayerNumber::PLAYER1 )
-            {
-                case sf::Keyboard::W:
-                    pBat->SetMovementDirection(eBatMoveDirection::UP);
-                break;
-            
-                case sf::Keyboard::S:
-                    pBat->SetMovementDirection(eBatMoveDirection::DOWN);
-                break;
-            }
-            else if ( playerId == ePlayerNumber::PLAYER2 )
-            {
-                case sf::Keyboard::Up:
-                    pBat->SetMovementDirection(eBatMoveDirection::UP);
-                break;
-            
-                case sf::Keyboard::Down:
-                    pBat->SetMovementDirection(eBatMoveDirection::DOWN);
-                break;
-            }
-            default:
-
-                break;
+           pBat->SetMovementDirection(eBatMoveDirection::UP); 
+        }
+        
+        if (playerId == ePlayerNumber::PLAYER1 && (event.key.code ==  sf::Keyboard::S)
+        || playerId == ePlayerNumber::PLAYER2 && (event.key.code ==  sf::Keyboard::Down))
+        {
+           pBat->SetMovementDirection(eBatMoveDirection::DOWN); 
         }
     }
     
     if (event.type == event.KeyReleased)
     {
-        if ((playerId == ePlayerNumber::PLAYER1 && event.key.code ==  sf::Keyboard::W || event.key.code == sf::Keyboard::S) ||
-            (playerId == ePlayerNumber::PLAYER2 && event.key.code ==  sf::Keyboard::Up || event.key.code == sf::Keyboard::Down))
+        if ((playerId == ePlayerNumber::PLAYER1 && (event.key.code ==  sf::Keyboard::W || event.key.code == sf::Keyboard::S)) ||
+            (playerId == ePlayerNumber::PLAYER2 && (event.key.code ==  sf::Keyboard::Up || event.key.code == sf::Keyboard::Down)))
         {
             pBat->SetMovementDirection(eBatMoveDirection::NONE);
         }
@@ -87,10 +72,15 @@ static void CalculateBatSpeed(sf::RenderWindow *pRenderWindow, Bat *pBat, float 
 {
     pBat->UpdateShapeToDesiredTransform();
 
-        if (pBat->GetMovementDirection() == eBatMoveDirection::UP )
+        if( (pBat->IsHittingBottom(pRenderWindow->getSize()) && pBat->GetMovementDirection() != eBatMoveDirection::UP) || 
+        (pBat->IsHittingTop() && pBat->GetMovementDirection() != eBatMoveDirection::DOWN) )
+        {
+            pBat->SetMovementDirection( eBatMoveDirection::NONE );
+            pBat->DecayVelocity();
+        }
+        else if (pBat->GetMovementDirection() == eBatMoveDirection::UP)
         {
             pBat->ModifyVelocity( - abs( pBat->GetAccel() ));
-
         }
         else if (pBat->GetMovementDirection() == eBatMoveDirection::DOWN )
         {
@@ -101,9 +91,18 @@ static void CalculateBatSpeed(sf::RenderWindow *pRenderWindow, Bat *pBat, float 
             pBat->DecayVelocity();
         }
 
-        float fSpeed = pBat->GetVelocity() * fLapsedTime;
-        
+        float fSpeed =  pBat->GetVelocity() * fLapsedTime;
+
+        if( (pBat->IsHittingBottom(pRenderWindow->getSize()) && pBat->GetMovementDirection() != eBatMoveDirection::UP) || 
+        (pBat->IsHittingTop() && pBat->GetMovementDirection() != eBatMoveDirection::DOWN) )
+        {
+            fSpeed *= -1.25f;
+            pBat->ModifyVelocity(pBat->GetVelocity()*-1.25f);
+        }
+
+
         pBat->SetPosition(sf::Vector2f(pBat->GetPosition().x, pBat->GetPosition().y + fSpeed));
+
         pBat->UpdateShapeToDesiredTransform();
 }
 
@@ -135,7 +134,6 @@ int BootScreen::UpdateBootscreen(tuple rTuple, sf::Clock &rGameClock)
         float fLapsedTime = rGameClock.getElapsedTime().asSeconds();
         CalculateBatSpeed(rTuple.pRenderWindow, pBat1, fLapsedTime);
         CalculateBatSpeed(rTuple.pRenderWindow, pBat2, fLapsedTime);
-
         
         rTuple.pRenderWindow->clear();
         rTuple.pRenderWindow->draw(GetCircleShape());

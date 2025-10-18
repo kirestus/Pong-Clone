@@ -19,9 +19,9 @@ int main()
 
     sf::Text sText("PONG", fPongFont);
     sText.setFillColor(sf::Color::White);
+    sText.setCharacterSize(70);
     sText.setOrigin(sText.getLocalBounds().getSize().x/2,sText.getLocalBounds().getSize().y/2);
-    sText.setRotation(270.0);
-    sText.setPosition(50,720/2); // should set this in the middle of the screen will do later
+    sText.setPosition(sf::Vector2f(window.getSize().x/2,window.getSize().y+-100.0f) ); // should set this in the middle of the screen will do later
 
     DataTuple.pRenderWindow = &window;
     DataTuple.pBat1 = &hPlayer1Bat;
