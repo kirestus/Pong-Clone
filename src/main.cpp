@@ -11,8 +11,8 @@ int main()
     sf::RenderWindow window(sf::VideoMode(1280, 720), "PongClone");
     sf::RenderWindow* ptrWindow = &window;
     
-    Bat hPlayer1Bat(sf::Vector2f(50.0f,720/2));
-    Bat hPlayer2Bat(sf::Vector2f(1280-50.0f,720/2));
+    Bat hPlayer1Bat(sf::Vector2f(50.0f,720/2), ePlayerNumber::PLAYER1);
+    Bat hPlayer2Bat(sf::Vector2f(1280-50.0f,720/2), ePlayerNumber::PLAYER2);
 
     sf::Font fPongFont;
     fPongFont.loadFromFile("fonts/Vector.ttf");

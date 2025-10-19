@@ -36,75 +36,6 @@ sf::Vector2f BootScreen::CalculateScreenCenter(sf::RenderWindow* pRenderWindow)
 
     return vScreenCenter;
 }
-//-----------------------------------------------------------------
-
-void BootScreen::DetermineEvent(sf::RenderWindow *pRenderWindow, Bat *pBat, ePlayerNumber playerId, sf::Event event)
-{
-    if(event.type == sf::Event::KeyPressed )
-    {
-        if (playerId == ePlayerNumber::PLAYER1 && (event.key.code ==  sf::Keyboard::W) 
-        || playerId == ePlayerNumber::PLAYER2 && (event.key.code ==  sf::Keyboard::Up))
-        {
-           pBat->SetMovementDirection(eBatMoveDirection::UP); 
-        }
-        
-        if (playerId == ePlayerNumber::PLAYER1 && (event.key.code ==  sf::Keyboard::S)
-        || playerId == ePlayerNumber::PLAYER2 && (event.key.code ==  sf::Keyboard::Down))
-        {
-           pBat->SetMovementDirection(eBatMoveDirection::DOWN); 
-        }
-    }
-    
-    if (event.type == event.KeyReleased)
-    {
-        if ((playerId == ePlayerNumber::PLAYER1 && (event.key.code ==  sf::Keyboard::W || event.key.code == sf::Keyboard::S)) ||
-            (playerId == ePlayerNumber::PLAYER2 && (event.key.code ==  sf::Keyboard::Up || event.key.code == sf::Keyboard::Down)))
-        {
-            pBat->SetMovementDirection(eBatMoveDirection::NONE);
-        }
-    } 
-    
-}
-
-//-----------------------------------------------------------------
-
-static void CalculateBatSpeed(sf::RenderWindow *pRenderWindow, Bat *pBat, float fLapsedTime)
-{
-    pBat->UpdateShapeToDesiredTransform();
-
-        if( (pBat->IsHittingBottom(pRenderWindow->getSize()) && pBat->GetMovementDirection() != eBatMoveDirection::UP) || 
-        (pBat->IsHittingTop() && pBat->GetMovementDirection() != eBatMoveDirection::DOWN) )
-        {
-            pBat->SetMovementDirection( eBatMoveDirection::NONE );
-            pBat->DecayVelocity();
-        }
-        else if (pBat->GetMovementDirection() == eBatMoveDirection::UP)
-        {
-            pBat->ModifyVelocity( - abs( pBat->GetAccel() ));
-        }
-        else if (pBat->GetMovementDirection() == eBatMoveDirection::DOWN )
-        {
-            pBat->ModifyVelocity( abs( pBat->GetAccel() ));
-        }
-        else
-        {
-            pBat->DecayVelocity();
-        }
-
-        float fSpeed =  pBat->GetVelocity() * fLapsedTime;
-
-        if( (pBat->IsHittingBottom(pRenderWindow->getSize()) && pBat->GetMovementDirection() != eBatMoveDirection::UP) || 
-        (pBat->IsHittingTop() && pBat->GetMovementDirection() != eBatMoveDirection::DOWN) )
-        {
-            fSpeed *= -1.25f;
-            pBat->ModifyVelocity(pBat->GetVelocity()*-1.25f);
-        }
-
-
-        pBat->SetPosition(sf::Vector2f(pBat->GetPosition().x, pBat->GetPosition().y + fSpeed));
-
-        pBat->UpdateShapeToDesiredTransform();
-}
 
 //-----------------------------------------------------------------
 
@@ -127,16 +58,29 @@ int BootScreen::UpdateBootscreen(tuple rTuple, sf::Clock &rGameClock)
                 rTuple.pRenderWindow->close();
             }
 
-            DetermineEvent(rTuple.pRenderWindow, pBat1, ePlayerNumber::PLAYER1, event);
-            DetermineEvent(rTuple.pRenderWindow, pBat2, ePlayerNumber::PLAYER2, event);
+            pBat1->DetermDesiredMoveDirection( event, rTuple.pRenderWindow );
+            pBat2->DetermDesiredMoveDirection( event, rTuple.pRenderWindow );
         }
 
         float fLapsedTime = rGameClock.getElapsedTime().asSeconds();
-        CalculateBatSpeed(rTuple.pRenderWindow, pBat1, fLapsedTime);
-        CalculateBatSpeed(rTuple.pRenderWindow, pBat2, fLapsedTime);
+        pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
+        pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
+
         
         rTuple.pRenderWindow->clear();
         rTuple.pRenderWindow->draw(GetCircleShape());
+        if (pBat1->GetCurrentMoveDirection() == eBatMoveDirection::UP)
+        {
+            rTuple.pMessage->setString("UP");
+        }
+        else if (pBat1->GetCurrentMoveDirection() == eBatMoveDirection::DOWN)
+        {
+            rTuple.pMessage->setString("DOWN");
+        }
+        else
+        {
+            rTuple.pMessage->setString("NONE");
+        }
         rTuple.pRenderWindow->draw( *rTuple.pMessage );
         rTuple.pRenderWindow->draw( pBat1->GetShape());
         rTuple.pRenderWindow->draw( pBat2->GetShape());

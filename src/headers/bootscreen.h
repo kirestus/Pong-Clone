@@ -6,18 +6,12 @@
 #include <headers/bat.h>
 #include <headers/tuple.h>
 
-enum ePlayerNumber{
-    PLAYER1,
-    PLAYER2
-};
-
 class BootScreen 
 {
     public:
 
         BootScreen( tuple );
         
-        void DetermineEvent(sf::RenderWindow *pRenderWindow, Bat *pBat, ePlayerNumber PlayerId,  sf::Event event );
         sf::CircleShape CreateCircleShape(BootScreen *pBootScreen, float fradius);
 
         sf::Vector2f CalculateScreenCenter(sf::RenderWindow* pRenderWindow);

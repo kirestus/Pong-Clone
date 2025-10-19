@@ -7,11 +7,21 @@ enum class eBatMoveDirection
     DOWN,
 };
 
+enum ePlayerNumber{
+    PLAYER1,
+    PLAYER2
+};
+
+
 class Bat
 {
     public:
-    Bat(sf::Vector2f vPosition);
+    Bat(sf::Vector2f, ePlayerNumber);
     Bat();
+
+
+    void DetermDesiredMoveDirection( sf::Event event, sf::RenderWindow* pRenderWindow );
+    void CalculateBatSpeed(sf::RenderWindow *pRenderWindow, float fLapsedTime);
 
     sf::Vector2f GetPosition() const { return m_vPosition ;}
     void SetPosition(sf::Vector2f _position) { m_vPosition = _position ; }
@@ -35,22 +45,33 @@ class Bat
     void UpdateShapeToDesiredTransform(){m_hRectShape.setPosition(m_vPosition) ;}
     void UpdateDesiredToShapeTransform(){m_vPosition = m_hRectShape.getPosition() ;}
 
-    bool IsWithinGameBounds(sf::Vector2u vRenderScreenArea)const{ return (m_vPosition.y < vRenderScreenArea.y && m_vPosition.y > 0.0f) ;}
-    bool IsHittingBottom(sf::Vector2u vRenderScreenArea) const {return m_vPosition.y > vRenderScreenArea.y ;}
-    bool IsHittingTop() const {return m_vPosition.y < 0.0f ;}
+    bool IsWithinGameBounds(sf::Vector2u vRenderScreenArea)const{ return (m_vPosition.y < vRenderScreenArea.y + 20 && m_vPosition.y > 0.0f - 20) ;}
+    bool IsHittingBottom(sf::Vector2u vRenderScreenArea) const {return m_vPosition.y >= vRenderScreenArea.y ;}
+    bool IsHittingTop() const {return m_vPosition.y <= 0.0f ;}
 
-    eBatMoveDirection GetMovementDirection() const { return m_eDesiredMoveDirection; }
-    void SetMovementDirection( eBatMoveDirection _direction ){ m_eDesiredMoveDirection = _direction ;}
+    bool IsBouncing(float);
 
+    eBatMoveDirection DetermCurrentMoveDirection(sf::RenderWindow* pRenderWindow );
+
+    eBatMoveDirection GetDesiredMoveDirection() const { return m_eDesiredMoveDirection; }
+    void SetDesiredMoveDirection( eBatMoveDirection _direction ){ m_eDesiredMoveDirection = _direction ;}
+
+    eBatMoveDirection GetCurrentMoveDirection() const { return m_eCurrentMoveDirection; }
+    void SetCurrentMoveDirection( eBatMoveDirection _direction ){ m_eCurrentMoveDirection = _direction ;}
 
 
     private:
         sf::Vector2f m_vPosition;
         sf::RectangleShape m_hRectShape;
 
+        ePlayerNumber m_ePlayerNumber;
+
         eBatMoveDirection m_eDesiredMoveDirection = eBatMoveDirection::NONE;
+        eBatMoveDirection m_eCurrentMoveDirection = eBatMoveDirection::NONE;
+
         const float m_fYaccel = 12.0f;
         const float m_fYtopSpeed = 20.00f;
-        const float m_fYdecaySpeed = 0.999f;
+        const float m_fYdecaySpeed = 0.995f;
         float m_fVelocity = 0.0f;
+        float m_fSpeed = 0.0f;
 };
