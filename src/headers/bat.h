@@ -20,7 +20,6 @@ class Bat
     Bat();
 
 
-    void DetermDesiredMoveDirection( sf::Event event, sf::RenderWindow* pRenderWindow );
     void CalculateBatSpeed(sf::RenderWindow *pRenderWindow, float fLapsedTime);
 
     sf::Vector2f GetPosition() const { return m_vPosition ;}
@@ -37,7 +36,9 @@ class Bat
     float GetAccel() const {return m_fYaccel ;}
     float GetTopSpeed() const {return m_fYtopSpeed ;}
 
-    void ModifyVelocity( float _speedMod ){m_fVelocity += _speedMod ;}
+    ePlayerNumber GetPlayerNumber() const { return m_ePlayerNumber ;}
+
+    void ModifyVelocity( float _speedMod ){ m_fVelocity += _speedMod ;}
     void DecayVelocity(){ m_fVelocity *= m_fYdecaySpeed ;}
 
     void UpdateTargetYPosition (float _fTargetYpos){ m_vPosition.y += _fTargetYpos;}

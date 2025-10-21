@@ -1,29 +1,16 @@
 #include <headers/bootscreen.h>
 
-BootScreen::BootScreen(tuple rTuple)
+BootScreen::BootScreen(tuple& rTuple)
 {
     CreateBootScreen(rTuple);
     UpdateBootscreen(rTuple,m_hClock);
 };
+
 //-----------------------------------------------------------------
 
-sf::CircleShape BootScreen::CreateCircleShape(BootScreen* pBootScreen,float fradius)
-{
-    sf::CircleShape circle(30.0f);
-    float circleMidPoint = circle.getRadius();
-    circle.setOrigin(circleMidPoint,circleMidPoint);
-    circle.setPosition(pBootScreen->GetScreenCenter());
-
-    return circle;
-}
-//-----------------------------------------------------------------
-
-void BootScreen::CreateBootScreen(tuple rTuple)
+void BootScreen::CreateBootScreen(tuple& rTuple)
 {
     SetScreenCenter(CalculateScreenCenter(rTuple.pRenderWindow));
-
-    sf::CircleShape circle = CreateCircleShape(this, 300.0);
-    SetCircleShape(circle);
 }
 
 //-----------------------------------------------------------------
@@ -39,7 +26,7 @@ sf::Vector2f BootScreen::CalculateScreenCenter(sf::RenderWindow* pRenderWindow)
 
 //-----------------------------------------------------------------
 
-int BootScreen::UpdateBootscreen(tuple rTuple, sf::Clock &rGameClock)
+int BootScreen::UpdateBootscreen(tuple& rTuple, sf::Clock &rGameClock)
 {
     sf::Music wololo;
     wololo.openFromFile("sfx/song.mp3");
@@ -47,6 +34,7 @@ int BootScreen::UpdateBootscreen(tuple rTuple, sf::Clock &rGameClock)
 
     Bat* pBat1 = rTuple.pBat1;
     Bat* pBat2 = rTuple.pBat2;
+    Ball* pBall = rTuple.pBall;
 
     while (rTuple.pRenderWindow->isOpen())
     {
@@ -57,18 +45,20 @@ int BootScreen::UpdateBootscreen(tuple rTuple, sf::Clock &rGameClock)
             {
                 rTuple.pRenderWindow->close();
             }
-
-            pBat1->DetermDesiredMoveDirection( event, rTuple.pRenderWindow );
-            pBat2->DetermDesiredMoveDirection( event, rTuple.pRenderWindow );
+            Command* command = m_hInputHandler.HandleInput(&event, pBat1);
+            if (command) 
+            {  
+                command->execute(rTuple);
+            }
         }
 
         float fLapsedTime = rGameClock.getElapsedTime().asSeconds();
         pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
         pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
+        sf::RectangleShape pBallShape = pBall->ReferenceShape();
 
         
         rTuple.pRenderWindow->clear();
-        rTuple.pRenderWindow->draw(GetCircleShape());
         if (pBat1->GetCurrentMoveDirection() == eBatMoveDirection::UP)
         {
             rTuple.pMessage->setString("UP");
@@ -84,6 +74,7 @@ int BootScreen::UpdateBootscreen(tuple rTuple, sf::Clock &rGameClock)
         rTuple.pRenderWindow->draw( *rTuple.pMessage );
         rTuple.pRenderWindow->draw( pBat1->GetShape());
         rTuple.pRenderWindow->draw( pBat2->GetShape());
+        rTuple.pRenderWindow->draw( pBall->GetShape() );
         rTuple.pRenderWindow->display();
 
         m_fTimeElapsed += rGameClock.getElapsedTime().asSeconds();

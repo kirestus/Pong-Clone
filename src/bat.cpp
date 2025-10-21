@@ -23,42 +23,6 @@ Bat::Bat()
 
 //-----------------------------------------------------------------
 
-void Bat::DetermDesiredMoveDirection( sf::Event event, sf::RenderWindow* pRenderWindow )
-{
-
-    if(event.type == sf::Event::KeyPressed )
-    {
-        if ( (m_ePlayerNumber == ePlayerNumber::PLAYER1 && (event.key.code ==  sf::Keyboard::W) 
-        || m_ePlayerNumber == ePlayerNumber::PLAYER2 && (event.key.code ==  sf::Keyboard::Up)))
-        {
-           SetDesiredMoveDirection(eBatMoveDirection::UP); 
-        }
-        if ( (m_ePlayerNumber == ePlayerNumber::PLAYER1 && (event.key.code ==  sf::Keyboard::S)
-        || m_ePlayerNumber == ePlayerNumber::PLAYER2 && (event.key.code ==  sf::Keyboard::Down)))
-        {
-           SetDesiredMoveDirection(eBatMoveDirection::DOWN); 
-        }
-    }
-    
-    if (event.type == event.KeyReleased)
-    {
-        if (m_ePlayerNumber == ePlayerNumber::PLAYER1 && (event.key.code ==  sf::Keyboard::W) ||
-            (m_ePlayerNumber == ePlayerNumber::PLAYER2 && (event.key.code ==  sf::Keyboard::Up )))
-        {
-            if (m_eCurrentMoveDirection == eBatMoveDirection::UP)
-            SetDesiredMoveDirection(eBatMoveDirection::NONE);
-        }
-        else if (m_ePlayerNumber == ePlayerNumber::PLAYER1 && (event.key.code ==  sf::Keyboard::S) ||
-            (m_ePlayerNumber == ePlayerNumber::PLAYER2 && (event.key.code ==  sf::Keyboard::Down )))
-        {
-            if (m_eCurrentMoveDirection == eBatMoveDirection::DOWN)
-            SetDesiredMoveDirection(eBatMoveDirection::NONE);
-        }
-    }  
-}
-
-//-----------------------------------------------------------------
-
 eBatMoveDirection Bat::DetermCurrentMoveDirection(sf::RenderWindow* pRenderWindow)
 {
     eBatMoveDirection eCurrentMoveDirection = GetCurrentMoveDirection();
@@ -140,7 +104,7 @@ void Bat::CalculateBatSpeed(sf::RenderWindow* pRenderWindow, float fLapsedTime)
 
     if( ( IsHittingBottom(pRenderWindow->getSize()) || IsHittingTop() ))
     {
-        SetVelocity (GetVelocity()*-1.0 );
+        SetVelocity (GetVelocity()*-0.8 );
     }
     
     //Nudge the bat if its at the top or bottom so it doesnt glitch out

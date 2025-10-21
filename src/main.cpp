@@ -13,6 +13,7 @@ int main()
     
     Bat hPlayer1Bat(sf::Vector2f(50.0f,720/2), ePlayerNumber::PLAYER1);
     Bat hPlayer2Bat(sf::Vector2f(1280-50.0f,720/2), ePlayerNumber::PLAYER2);
+    Ball hBall(ptrWindow);
 
     sf::Font fPongFont;
     fPongFont.loadFromFile("fonts/Vector.ttf");
@@ -26,8 +27,10 @@ int main()
     DataTuple.pRenderWindow = &window;
     DataTuple.pBat1 = &hPlayer1Bat;
     DataTuple.pBat2 = &hPlayer2Bat;
+    DataTuple.pBall = &hBall;
     DataTuple.pMessage = &sText;
     DataTuple.pFont = &fPongFont;
+
 
     BootScreen gameScreen = BootScreen(DataTuple);
 
