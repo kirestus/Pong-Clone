@@ -7,6 +7,8 @@ public:
     virtual void execute(tuple& rTuple) = 0;
 };
 
+//----------------------------------------------------------
+
 class Player1DownCommand : public Command
 {
 public:
@@ -15,6 +17,8 @@ public:
     rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
   }
 };
+
+//----------------------------------------------------------
 
 class Player1UpCommand : public Command
 {
@@ -25,6 +29,8 @@ public:
   }
 };
 
+//----------------------------------------------------------
+
 class Player2DownCommand : public Command
 {
 public:
@@ -33,6 +39,8 @@ public:
     rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
   }
 };
+
+//----------------------------------------------------------
 
 class Player2UpCommand : public Command
 {
@@ -43,6 +51,8 @@ public:
   }
 };
 
+//----------------------------------------------------------
+
 class StartCommand : public Command
 {
 public:
@@ -51,6 +61,8 @@ public:
     rTuple.pBat1->GetCurrentMoveDirection();
   }
 };
+
+//----------------------------------------------------------
 
 class StopPlayer1DownCommand : public Command
 {
@@ -62,6 +74,8 @@ public:
     }
 };
 
+//----------------------------------------------------------
+
 class StopPlayer2DownCommand : public Command
 {
 public:
@@ -72,6 +86,8 @@ public:
     }
 };
 
+//----------------------------------------------------------
+
 class StopPlayer1UpCommand : public Command
 {
 public:
@@ -81,6 +97,8 @@ public:
         rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
     }
 };
+
+//----------------------------------------------------------
 
 class StopPlayer2UpCommand : public Command
 {

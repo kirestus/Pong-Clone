@@ -1,5 +1,6 @@
 #include <headers/bat.h>
 
+
 Bat::Bat(sf::Vector2f vPosition , ePlayerNumber ePlayer)
 {
     m_hRectShape.setPosition(vPosition);
@@ -104,10 +105,19 @@ void Bat::CalculateBatSpeed(sf::RenderWindow* pRenderWindow, float fLapsedTime)
 
     if( ( IsHittingBottom(pRenderWindow->getSize()) || IsHittingTop() ))
     {
+        NudgeBat(pRenderWindow);
         SetVelocity (GetVelocity()*-0.8 );
     }
     
-    //Nudge the bat if its at the top or bottom so it doesnt glitch out
+    UpdateShapeToDesiredTransform();
+}
+
+//-----------------------------------------------------------------
+
+
+void Bat::NudgeBat(sf::RenderWindow* pRenderWindow)
+{
+        //Nudge the bat if its at the top or bottom so it doesnt glitch out
     if( IsHittingTop() )
     {
         sf::Vector2f nudgeDown = sf::Vector2f(GetPosition().x,GetPosition().y+0.1);
@@ -118,7 +128,4 @@ void Bat::CalculateBatSpeed(sf::RenderWindow* pRenderWindow, float fLapsedTime)
         sf::Vector2f nudgeUp = sf::Vector2f(GetPosition().x,GetPosition().y-0.1);
         SetPosition(nudgeUp);
     }
-    UpdateShapeToDesiredTransform();
 }
-
-//-----------------------------------------------------------------

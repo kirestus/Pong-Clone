@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+
 enum class eBatMoveDirection
 {
     NONE,
@@ -15,12 +16,16 @@ enum ePlayerNumber{
 
 class Bat
 {
-    public:
+
+public:
+
+    virtual ~Bat(){};
+
     Bat(sf::Vector2f, ePlayerNumber);
     Bat();
 
-
     void CalculateBatSpeed(sf::RenderWindow *pRenderWindow, float fLapsedTime);
+    void NudgeBat(sf::RenderWindow* pRenderWindow);
 
     sf::Vector2f GetPosition() const { return m_vPosition ;}
     void SetPosition(sf::Vector2f _position) { m_vPosition = _position ; }
@@ -61,18 +66,19 @@ class Bat
     void SetCurrentMoveDirection( eBatMoveDirection _direction ){ m_eCurrentMoveDirection = _direction ;}
 
 
-    private:
-        sf::Vector2f m_vPosition;
-        sf::RectangleShape m_hRectShape;
+private:
 
-        ePlayerNumber m_ePlayerNumber;
+    sf::Vector2f m_vPosition;
+    sf::RectangleShape m_hRectShape;
 
-        eBatMoveDirection m_eDesiredMoveDirection = eBatMoveDirection::NONE;
-        eBatMoveDirection m_eCurrentMoveDirection = eBatMoveDirection::NONE;
+    ePlayerNumber m_ePlayerNumber;
 
-        const float m_fYaccel = 12.0f;
-        const float m_fYtopSpeed = 20.00f;
-        const float m_fYdecaySpeed = 0.995f;
-        float m_fVelocity = 0.0f;
-        float m_fSpeed = 0.0f;
+    eBatMoveDirection m_eDesiredMoveDirection = eBatMoveDirection::NONE;
+    eBatMoveDirection m_eCurrentMoveDirection = eBatMoveDirection::NONE;
+
+    const float m_fYaccel = 12.0f;
+    const float m_fYtopSpeed = 20.00f;
+    const float m_fYdecaySpeed = 0.995f;
+    float m_fVelocity = 0.0f;
+    float m_fSpeed = 0.0f;
 };

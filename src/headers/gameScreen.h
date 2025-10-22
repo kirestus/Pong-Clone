@@ -9,7 +9,7 @@
 class GameScreen 
 {
     public:
-
+        
         GameScreen( tuple& );
 
         sf::Vector2f CalculateScreenCenter(sf::RenderWindow* pRenderWindow);

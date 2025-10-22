@@ -7,12 +7,13 @@
 int main()
 {
     tuple DataTuple; 
+    sf::Vector2f vScreenArea(1024, 768);
 
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "PongClone");
+    sf::RenderWindow window(sf::VideoMode(vScreenArea.x,vScreenArea.y), "PongClone");
     sf::RenderWindow* ptrWindow = &window;
     
-    Bat hPlayer1Bat(sf::Vector2f(50.0f,720/2), ePlayerNumber::PLAYER1);
-    Bat hPlayer2Bat(sf::Vector2f(1280-50.0f,720/2), ePlayerNumber::PLAYER2);
+    Bat hPlayer1Bat(sf::Vector2f(50.0f,vScreenArea.x/2), ePlayerNumber::PLAYER1);
+    Bat hPlayer2Bat(sf::Vector2f(vScreenArea.x-50.0f,vScreenArea.y/2), ePlayerNumber::PLAYER2);
     Ball hBall(ptrWindow);
 
     sf::Font fPongFont;
@@ -22,7 +23,7 @@ int main()
     sText.setFillColor(sf::Color::White);
     sText.setCharacterSize(70);
     sText.setOrigin(sText.getLocalBounds().getSize().x/2,sText.getLocalBounds().getSize().y/2);
-    sText.setPosition(sf::Vector2f(window.getSize().x/2,window.getSize().y+-100.0f) ); // should set this in the middle of the screen will do later
+    sText.setPosition(sf::Vector2f(vScreenArea.x/2,vScreenArea.y+-100.0f) ); // should set this in the middle of the screen will do later
 
     DataTuple.pRenderWindow = &window;
     DataTuple.pBat1 = &hPlayer1Bat;

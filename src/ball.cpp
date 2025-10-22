@@ -9,6 +9,8 @@ Ball::Ball(sf::RenderWindow* pRenderWindow)
     m_sShape.setPosition(m_vBallVector.x ,m_vBallVector.y);
 }
 
+//----------------------------------------------------------
+
 void Ball::StateMachine(eBallState eCurrentBallState, eBallState eDesiredBallState)
 {
     eBallState eNewBallState;
@@ -49,6 +51,8 @@ void Ball::StateMachine(eBallState eCurrentBallState, eBallState eDesiredBallSta
         }
     }
 }
+
+//----------------------------------------------------------
 
 void Ball::UpdateBallPosition()
 {
