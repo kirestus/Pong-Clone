@@ -2,22 +2,22 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include <headers/bootscreen.h>
+#include <headers/gameScreen.h>
 #include <headers/tuple.h>
 #include <headers/inputHandler.h>
 
-class BootScreen 
+class GameScreen 
 {
     public:
 
-        BootScreen( tuple& );
+        GameScreen( tuple& );
 
         sf::Vector2f CalculateScreenCenter(sf::RenderWindow* pRenderWindow);
         sf::Vector2f GetScreenCenter() const {return m_vScreenCenter;}
         void SetScreenCenter(sf::Vector2f fScreenCenter){m_vScreenCenter = fScreenCenter;} 
 
-        void CreateBootScreen(tuple& rTuple); 
-        int UpdateBootscreen(tuple& rTuple, sf::Clock &rTimer);
+        void CreateGameScreen(tuple& rTuple); 
+        int UpdateGamescreen(tuple& rTuple, sf::Clock &rTimer);
 
         sf::Clock GetGameClock() const {return m_hClock;}
 

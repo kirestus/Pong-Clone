@@ -1,21 +1,21 @@
-#include <headers/bootscreen.h>
+#include <headers/gameScreen.h>
 
-BootScreen::BootScreen(tuple& rTuple)
+GameScreen::GameScreen(tuple& rTuple)
 {
-    CreateBootScreen(rTuple);
-    UpdateBootscreen(rTuple,m_hClock);
+    CreateGameScreen(rTuple);
+    UpdateGamescreen(rTuple,m_hClock);
 };
 
 //-----------------------------------------------------------------
 
-void BootScreen::CreateBootScreen(tuple& rTuple)
+void GameScreen::CreateGameScreen(tuple& rTuple)
 {
     SetScreenCenter(CalculateScreenCenter(rTuple.pRenderWindow));
 }
 
 //-----------------------------------------------------------------
 
-sf::Vector2f BootScreen::CalculateScreenCenter(sf::RenderWindow* pRenderWindow)
+sf::Vector2f GameScreen::CalculateScreenCenter(sf::RenderWindow* pRenderWindow)
 {
     sf::Vector2f vScreenCenter;
     vScreenCenter.x = pRenderWindow->getSize().x/2;
@@ -26,7 +26,7 @@ sf::Vector2f BootScreen::CalculateScreenCenter(sf::RenderWindow* pRenderWindow)
 
 //-----------------------------------------------------------------
 
-int BootScreen::UpdateBootscreen(tuple& rTuple, sf::Clock &rGameClock)
+int GameScreen::UpdateGamescreen(tuple& rTuple, sf::Clock &rGameClock)
 {
     sf::Music wololo;
     wololo.openFromFile("sfx/song.mp3");

@@ -1,42 +1,72 @@
 #include <headers/inputHandler.h>
-#include <SFML/System.hpp>
+
+InputHandler::InputHandler()
+{
+    // create new heap objects for each event
+    m_pPlayer1ButtonUp_ = new Player1UpCommand;
+    m_pPlayer1ButtonDown_ = new Player1DownCommand;
+    m_pPlayer2ButtonUp_ = new Player2UpCommand;
+    m_pPlayer2ButtonDown_ = new Player2DownCommand;
+
+    m_pReleasePlayer1ButtonUp_ = new StopPlayer1UpCommand;
+    m_pReleasePlayer2ButtonUp_ = new StopPlayer2UpCommand;
+    m_pReleasePlayer1ButtonDown_ = new StopPlayer1DownCommand;
+    m_pReleasePlayer2ButtonDown_ = new StopPlayer2DownCommand;
+
+    m_pStartGame_ = new StartCommand;
+
+    m_aCommandArray[0] = m_pPlayer1ButtonUp_;
+    m_aCommandArray[1] = m_pPlayer1ButtonDown_;
+    m_aCommandArray[2] = m_pPlayer2ButtonUp_;
+    m_aCommandArray[3] = m_pPlayer2ButtonDown_;
+    m_aCommandArray[4] = m_pReleasePlayer1ButtonUp_;
+    m_aCommandArray[5] = m_pReleasePlayer2ButtonUp_;
+    m_aCommandArray[6] = m_pReleasePlayer1ButtonDown_;
+    m_aCommandArray[7] = m_pReleasePlayer2ButtonDown_;
+    m_aCommandArray[8] = m_pStartGame_;
+}
 
 
-
+InputHandler::~InputHandler()
+{
+    //clean up all the commands on the heap when the input handler is destroyed
+    for(Command* command : m_aCommandArray)
+    {
+        delete command;
+    }
+}
 
 Command* InputHandler::HandleInput( sf::Event* pEvent, Bat* pBat )
 {
     if(pEvent->type == sf::Event::KeyPressed )
     {
         if ( pEvent->key.code ==  sf::Keyboard::W )
-        return pPlayer1ButtonUp_;
+        return m_pPlayer1ButtonUp_;
 
         else if ( pEvent->key.code ==  sf::Keyboard::Up ) 
-        return pPlayer2ButtonUp_;
+        return m_pPlayer2ButtonUp_;
 
         else if ( pEvent->key.code ==  sf::Keyboard::S ) 
-        return pPlayer1ButtonDown_;
+        return m_pPlayer1ButtonDown_;
         
         else if ( pEvent->key.code ==  sf::Keyboard::Down )
-        return pPlayer2ButtonDown_;
+        return m_pPlayer2ButtonDown_;
     }
 
     if (pEvent->type == pEvent->KeyReleased)
     {
         if (pEvent->key.code ==  sf::Keyboard::W)
-        return pReleasePlayer1ButtonUp_;
+        return m_pReleasePlayer1ButtonUp_;
 
         else if (pEvent->key.code ==  sf::Keyboard::Up )
-        return pReleasePlayer2ButtonUp_;
+        return m_pReleasePlayer2ButtonUp_;
 
         else if (pEvent->key.code ==  sf::Keyboard::S)
-        return pReleasePlayer1ButtonDown_;
+        return m_pReleasePlayer1ButtonDown_;
 
         else if ( pEvent->key.code ==  sf::Keyboard::Down )
-        return pReleasePlayer2ButtonDown_;
+        return m_pReleasePlayer2ButtonDown_;
     }  
-
-
 
     //Remove this after i do the next part
     return NULL;
