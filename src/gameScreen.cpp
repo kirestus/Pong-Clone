@@ -1,16 +1,24 @@
 #include <headers/gameScreen.h>
 
-GameScreen::GameScreen(tuple& rTuple)
+GameScreen::GameScreen(DataStruct& rTuple)
 {
     CreateGameScreen(rTuple);
     UpdateGamescreen(rTuple,m_hClock);
-};
+}
 
 //-----------------------------------------------------------------
 
-void GameScreen::CreateGameScreen(tuple& rTuple)
+void GameScreen::CreateGameScreen(DataStruct& rTuple)
 {
     SetScreenCenter(CalculateScreenCenter(rTuple.pRenderWindow));
+    rTuple.pWorldGameState = new GameState;
+}
+
+//-----------------------------------------------------------------
+
+GameScreen::~GameScreen()
+{
+    delete m_pGameScreenGameState;
 }
 
 //-----------------------------------------------------------------
@@ -26,7 +34,7 @@ sf::Vector2f GameScreen::CalculateScreenCenter(sf::RenderWindow* pRenderWindow)
 
 //-----------------------------------------------------------------
 
-int GameScreen::UpdateGamescreen(tuple& rTuple, sf::Clock &rGameClock)
+int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 {
     sf::Music wololo;
     wololo.openFromFile("sfx/song.mp3");
@@ -52,30 +60,38 @@ int GameScreen::UpdateGamescreen(tuple& rTuple, sf::Clock &rGameClock)
             }
         }
 
+        rTuple.pWorldGameState->DetermineGameState();
+        
         float fLapsedTime = rGameClock.getElapsedTime().asSeconds();
-        pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
-        pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
-        sf::RectangleShape pBallShape = pBall->ReferenceShape();
 
+        if ( rTuple.pWorldGameState->GetCurrentGameState() != Paused )
+        {
+            pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
+            pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
+        }
+
+        sf::RectangleShape pBallShape = pBall->ReferenceShape();
         
         rTuple.pRenderWindow->clear();
-        if (pBat1->GetCurrentMoveDirection() == eBatMoveDirection::UP)
+        if (rTuple.pWorldGameState->GetCurrentGameState() == eGameState::Paused)
         {
-            rTuple.pMessage->setString("UP");
+            rTuple.pMessage->setString("GAME PAUSED PRESS SPACE TO RESUME");
         }
-        else if (pBat1->GetCurrentMoveDirection() == eBatMoveDirection::DOWN)
+        else if ((rTuple.pWorldGameState->GetCurrentGameState() == eGameState::Boot))
         {
-            rTuple.pMessage->setString("DOWN");
+            rTuple.pMessage->setString("BOOT");
         }
         else
         {
-            rTuple.pMessage->setString("NONE");
+            rTuple.pMessage->setString("");
         }
-        rTuple.pRenderWindow->draw( *rTuple.pMessage );
-        rTuple.pRenderWindow->draw( pBat1->GetShape());
-        rTuple.pRenderWindow->draw( pBat2->GetShape());
-        rTuple.pRenderWindow->draw( pBall->GetShape() );
-        rTuple.pRenderWindow->display();
+
+            rTuple.pRenderWindow->draw( *rTuple.pMessage );
+            rTuple.pRenderWindow->draw( pBat1->GetShape());
+            rTuple.pRenderWindow->draw( pBat2->GetShape());
+            rTuple.pRenderWindow->draw( pBall->GetShape() );
+            rTuple.pRenderWindow->display();
+
 
         m_fTimeElapsed += rGameClock.getElapsedTime().asSeconds();
 

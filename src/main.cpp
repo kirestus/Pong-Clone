@@ -2,17 +2,17 @@
 #include <headers/gameScreen.h>
 #include <SFML/System/String.hpp>
 #include <headers/bat.h>
-#include <headers/tuple.h>
+#include <headers/dataStruct.h>
 
 int main()
 {
-    tuple DataTuple; 
+    DataStruct DataTuple; 
     sf::Vector2f vScreenArea(1024, 768);
 
     sf::RenderWindow window(sf::VideoMode(vScreenArea.x,vScreenArea.y), "PongClone");
     sf::RenderWindow* ptrWindow = &window;
     
-    Bat hPlayer1Bat(sf::Vector2f(50.0f,vScreenArea.x/2), ePlayerNumber::PLAYER1);
+    Bat hPlayer1Bat(sf::Vector2f(50.0f,vScreenArea.y/2), ePlayerNumber::PLAYER1);
     Bat hPlayer2Bat(sf::Vector2f(vScreenArea.x-50.0f,vScreenArea.y/2), ePlayerNumber::PLAYER2);
     Ball hBall(ptrWindow);
 

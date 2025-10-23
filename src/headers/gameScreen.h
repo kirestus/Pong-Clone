@@ -3,29 +3,33 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <headers/gameScreen.h>
-#include <headers/tuple.h>
+#include <headers/dataStruct.h>
 #include <headers/inputHandler.h>
+#include <headers/gameState.h>
 
 class GameScreen 
 {
     public:
-        
-        GameScreen( tuple& );
+
+        GameScreen( DataStruct& );
+        virtual ~GameScreen();
 
         sf::Vector2f CalculateScreenCenter(sf::RenderWindow* pRenderWindow);
         sf::Vector2f GetScreenCenter() const {return m_vScreenCenter;}
         void SetScreenCenter(sf::Vector2f fScreenCenter){m_vScreenCenter = fScreenCenter;} 
 
-        void CreateGameScreen(tuple& rTuple); 
-        int UpdateGamescreen(tuple& rTuple, sf::Clock &rTimer);
+        void CreateGameScreen(DataStruct& rTuple); 
+        int UpdateGamescreen(DataStruct& rTuple, sf::Clock &rTimer);
 
-        sf::Clock GetGameClock() const {return m_hClock;}
+        sf::Clock GetGameClock() const { return m_hClock; }
+
+        GameState* GetGameState() const { return m_pGameScreenGameState ;}
 
     private:
+        GameState* m_pGameScreenGameState = nullptr;
         InputHandler m_hInputHandler;         
         sf::Vector2f m_vScreenCenter;
         sf::Clock m_hClock;
         float m_fTimeElapsed = 0.00f;
-
 };
 

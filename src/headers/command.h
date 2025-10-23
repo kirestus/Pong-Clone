@@ -1,10 +1,10 @@
-#include <headers/tuple.h>
+#include <headers/dataStruct.h>
 
 class Command
 {  
 public:
     virtual ~Command() {}
-    virtual void execute(tuple& rTuple) = 0;
+    virtual void execute(DataStruct& rTuple) = 0;
 };
 
 //----------------------------------------------------------
@@ -12,7 +12,7 @@ public:
 class Player1DownCommand : public Command
 {
 public:
-  virtual void execute(tuple& rTuple)
+  virtual void execute(DataStruct& rTuple)
   {
     rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
   }
@@ -23,7 +23,7 @@ public:
 class Player1UpCommand : public Command
 {
 public:
-  virtual void execute(tuple& rTuple)
+  virtual void execute(DataStruct& rTuple)
   {
     rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::UP);
   }
@@ -34,7 +34,7 @@ public:
 class Player2DownCommand : public Command
 {
 public:
-  virtual void execute(tuple& rTuple)
+  virtual void execute(DataStruct& rTuple)
   {
     rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
   }
@@ -45,7 +45,7 @@ public:
 class Player2UpCommand : public Command
 {
 public:
-  virtual void execute(tuple& rTuple)
+  virtual void execute(DataStruct& rTuple)
   {
     rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::UP);
   }
@@ -56,10 +56,18 @@ public:
 class StartCommand : public Command
 {
 public:
-  virtual void execute(tuple& rTuple)
+  virtual void execute(DataStruct& rTuple)
   {
-    rTuple.pBat1->GetCurrentMoveDirection();
+    if ( rTuple.pWorldGameState->GetCurrentGameState() == eGameState::Paused )
+    {
+        rTuple.pWorldGameState->SetDesiredGamestate(eGameState::Running);
+    }
+    else
+    {
+        rTuple.pWorldGameState->SetDesiredGamestate(eGameState::Paused);
+    }
   }
+
 };
 
 //----------------------------------------------------------
@@ -67,7 +75,7 @@ public:
 class StopPlayer1DownCommand : public Command
 {
 public:
-    virtual void execute( tuple& rTuple )
+    virtual void execute( DataStruct& rTuple )
     {
         if (rTuple.pBat1->GetCurrentMoveDirection() == eBatMoveDirection::DOWN)
         rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
@@ -79,7 +87,7 @@ public:
 class StopPlayer2DownCommand : public Command
 {
 public:
-    virtual void execute( tuple& rTuple )
+    virtual void execute( DataStruct& rTuple )
     {
         if (rTuple.pBat2->GetCurrentMoveDirection() == eBatMoveDirection::DOWN)
         rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
@@ -91,7 +99,7 @@ public:
 class StopPlayer1UpCommand : public Command
 {
 public:
-    virtual void execute( tuple& rTuple )
+    virtual void execute( DataStruct& rTuple )
     {
         if (rTuple.pBat1->GetCurrentMoveDirection() == eBatMoveDirection::UP)
         rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
@@ -103,7 +111,7 @@ public:
 class StopPlayer2UpCommand : public Command
 {
 public:
-    virtual void execute( tuple& rTuple )
+    virtual void execute( DataStruct& rTuple )
     {
         if (rTuple.pBat2->GetCurrentMoveDirection() == eBatMoveDirection::UP)
         rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);

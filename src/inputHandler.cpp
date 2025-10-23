@@ -51,6 +51,9 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, Bat* pBat )
         
         else if ( pEvent->key.code ==  sf::Keyboard::Down )
         return m_pPlayer2ButtonDown_;
+
+        else if ( pEvent->key.code == sf::Keyboard::Space)
+        return m_pStartGame_;
     }
 
     if (pEvent->type == pEvent->KeyReleased)
