@@ -7,6 +7,11 @@ void GameState::DetermineGameState()
     eGameState eDesiredGameState = GetDesiredGameState();
     eGameState eNewGameState = eCurrentGameState;
 
+    if ( eDesiredGameState == eGameState::Quit)
+    {
+        eNewGameState = Quit;
+    }
+    
     if(eCurrentGameState == eGameState::Boot)
     {
         if( eDesiredGameState == eGameState::Running )

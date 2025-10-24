@@ -72,25 +72,15 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 
         sf::RectangleShape pBallShape = pBall->ReferenceShape();
         
+        rTuple.pMessage->setString(DebugTextGameState(rTuple.pWorldGameState->GetCurrentGameState()));
         rTuple.pRenderWindow->clear();
-        if (rTuple.pWorldGameState->GetCurrentGameState() == eGameState::Paused)
-        {
-            rTuple.pMessage->setString("GAME PAUSED PRESS SPACE TO RESUME");
-        }
-        else if ((rTuple.pWorldGameState->GetCurrentGameState() == eGameState::Boot))
-        {
-            rTuple.pMessage->setString("BOOT");
-        }
-        else
-        {
-            rTuple.pMessage->setString("");
-        }
 
-            rTuple.pRenderWindow->draw( *rTuple.pMessage );
-            rTuple.pRenderWindow->draw( pBat1->GetShape());
-            rTuple.pRenderWindow->draw( pBat2->GetShape());
-            rTuple.pRenderWindow->draw( pBall->GetShape() );
-            rTuple.pRenderWindow->display();
+
+        rTuple.pRenderWindow->draw( *rTuple.pMessage );
+        rTuple.pRenderWindow->draw( pBat1->GetShape());
+        rTuple.pRenderWindow->draw( pBat2->GetShape());
+        rTuple.pRenderWindow->draw( pBall->GetShape() );
+        rTuple.pRenderWindow->display();
 
 
         m_fTimeElapsed += rGameClock.getElapsedTime().asSeconds();
@@ -102,3 +92,29 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 }
 
 //----------------------------------------------------------
+
+sf::String GameScreen::DebugTextGameState( eGameState eGameState )
+{
+    if (eGameState == eGameState::Paused)
+    {
+        return sf::String("Paused:");
+    }
+    else if (eGameState == eGameState::Boot)
+    {
+        return sf::String("Boot:");
+    }
+    else if (eGameState == eGameState::Running)
+    {
+        return sf::String("Running:");
+    }
+    else if (eGameState == eGameState::GameOver)
+    {
+        return sf::String("GameOver:");
+    }
+    else
+    {
+        return sf::String("");
+    }
+
+    return sf::String("");
+}

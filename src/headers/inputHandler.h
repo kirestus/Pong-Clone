@@ -19,6 +19,7 @@ private:
     Command* m_pReleasePlayer2ButtonDown_ = nullptr; ;
 
     Command* m_pStartGame_ = nullptr; ;
+    Command* m_pQuitGame_ = nullptr; ;
 
-    Command* m_aCommandArray[9];
+    Command* m_aCommandArray[10];
 };

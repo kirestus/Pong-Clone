@@ -5,6 +5,7 @@ enum eGameState
     Paused,
     GameOver,
     Running,
+    Quit
 };
 
 class GameState{

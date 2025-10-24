@@ -14,6 +14,7 @@ InputHandler::InputHandler()
     m_pReleasePlayer2ButtonDown_ = new StopPlayer2DownCommand;
 
     m_pStartGame_ = new StartCommand;
+    m_pQuitGame_ = new QuitCommand;
 
     m_aCommandArray[0] = m_pPlayer1ButtonUp_;
     m_aCommandArray[1] = m_pPlayer1ButtonDown_;
@@ -24,6 +25,7 @@ InputHandler::InputHandler()
     m_aCommandArray[6] = m_pReleasePlayer1ButtonDown_;
     m_aCommandArray[7] = m_pReleasePlayer2ButtonDown_;
     m_aCommandArray[8] = m_pStartGame_;
+    m_aCommandArray[9] = m_pQuitGame_;
 }
 
 
@@ -54,6 +56,9 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, Bat* pBat )
 
         else if ( pEvent->key.code == sf::Keyboard::Space)
         return m_pStartGame_;
+
+        else if ( pEvent->key.code == sf::Keyboard::Escape)
+        return m_pQuitGame_;
     }
 
     if (pEvent->type == pEvent->KeyReleased)

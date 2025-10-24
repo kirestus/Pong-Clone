@@ -72,6 +72,17 @@ public:
 
 //----------------------------------------------------------
 
+class QuitCommand : public Command
+{
+public:
+  virtual void execute(DataStruct& rTuple)
+  {
+      rTuple.pRenderWindow->close();
+  }
+};
+
+//----------------------------------------------------------
+
 class StopPlayer1DownCommand : public Command
 {
 public:
@@ -117,3 +128,6 @@ public:
         rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
     }
 };
+
+//----------------------------------------------------------
+
