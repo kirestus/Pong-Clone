@@ -30,14 +30,14 @@ class Ball
 
         void SetBallVector(sf::Vector3f _vector){m_vBallVector = _vector ;}
 
-        void StateMachine( eBallState eCurrentBallState, eBallState eDesiredBallState );
+        void StateMachine(bool);
         void UpdateBallPosition(float);
 
 
     private:
 
-        eBallState eCurrentBallState = eBallState::ResetGamePosition;
-        eBallState eDesiredBallState = eBallState::None;
+        eBallState m_eCurrentBallState = eBallState::ResetGamePosition;
+        eBallState m_eDesiredBallState = eBallState::None;
         sf::Vector3f m_vBallVector;
         sf::RectangleShape m_sShape;
         float m_fSpeed = 120.0f;

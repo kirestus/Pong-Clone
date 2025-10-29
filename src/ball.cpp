@@ -11,52 +11,53 @@ Ball::Ball(sf::RenderWindow* pRenderWindow)
 
 //----------------------------------------------------------
 
-void Ball::StateMachine(eBallState eCurrentBallState, eBallState eDesiredBallState)
+void Ball::StateMachine(bool isHittingPaddle)
 {
     eBallState eNewBallState;
-    if (eCurrentBallState == eBallState::ResetGamePosition )
+    if (m_eCurrentBallState == eBallState::ResetGamePosition )
     {
         //game reset state will go to either left or right
-        if (eDesiredBallState == eBallState::LEFT)
+        if (m_eDesiredBallState == eBallState::LEFT)
         {
-            eNewBallState = eDesiredBallState;
+            eNewBallState = m_eDesiredBallState;
         }
-        else if(eDesiredBallState == eBallState::RIGHT)
+        else if(m_eDesiredBallState == eBallState::RIGHT)
         {
-            eNewBallState = eDesiredBallState;
+            eNewBallState = m_eDesiredBallState;
         }
     }
-    else if( eCurrentBallState == eBallState::LEFT || eCurrentBallState == eBallState::RIGHT )
+    else if(m_eCurrentBallState == eBallState::LEFT || m_eCurrentBallState == eBallState::RIGHT )
     {
-        if ( eDesiredBallState == eBallState::LEFT || eCurrentBallState == eBallState::RIGHT)
+        if ( m_eDesiredBallState == eBallState::LEFT || m_eCurrentBallState == eBallState::RIGHT)
         {
-            if(eNewBallState != eCurrentBallState)
+            if(eNewBallState != m_eCurrentBallState)
             {
                 // send the ball back the other way
-                eNewBallState = eDesiredBallState ;
+                eNewBallState = m_eDesiredBallState ;
                 m_fSpeed *= -1;
                 //todo change the balls rotation so the ball isnt just moving back and fourth
                 //maybe add some degree of randomization to it or even calculate spin based on the paddle speed on contact
             }
         }
-        else if( eCurrentBallState == eBallState::GoalOnPlayer1 )
+        else if( m_eCurrentBallState == eBallState::GoalOnPlayer1 )
         {
             //todo Scoreboard handling will be done here
             eNewBallState = eBallState::AtPlayer1 ;
         }
-        else if( eCurrentBallState == eBallState::GoalOnPlayer2 )
+        else if( m_eCurrentBallState == eBallState::GoalOnPlayer2 )
         {
             //todo Scoreboard handling will be done here
             eNewBallState = eBallState::AtPlayer2 ;
         }
     }
+    m_eCurrentBallState = eNewBallState;
 }
 
 //----------------------------------------------------------
 
 void Ball::UpdateBallPosition(float fDeltaT)
 {
-    // need to copy the physics over from the bat to stop the ball from being so linear
+    // need to copy the physics over from the bat to stop the ball from being so
     m_vBallVector.x += GetSpeed()*fDeltaT;
     m_sShape.setPosition(GetTranslationPosition().x, GetTranslationPosition().y);
 

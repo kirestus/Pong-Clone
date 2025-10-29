@@ -63,15 +63,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         rTuple.pWorldGameState->DetermineGameState();
         float fLapsedTime = rGameClock.getElapsedTime().asSeconds();
 
-        bool bIsCollidingWithP1 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat1->GetShape().getGlobalBounds());
-        bool bIsCollidingWithP2 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat2->GetShape().getGlobalBounds());
-
-
-        if (bIsCollidingWithP1 || bIsCollidingWithP2)
-        {
-            /// this is returning true, somehting is broken with collision check
-            //return;
-        }
+        
 
         sf::RectangleShape pBallShape = pBall->ReferenceShape();
 
@@ -80,6 +72,16 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
             pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
             pBall->UpdateBallPosition(fLapsedTime);
+
+            bool bIsCollidingWithP1 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat1->GetShape().getGlobalBounds());
+            bool bIsCollidingWithP2 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat2->GetShape().getGlobalBounds());
+
+            if (bIsCollidingWithP1 || bIsCollidingWithP2)
+            {
+                sf::FloatRect testRect = rTuple.pBall->GetShape().getGlobalBounds();
+                sf::FloatRect testRect2 = rTuple.pBat2->GetShape().getGlobalBounds();
+                pBall->StateMachine(bIsCollidingWithP1 || bIsCollidingWithP2);
+            }
         }
         
         rTuple.pMessage->setString(DebugTextGameState(rTuple.pWorldGameState->GetCurrentGameState()));
@@ -131,11 +133,7 @@ sf::String GameScreen::DebugTextGameState( eGameState eGameState )
 
 bool GameScreen::isBallCollidingWithTarget(sf::FloatRect box1, sf::FloatRect box2)
 {
-    if( box1.left < box2.left + box2.width && box1.left + box1.width > box2.left )
-    {
-        return true;
-    }
-    else if ( box1.top < box2.top + box2.height && box1.top + box1.height > box2.top )
+    if( box1.intersects(box2) )
     {
         return true;
     }
