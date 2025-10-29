@@ -55,7 +55,7 @@ public:
     bool IsHittingBottom(sf::Vector2u vRenderScreenArea) const {return m_vPosition.y >= vRenderScreenArea.y ;}
     bool IsHittingTop() const {return m_vPosition.y <= 0.0f ;}
 
-    bool IsBouncing(float);
+    bool IsBouncing(float fSpeed);
 
     eBatMoveDirection DetermCurrentMoveDirection(sf::RenderWindow* pRenderWindow );
 
@@ -77,7 +77,7 @@ private:
     eBatMoveDirection m_eCurrentMoveDirection = eBatMoveDirection::NONE;
 
     const float m_fYaccel = 12.0f;
-    const float m_fYtopSpeed = 20.00f;
+    const float m_fYtopSpeed = 12.00f;
     const float m_fYdecaySpeed = 0.995f;
     float m_fVelocity = 0.0f;
     float m_fSpeed = 0.0f;

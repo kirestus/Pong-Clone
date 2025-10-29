@@ -2,11 +2,11 @@
 
 cogCollider::cogCollider()
 {
-    m_pColliderRect = new sf::RectangleShape();
+    //m_pColliderRect = new sf::RectangleShape();
 };
 
 cogCollider::~cogCollider()
 {
-    delete m_pColliderRect;
+    //delete m_pColliderRect;
 };
 

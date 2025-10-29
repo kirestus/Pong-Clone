@@ -72,8 +72,8 @@ eBatMoveDirection Bat::DetermCurrentMoveDirection(sf::RenderWindow* pRenderWindo
 
 bool Bat::IsBouncing(float fSpeed)
 {
-    return (GetDesiredMoveDirection() == eBatMoveDirection::UP && fSpeed > 0 )||
-    (GetDesiredMoveDirection() == eBatMoveDirection::DOWN && fSpeed < 0);
+    return ((GetDesiredMoveDirection() == eBatMoveDirection::UP && fSpeed > 0 )||
+    (GetDesiredMoveDirection() == eBatMoveDirection::DOWN && fSpeed < 0));
 }
 
 //-----------------------------------------------------------------
@@ -81,32 +81,39 @@ bool Bat::IsBouncing(float fSpeed)
 void Bat::CalculateBatSpeed(sf::RenderWindow* pRenderWindow, float fLapsedTime)
 {
     eBatMoveDirection newMoveDirection = DetermCurrentMoveDirection(pRenderWindow);
-    float fSpeed =  GetVelocity() * fLapsedTime;
     UpdateDesiredToShapeTransform();
+    float fSpeed =  GetVelocity() * fLapsedTime;
 
-    if (abs(fSpeed) < GetTopSpeed())
+    if ( fSpeed < GetTopSpeed() || fSpeed > GetTopSpeed() *-1 )
     {
         SetPosition(sf::Vector2f(GetPosition().x, GetPosition().y + fSpeed ));
     }
 
-    if (newMoveDirection == eBatMoveDirection::UP )
+    if (newMoveDirection == eBatMoveDirection::UP && abs(fSpeed) < GetTopSpeed())
     {
-        ModifyVelocity( - abs( GetAccel() ));
+        if (!IsBouncing(fSpeed) )
+        {
+            ModifyVelocity( - ( GetAccel() ));
+        }
+        else{
+            ModifyVelocity( - ( GetAccel()*1.4 ));
+        }
     }
-    else if (newMoveDirection == eBatMoveDirection::DOWN )
+    else if (newMoveDirection == eBatMoveDirection::DOWN && abs(fSpeed) < GetTopSpeed())
     { 
-        ModifyVelocity( + abs( GetAccel() ));
-    }
-
-    if (IsBouncing(fSpeed))
-    {
-        DecayVelocity();
+        if (!IsBouncing(fSpeed))
+        {
+            ModifyVelocity( ( GetAccel() ));
+        }
+        else{
+            ModifyVelocity(  ( GetAccel()*1.4 ));
+        }
     }
 
     if( ( IsHittingBottom(pRenderWindow->getSize()) || IsHittingTop() ))
     {
         NudgeBat(pRenderWindow);
-        SetVelocity (GetVelocity()*-0.8 );
+        SetVelocity(0.0f);
     }
     
     UpdateShapeToDesiredTransform();

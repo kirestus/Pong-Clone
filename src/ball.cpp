@@ -54,11 +54,10 @@ void Ball::StateMachine(eBallState eCurrentBallState, eBallState eDesiredBallSta
 
 //----------------------------------------------------------
 
-void Ball::UpdateBallPosition()
+void Ball::UpdateBallPosition(float fDeltaT)
 {
-    sf::Vector2f vBallPosition = GetTranslationPosition();
-    float fBallRotation = GetBallRotation();
-
-    sf::RectangleShape sBallShape = GetShape();
+    // need to copy the physics over from the bat to stop the ball from being so linear
+    m_vBallVector.x += GetSpeed()*fDeltaT;
+    m_sShape.setPosition(GetTranslationPosition().x, GetTranslationPosition().y);
 
 }
