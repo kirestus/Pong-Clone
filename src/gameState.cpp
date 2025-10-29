@@ -22,6 +22,10 @@ void GameState::DetermineGameState()
         {
             eNewGameState = Paused;
         }
+        else
+        {
+            eNewGameState = Paused;
+        }
     }
     else if ( eCurrentGameState == eGameState::GameOver )
     {

@@ -15,6 +15,9 @@ class GameScreen
         virtual ~GameScreen();
 
         bool isBallCollidingWithTarget(sf::FloatRect box1, sf::FloatRect box2);
+        bool isBallHittingWall(sf::FloatRect box1, sf::RenderWindow* pRenderWindow);
+        bool isBallHittingGoal( sf::FloatRect box1, sf::RenderWindow* pRenderWindow );
+
         sf::Vector2f CalculateScreenCenter(sf::RenderWindow* pRenderWindow);
         sf::Vector2f GetScreenCenter() const {return m_vScreenCenter;}
         void SetScreenCenter(sf::Vector2f fScreenCenter){m_vScreenCenter = fScreenCenter;} 

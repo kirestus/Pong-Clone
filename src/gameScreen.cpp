@@ -67,7 +67,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 
         sf::RectangleShape pBallShape = pBall->ReferenceShape();
 
-        if ( rTuple.pWorldGameState->GetCurrentGameState() != Paused )
+        if ( rTuple.pWorldGameState->GetCurrentGameState() != Paused && rTuple.pWorldGameState->GetCurrentGameState() != Boot )
         {
             pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
             pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
@@ -75,12 +75,15 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 
             bool bIsCollidingWithP1 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat1->GetShape().getGlobalBounds());
             bool bIsCollidingWithP2 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat2->GetShape().getGlobalBounds());
+            bool bIsCollidingWithWalls = isBallHittingWall(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
+            bool bDidPLayerScore = isBallHittingGoal(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
 
-            if (bIsCollidingWithP1 || bIsCollidingWithP2)
+            pBall->OnBatCollision(bIsCollidingWithP1 || bIsCollidingWithP2);
+            pBall->OnWallCollision(bIsCollidingWithWalls);
+            if(bDidPLayerScore)
             {
-                sf::FloatRect testRect = rTuple.pBall->GetShape().getGlobalBounds();
-                sf::FloatRect testRect2 = rTuple.pBat2->GetShape().getGlobalBounds();
-                pBall->StateMachine(bIsCollidingWithP1 || bIsCollidingWithP2);
+                pBall->OnScoreGoal(bDidPLayerScore, 0);
+                rTuple.pWorldGameState->SetDesiredGamestate(eGameState::GameOver);
             }
         }
         
@@ -137,8 +140,36 @@ bool GameScreen::isBallCollidingWithTarget(sf::FloatRect box1, sf::FloatRect box
     {
         return true;
     }
-    else
+    return false;
+}
+
+//----------------------------------------------------------
+
+bool GameScreen::isBallHittingWall(sf::FloatRect box1, sf::RenderWindow* pRenderWindow)
+{
+    float rectTop = 0.0f;
+    float rectBottom = pRenderWindow->getSize().y;
+    if (box1.top+(box1.height) > rectBottom || box1.top < rectTop)
     {
-        return false;
+        return true;
     }
+    return false;
+}
+
+bool GameScreen::isBallHittingGoal( sf::FloatRect box1, sf::RenderWindow* pRenderWindow )
+{
+    float fLeftGoalPosition = 0.0f;
+    float fRightGoalPosition = pRenderWindow->getSize().x;
+
+    if  (box1.left < fLeftGoalPosition )
+    {
+        //give player 2 a goal and reset the game
+        return true;
+    }
+    else if (box1.left+box1.width > fRightGoalPosition)
+    {
+        //give player 1 a goal
+        return true;
+    }
+    return false;
 }
