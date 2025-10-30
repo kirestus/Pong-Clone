@@ -66,6 +66,10 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         
 
         sf::RectangleShape pBallShape = pBall->ReferenceShape();
+        if (rTuple.pWorldGameState->GetCurrentGameState() == Boot)
+        {
+            ResetGame(rTuple);
+        }
 
         if ( rTuple.pWorldGameState->GetCurrentGameState() != Paused && rTuple.pWorldGameState->GetCurrentGameState() != Boot )
         {
@@ -73,18 +77,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
             pBall->UpdateBallPosition(fLapsedTime);
 
-            bool bIsCollidingWithP1 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat1->GetShape().getGlobalBounds());
-            bool bIsCollidingWithP2 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat2->GetShape().getGlobalBounds());
-            bool bIsCollidingWithWalls = isBallHittingWall(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
-            bool bDidPLayerScore = isBallHittingGoal(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
-
-            pBall->OnBatCollision(bIsCollidingWithP1 || bIsCollidingWithP2);
-            pBall->OnWallCollision(bIsCollidingWithWalls);
-            if(bDidPLayerScore)
-            {
-                pBall->OnScoreGoal(bDidPLayerScore, 0);
-                rTuple.pWorldGameState->SetDesiredGamestate(eGameState::GameOver);
-            }
+            CheckCollisions(rTuple);
         }
         
         rTuple.pMessage->setString(DebugTextGameState(rTuple.pWorldGameState->GetCurrentGameState()));
@@ -156,6 +149,8 @@ bool GameScreen::isBallHittingWall(sf::FloatRect box1, sf::RenderWindow* pRender
     return false;
 }
 
+//----------------------------------------------------------
+
 bool GameScreen::isBallHittingGoal( sf::FloatRect box1, sf::RenderWindow* pRenderWindow )
 {
     float fLeftGoalPosition = 0.0f;
@@ -172,4 +167,34 @@ bool GameScreen::isBallHittingGoal( sf::FloatRect box1, sf::RenderWindow* pRende
         return true;
     }
     return false;
+}
+
+//----------------------------------------------------------
+
+void GameScreen::ResetGame(DataStruct rTuple)
+{
+    sf::Vector2u vScreenArea = rTuple.pRenderWindow->getSize();
+    rTuple.pBat1->SetPosition(sf::Vector2f(50.0f,vScreenArea.y/2));
+    rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
+    rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
+    rTuple.pBat2->SetPosition(sf::Vector2f(vScreenArea.x-50.0f,vScreenArea.y/2) );
+    rTuple.pBall->SetBallVector(sf::Vector3f(vScreenArea.x/2,vScreenArea.y/2, 0.00f));
+}
+
+
+void GameScreen::CheckCollisions(DataStruct rTuple)
+{
+    bool bIsCollidingWithP1 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat1->GetShape().getGlobalBounds());
+    bool bIsCollidingWithP2 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat2->GetShape().getGlobalBounds());
+    bool bIsCollidingWithWalls = isBallHittingWall(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
+    bool bDidPLayerScore = isBallHittingGoal(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
+
+    rTuple.pBall->OnBatCollision(bIsCollidingWithP1 || bIsCollidingWithP2);
+    rTuple.pBall->OnWallCollision(bIsCollidingWithWalls);
+    if(bDidPLayerScore)
+    {
+        rTuple.pBall->OnScoreGoal(bDidPLayerScore, 0);
+        rTuple.pWorldGameState->SetDesiredGamestate(eGameState::GameOver);
+    }
+
 }

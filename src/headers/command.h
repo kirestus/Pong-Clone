@@ -62,6 +62,10 @@ public:
     {
         rTuple.pWorldGameState->SetDesiredGamestate(eGameState::Running);
     }
+    else if (rTuple.pWorldGameState->GetCurrentGameState() == eGameState::GameOver)
+    {
+        rTuple.pWorldGameState->SetDesiredGamestate(eGameState::Boot);
+    }
     else
     {
         rTuple.pWorldGameState->SetDesiredGamestate(eGameState::Paused);

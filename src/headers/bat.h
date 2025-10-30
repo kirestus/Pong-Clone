@@ -52,8 +52,8 @@ public:
     void UpdateDesiredToShapeTransform(){m_vPosition = m_hRectShape.getPosition() ;}
 
     bool IsWithinGameBounds(sf::Vector2u vRenderScreenArea)const{ return (m_vPosition.y < vRenderScreenArea.y + 20 && m_vPosition.y > 0.0f - 20) ;}
-    bool IsHittingBottom(sf::Vector2u vRenderScreenArea) const {return m_vPosition.y >= vRenderScreenArea.y ;}
-    bool IsHittingTop() const {return m_vPosition.y <= 0.0f ;}
+    bool IsHittingBottom(sf::Vector2u vRenderScreenArea) const {return m_vPosition.y + (5.0f + m_hRectShape.getSize().y/2 ) >= vRenderScreenArea.y ;}
+    bool IsHittingTop() const {return m_vPosition.y - (5.0f+ m_hRectShape.getSize().y/2 ) <= 0.0f ;}
 
     bool IsBouncing(float fSpeed);
 

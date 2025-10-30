@@ -14,6 +14,9 @@ class GameScreen
         GameScreen( DataStruct& );
         virtual ~GameScreen();
 
+        void ResetGame(DataStruct rTuple);
+        void CheckCollisions(DataStruct rTuple);
+
         bool isBallCollidingWithTarget(sf::FloatRect box1, sf::FloatRect box2);
         bool isBallHittingWall(sf::FloatRect box1, sf::RenderWindow* pRenderWindow);
         bool isBallHittingGoal( sf::FloatRect box1, sf::RenderWindow* pRenderWindow );
