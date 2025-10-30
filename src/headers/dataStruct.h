@@ -1,6 +1,7 @@
 #pragma once
 
 #include<SFML/Graphics.hpp>
+#include<SFML/Audio.hpp>
 #include<headers/bat.h>
 #include<headers/ball.h>
 #include<headers/gameState.h>
@@ -16,6 +17,12 @@ struct DataStruct{
     sf::Text* pMessage = nullptr;
     sf::Font* pFont = nullptr;
     sf::RenderWindow* pRenderWindow = nullptr;
+
+    //---SFX----
+    sf::SoundBuffer* pPlayer1SoundBuffer = nullptr;
+    sf::SoundBuffer* pPlayer2SoundBuffer = nullptr;
+    sf::Sound* pPlayer1SoundEffect = nullptr;
+    sf::Sound* pPlayer2SoundEffect = nullptr;
     
 };
 

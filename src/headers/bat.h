@@ -19,8 +19,6 @@ class Bat
 
 public:
 
-    virtual ~Bat(){};
-
     Bat(sf::Vector2f, ePlayerNumber);
     Bat();
 
@@ -31,7 +29,6 @@ public:
     void SetPosition(sf::Vector2f _position) { m_vPosition = _position ; }
 
     sf::RectangleShape& GetRectReference(){ return m_hRectShape ;} 
-
     sf::RectangleShape GetShape() const { return m_hRectShape; }
     void SetShape( sf::RectangleShape _shape ) { m_hRectShape = _shape ;}
 

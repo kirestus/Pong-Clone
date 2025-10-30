@@ -21,24 +21,37 @@ void Ball::StateMachine()
         {
             eNewBallState = m_eDesiredBallState;
         }
-        else if(m_eDesiredBallState == eBallState::RIGHT)
+        else
         {
-            eNewBallState = m_eDesiredBallState;
+            eNewBallState = eBallState::RIGHT;
         }
     }
-    else if(m_eDesiredBallState == eBallState::HitWall)
-    {
-            SetYSpeed(GetYSpeed()*-1);
-    }
-
     else if(m_eCurrentBallState == eBallState::LEFT || m_eCurrentBallState == eBallState::RIGHT)
     {
         if ( m_eDesiredBallState == eBallState::HitBall )
         {
             eBallState eOppositeDirection = m_eCurrentBallState == LEFT ? RIGHT : LEFT;
             // send the ball back the other way
-            eNewBallState = eOppositeDirection;
-            SetXSpeed((GetXSpeed()+25.0f)*-1);
+
+
+            if (eOppositeDirection == LEFT && (GetShape().getPosition().x > 300.0f) ||
+             (eOppositeDirection == RIGHT &&  (GetShape().getPosition().x < 300.0f)))
+            {
+                eNewBallState = eOppositeDirection;
+
+                if (m_fTopSpeed > abs(m_v2CurrentBallSpeed.x))
+                {
+                    m_v2CurrentBallSpeed.x += m_fSpeedUpIncriment; 
+                }
+
+                m_v2CurrentBallSpeed.x *= -1;
+                SetYSpeed(GetYSpeed()+20.0f);
+            }
+            else
+            {
+                eNewBallState = m_eCurrentBallState;
+            }
+           
             //todo change the balls rotation so the ball isnt just moving back and fourth
             //maybe add some degree of randomization to it or even calculate spin based on the paddle speed on contact
         }
@@ -51,6 +64,11 @@ void Ball::StateMachine()
         {
             //todo Scoreboard handling will be done here
             eNewBallState = eBallState::AtPlayer2 ;
+        }
+        else if(m_eDesiredBallState == eBallState::HitWall)
+        {
+            SetYSpeed(GetYSpeed()*-1);
+            eNewBallState = m_eCurrentBallState;
         }
     }
     m_eCurrentBallState = eNewBallState;

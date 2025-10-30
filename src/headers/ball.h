@@ -26,11 +26,13 @@ class Ball
         sf::RectangleShape GetShape() const { return m_sShape; }
         void SetShape( sf::RectangleShape _shape ) { m_sShape = _shape ;}
 
-        float GetXSpeed() const { return m_fXSpeed ;}
-        void SetXSpeed( float _speed) { m_fXSpeed = _speed ;}
+        float GetXSpeed() const { return m_v2CurrentBallSpeed.x ;}
+        void SetXSpeed( float _speed) { m_v2CurrentBallSpeed.x = _speed ;}
 
-        float GetYSpeed() const { return m_fYSpeed ;}
-        void SetYSpeed( float _speed) { m_fYSpeed = _speed ;}
+        float GetYSpeed() const { return m_v2CurrentBallSpeed.y ;}
+        void SetYSpeed( float _speed) { m_v2CurrentBallSpeed.y = _speed ;}
+
+        sf::Vector2f GetInitialSpeed() const { return m_v2InitialSpeed ;}
 
 
         sf::Vector2f GetTranslationPosition() const {return sf::Vector2f(m_vBallVector.x, m_vBallVector.y) ;}
@@ -52,9 +54,9 @@ class Ball
         eBallState m_eDesiredBallState = eBallState::None;
         sf::Vector3f m_vBallVector;
         sf::RectangleShape m_sShape;
-        float m_fXSpeed = 600.0f;
-        float m_fYSpeed = 300.0f;
-        float m_fTopSpeed = 20.00f;
-        float m_fSpeedUpIncriment = 0.5f;
+        const float m_fTopSpeed = 8200.00f;
+        const sf::Vector2f m_v2InitialSpeed = sf::Vector2f(3000.0f,600.0f);
+        sf::Vector2f m_v2CurrentBallSpeed = m_v2InitialSpeed;
+        const float m_fSpeedUpIncriment = 600.0f;
 
 };

@@ -3,6 +3,7 @@
 InputHandler::InputHandler()
 {
     // create new heap objects for each event
+    /*
     m_pPlayer1ButtonUp_ = new Player1UpCommand;
     m_pPlayer1ButtonDown_ = new Player1DownCommand;
     m_pPlayer2ButtonUp_ = new Player2UpCommand;
@@ -15,7 +16,7 @@ InputHandler::InputHandler()
 
     m_pStartGame_ = new StartCommand;
     m_pQuitGame_ = new QuitCommand;
-
+*/
     m_aCommandArray[0] = m_pPlayer1ButtonUp_;
     m_aCommandArray[1] = m_pPlayer1ButtonDown_;
     m_aCommandArray[2] = m_pPlayer2ButtonUp_;
@@ -38,7 +39,7 @@ InputHandler::~InputHandler()
     }
 }
 
-Command* InputHandler::HandleInput( sf::Event* pEvent, Bat* pBat )
+Command* InputHandler::HandleInput( sf::Event* pEvent )
 {
     if(pEvent->type == sf::Event::KeyPressed )
     {

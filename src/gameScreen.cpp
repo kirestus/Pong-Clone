@@ -53,7 +53,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             {
                 rTuple.pRenderWindow->close();
             }
-            Command* command = m_hInputHandler.HandleInput(&event, pBat1);
+            Command* command = m_hInputHandler.HandleInput( &event );
             if (command) 
             {  
                 command->execute(rTuple);
@@ -62,8 +62,6 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 
         rTuple.pWorldGameState->DetermineGameState();
         float fLapsedTime = rGameClock.getElapsedTime().asSeconds();
-
-        
 
         sf::RectangleShape pBallShape = pBall->ReferenceShape();
         if (rTuple.pWorldGameState->GetCurrentGameState() == Boot)
@@ -76,7 +74,6 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
             pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
             pBall->UpdateBallPosition(fLapsedTime);
-
             CheckCollisions(rTuple);
         }
         
@@ -158,12 +155,10 @@ bool GameScreen::isBallHittingGoal( sf::FloatRect box1, sf::RenderWindow* pRende
 
     if  (box1.left < fLeftGoalPosition )
     {
-        //give player 2 a goal and reset the game
         return true;
     }
     else if (box1.left+box1.width > fRightGoalPosition)
     {
-        //give player 1 a goal
         return true;
     }
     return false;
@@ -176,9 +171,13 @@ void GameScreen::ResetGame(DataStruct rTuple)
     sf::Vector2u vScreenArea = rTuple.pRenderWindow->getSize();
     rTuple.pBat1->SetPosition(sf::Vector2f(50.0f,vScreenArea.y/2));
     rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
+
     rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
     rTuple.pBat2->SetPosition(sf::Vector2f(vScreenArea.x-50.0f,vScreenArea.y/2) );
+
     rTuple.pBall->SetBallVector(sf::Vector3f(vScreenArea.x/2,vScreenArea.y/2, 0.00f));
+    rTuple.pBall->SetXSpeed(rTuple.pBall->GetInitialSpeed().x);
+    rTuple.pBall->SetYSpeed(rTuple.pBall->GetInitialSpeed().y);
 }
 
 
@@ -191,10 +190,25 @@ void GameScreen::CheckCollisions(DataStruct rTuple)
 
     rTuple.pBall->OnBatCollision(bIsCollidingWithP1 || bIsCollidingWithP2);
     rTuple.pBall->OnWallCollision(bIsCollidingWithWalls);
+    
+
+    sf::Vector3f ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
+    rTuple.pPlayer1SoundEffect->setPosition(ballPosition);
+    rTuple.pPlayer2SoundEffect->setPosition(ballPosition);
+
     if(bDidPLayerScore)
     {
         rTuple.pBall->OnScoreGoal(bDidPLayerScore, 0);
         rTuple.pWorldGameState->SetDesiredGamestate(eGameState::GameOver);
+    }
+    else if(bIsCollidingWithP1)
+    {
+        rTuple.pPlayer1SoundEffect->play();
+    }
+    else if(bIsCollidingWithP2)
+    {
+
+        rTuple.pPlayer2SoundEffect->play();
     }
 
 }
