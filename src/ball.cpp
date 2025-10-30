@@ -58,12 +58,12 @@ void Ball::StateMachine()
         else if( m_eCurrentBallState == eBallState::GoalOnPlayer1 )
         {
             //todo Scoreboard handling will be done here
-            eNewBallState = eBallState::AtPlayer1 ;
+            eNewBallState = eBallState::ResetGamePosition ;
         }
         else if( m_eCurrentBallState == eBallState::GoalOnPlayer2 )
         {
             //todo Scoreboard handling will be done here
-            eNewBallState = eBallState::AtPlayer2 ;
+            eNewBallState = eBallState::ResetGamePosition ;
         }
         else if(m_eDesiredBallState == eBallState::HitWall)
         {
@@ -109,8 +109,6 @@ void Ball::OnWallCollision(bool isColliding)
 void Ball::OnScoreGoal(bool isColliding, int playerID)
 {
     //i should really combine these 2 functions and take a param to check what i hit
-    if (isColliding)
-    {
         if (playerID == 1)
         {
             SetDesiredBallState(eBallState::GoalOnPlayer1);
@@ -120,5 +118,4 @@ void Ball::OnScoreGoal(bool isColliding, int playerID)
             SetDesiredBallState(eBallState::GoalOnPlayer2);
         }
         StateMachine();
-    }
 }

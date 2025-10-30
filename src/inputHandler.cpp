@@ -2,21 +2,7 @@
 
 InputHandler::InputHandler()
 {
-    // create new heap objects for each event
-    /*
-    m_pPlayer1ButtonUp_ = new Player1UpCommand;
-    m_pPlayer1ButtonDown_ = new Player1DownCommand;
-    m_pPlayer2ButtonUp_ = new Player2UpCommand;
-    m_pPlayer2ButtonDown_ = new Player2DownCommand;
-
-    m_pReleasePlayer1ButtonUp_ = new StopPlayer1UpCommand;
-    m_pReleasePlayer2ButtonUp_ = new StopPlayer2UpCommand;
-    m_pReleasePlayer1ButtonDown_ = new StopPlayer1DownCommand;
-    m_pReleasePlayer2ButtonDown_ = new StopPlayer2DownCommand;
-
-    m_pStartGame_ = new StartCommand;
-    m_pQuitGame_ = new QuitCommand;
-*/
+    //add all of the commands to an array
     m_aCommandArray[0] = m_pPlayer1ButtonUp_;
     m_aCommandArray[1] = m_pPlayer1ButtonDown_;
     m_aCommandArray[2] = m_pPlayer2ButtonUp_;

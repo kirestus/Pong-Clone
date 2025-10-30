@@ -40,6 +40,9 @@ class Ball
 
         void SetBallVector(sf::Vector3f _vector){m_vBallVector = _vector ;}
 
+
+        eBallState GetCurrentBallState() const { return m_eCurrentBallState ;}
+
         void StateMachine();
         void UpdateBallPosition(float);
 

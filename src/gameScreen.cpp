@@ -77,7 +77,8 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             CheckCollisions(rTuple);
         }
         
-        rTuple.pMessage->setString(DebugTextGameState(rTuple.pWorldGameState->GetCurrentGameState()));
+        //rTuple.pMessage->setString(DebugTextGameState(rTuple.pWorldGameState->GetCurrentGameState()));
+        rTuple.pMessage->setString(DebugTextBallState(rTuple.pBall->GetCurrentBallState()));
         rTuple.pRenderWindow->clear();
 
         rTuple.pRenderWindow->draw( *rTuple.pMessage );
@@ -113,6 +114,38 @@ sf::String GameScreen::DebugTextGameState( eGameState eGameState )
     else if (eGameState == eGameState::GameOver)
     {
         return sf::String("GameOver:");
+    }
+    else
+    {
+        return sf::String("");
+    }
+
+    return sf::String("");
+}
+
+//----------------------------------------------------------
+
+sf::String GameScreen::DebugTextBallState( eBallState eBallState )
+{
+    if (eBallState == eBallState::LEFT)
+    {
+        return sf::String("LEFT:");
+    }
+    else if (eBallState == eBallState::RIGHT)
+    {
+        return sf::String("RIGHT:");
+    }
+    else if (eBallState == eBallState::HitBall)
+    {
+        return sf::String("HitBall:");
+    }
+    else if (eBallState == eBallState::HitWall)
+    {
+        return sf::String("HitWall:");
+    }
+    else if (eBallState == eBallState::ResetGamePosition)
+    {
+        return sf::String("RESET:");
     }
     else
     {
@@ -175,6 +208,7 @@ void GameScreen::ResetGame(DataStruct rTuple)
     rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
     rTuple.pBat2->SetPosition(sf::Vector2f(vScreenArea.x-50.0f,vScreenArea.y/2) );
 
+    rTuple.pBall->SetDesiredBallState(eBallState::ResetGamePosition);
     rTuple.pBall->SetBallVector(sf::Vector3f(vScreenArea.x/2,vScreenArea.y/2, 0.00f));
     rTuple.pBall->SetXSpeed(rTuple.pBall->GetInitialSpeed().x);
     rTuple.pBall->SetYSpeed(rTuple.pBall->GetInitialSpeed().y);
@@ -198,6 +232,9 @@ void GameScreen::CheckCollisions(DataStruct rTuple)
 
     if(bDidPLayerScore)
     {
+        //this is bugged valve please fix
+
+        //DONT IGNORE 
         rTuple.pBall->OnScoreGoal(bDidPLayerScore, 0);
         rTuple.pWorldGameState->SetDesiredGamestate(eGameState::GameOver);
     }

@@ -25,6 +25,7 @@ class GameScreen
         sf::Vector2f GetScreenCenter() const {return m_vScreenCenter;}
         void SetScreenCenter(sf::Vector2f fScreenCenter){m_vScreenCenter = fScreenCenter;} 
         sf::String DebugTextGameState( eGameState eGameState );
+        sf::String DebugTextBallState( eBallState eBallState );
 
         void CreateGameScreen(DataStruct& rTuple); 
         int UpdateGamescreen(DataStruct& rTuple, sf::Clock &rTimer);

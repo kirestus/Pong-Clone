@@ -6,6 +6,8 @@
 
 int main()
 {
+    //create a bunch of game objects and add pointers of them to a struct
+
     DataStruct DataTuple; 
     sf::Vector2f vScreenArea(1024, 768);
 
