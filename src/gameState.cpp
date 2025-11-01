@@ -18,10 +18,6 @@ void GameState::DetermineGameState()
         {
             eNewGameState = Running;
         }
-        else if( eDesiredGameState == eGameState::Paused )
-        {
-            eNewGameState = Paused;
-        }
         else
         {
             eNewGameState = Paused;
@@ -32,6 +28,10 @@ void GameState::DetermineGameState()
         if( eDesiredGameState == eGameState::Boot )
         {
             eNewGameState = Boot;
+        }
+        else
+        {
+            eNewGameState = Paused;
         }
     }
     else if ( eCurrentGameState == eGameState::Paused )

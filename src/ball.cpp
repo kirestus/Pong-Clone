@@ -16,14 +16,15 @@ void Ball::StateMachine()
     eBallState eNewBallState;
     if (m_eCurrentBallState == eBallState::ResetGamePosition )
     {
+            m_sShape.setPosition(m_vBallVector.x ,m_vBallVector.y);
         //game reset state will go to either left or right
-        if (m_eDesiredBallState == eBallState::LEFT)
+        if (m_eDesiredBallState == eBallState::RIGHT)
         {
-            eNewBallState = m_eDesiredBallState;
+            eNewBallState = eBallState::RIGHT;
         }
         else
         {
-            eNewBallState = eBallState::RIGHT;
+            eNewBallState = eBallState::LEFT;
         }
     }
     else if(m_eCurrentBallState == eBallState::LEFT || m_eCurrentBallState == eBallState::RIGHT)
@@ -34,13 +35,14 @@ void Ball::StateMachine()
             // send the ball back the other way
 
 
-            if (eOppositeDirection == LEFT && (GetShape().getPosition().x > 300.0f) ||
-             (eOppositeDirection == RIGHT &&  (GetShape().getPosition().x < 300.0f)))
+            if (eOppositeDirection == LEFT && (GetShape().getGlobalBounds().getPosition().x > 300.0f) ||
+             (eOppositeDirection == RIGHT &&  (GetShape().getGlobalBounds().getPosition().x < 300.0f)))
             {
                 eNewBallState = eOppositeDirection;
 
-                if (m_fTopSpeed > abs(m_v2CurrentBallSpeed.x))
+                if (abs(m_v2CurrentBallSpeed.x) < m_fTopSpeed )
                 {
+                    m_v2CurrentBallSpeed.x = eOppositeDirection == LEFT ? m_v2CurrentBallSpeed.x -= m_fSpeedUpIncriment : 
                     m_v2CurrentBallSpeed.x += m_fSpeedUpIncriment; 
                 }
 
@@ -55,15 +57,10 @@ void Ball::StateMachine()
             //todo change the balls rotation so the ball isnt just moving back and fourth
             //maybe add some degree of randomization to it or even calculate spin based on the paddle speed on contact
         }
-        else if( m_eCurrentBallState == eBallState::GoalOnPlayer1 )
+        else if( m_eCurrentBallState == eBallState::GoalOnPlayer1 ||
+        m_eCurrentBallState == eBallState::GoalOnPlayer2 )
         {
-            //todo Scoreboard handling will be done here
-            eNewBallState = eBallState::ResetGamePosition ;
-        }
-        else if( m_eCurrentBallState == eBallState::GoalOnPlayer2 )
-        {
-            //todo Scoreboard handling will be done here
-            eNewBallState = eBallState::ResetGamePosition ;
+            eNewBallState = eBallState::ResetGamePosition;
         }
         else if(m_eDesiredBallState == eBallState::HitWall)
         {
@@ -76,13 +73,15 @@ void Ball::StateMachine()
 
 //----------------------------------------------------------
 
-void Ball::UpdateBallPosition(float fDeltaT)
+void Ball::UpdateBallPosition(float fDeltaT, bool isPaused)
 {
-    // need to copy the physics over from the bat to stop the ball from being so
-    m_vBallVector.x += GetXSpeed()*fDeltaT;
-    m_vBallVector.y += GetYSpeed()*fDeltaT;
+    if (isPaused)
+    { 
+        return; 
+    }
+    m_vBallVector.x -= GetXSpeed()*fDeltaT;
+    m_vBallVector.y -= GetYSpeed()*fDeltaT;
     m_sShape.setPosition(GetTranslationPosition().x, GetTranslationPosition().y);
-
 }
 
 //----------------------------------------------------------
@@ -96,9 +95,10 @@ void Ball::OnBatCollision(bool isColliding)
     }
 }
 
+//----------------------------------------------------------
+
 void Ball::OnWallCollision(bool isColliding)
 {
-    //i should really combine these 2 functions and take a param to check what i hit
     if (isColliding)
     {
         SetDesiredBallState(eBallState::HitWall);
@@ -106,10 +106,11 @@ void Ball::OnWallCollision(bool isColliding)
     }
 }
 
-void Ball::OnScoreGoal(bool isColliding, int playerID)
+//----------------------------------------------------------
+
+void Ball::OnScoreGoal(bool isColliding, bool isLeft)
 {
-    //i should really combine these 2 functions and take a param to check what i hit
-        if (playerID == 1)
+        if (isLeft)
         {
             SetDesiredBallState(eBallState::GoalOnPlayer1);
         }

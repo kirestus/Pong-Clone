@@ -78,13 +78,13 @@ bool Bat::IsBouncing(float fSpeed)
 
 //-----------------------------------------------------------------
 
-void Bat::CalculateBatSpeed(sf::RenderWindow* pRenderWindow, float fLapsedTime)
+void Bat::CalculateBatSpeed(sf::RenderWindow* pRenderWindow, float fLapsedTime, bool isGamePaused = false)
 {
     eBatMoveDirection newMoveDirection = DetermCurrentMoveDirection(pRenderWindow);
     UpdateDesiredToShapeTransform();
     float fSpeed =  GetVelocity() * fLapsedTime;
 
-    if ( fSpeed < GetTopSpeed() || fSpeed > GetTopSpeed() *-1 )
+    if (( fSpeed < GetTopSpeed() || fSpeed > GetTopSpeed() *-1 )&& !isGamePaused)
     {
         SetPosition(sf::Vector2f(GetPosition().x, GetPosition().y + fSpeed ));
     }

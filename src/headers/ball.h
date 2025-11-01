@@ -44,11 +44,11 @@ class Ball
         eBallState GetCurrentBallState() const { return m_eCurrentBallState ;}
 
         void StateMachine();
-        void UpdateBallPosition(float);
+        void UpdateBallPosition(float, bool);
 
         void OnBatCollision(bool);
         void OnWallCollision(bool);
-        void OnScoreGoal(bool, int playerID);
+        void OnScoreGoal(bool, bool isLeft);
 
 
     private:
@@ -57,9 +57,9 @@ class Ball
         eBallState m_eDesiredBallState = eBallState::None;
         sf::Vector3f m_vBallVector;
         sf::RectangleShape m_sShape;
-        const float m_fTopSpeed = 8200.00f;
+        const float m_fTopSpeed = 15000.00f;
         const sf::Vector2f m_v2InitialSpeed = sf::Vector2f(3000.0f,600.0f);
         sf::Vector2f m_v2CurrentBallSpeed = m_v2InitialSpeed;
-        const float m_fSpeedUpIncriment = 600.0f;
+        const float m_fSpeedUpIncriment = 1000.0f;
 
 };

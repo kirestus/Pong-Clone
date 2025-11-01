@@ -17,9 +17,9 @@ class GameScreen
         void ResetGame(DataStruct rTuple);
         void CheckCollisions(DataStruct rTuple);
 
-        bool isBallCollidingWithTarget(sf::FloatRect box1, sf::FloatRect box2);
-        bool isBallHittingWall(sf::FloatRect box1, sf::RenderWindow* pRenderWindow);
-        bool isBallHittingGoal( sf::FloatRect box1, sf::RenderWindow* pRenderWindow );
+        bool isBallCollidingWithTarget(const sf::FloatRect box1, const sf::FloatRect box2);
+        bool isBallHittingWall(const sf::FloatRect box1, sf::RenderWindow* pRenderWindow);
+        bool isBallHittingGoal( const sf::FloatRect box1, sf::RenderWindow* pRenderWindow );
 
         sf::Vector2f CalculateScreenCenter(sf::RenderWindow* pRenderWindow);
         sf::Vector2f GetScreenCenter() const {return m_vScreenCenter;}

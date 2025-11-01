@@ -22,7 +22,7 @@ public:
     Bat(sf::Vector2f, ePlayerNumber);
     Bat();
 
-    void CalculateBatSpeed(sf::RenderWindow *pRenderWindow, float fLapsedTime);
+    void CalculateBatSpeed(sf::RenderWindow *pRenderWindow, float fLapsedTime, bool isGamePaused);
     void NudgeBat(sf::RenderWindow* pRenderWindow);
 
     sf::Vector2f GetPosition() const { return m_vPosition ;}

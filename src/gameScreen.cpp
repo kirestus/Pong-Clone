@@ -69,16 +69,15 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             ResetGame(rTuple);
         }
 
-        if ( rTuple.pWorldGameState->GetCurrentGameState() != Paused && rTuple.pWorldGameState->GetCurrentGameState() != Boot )
-        {
-            pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
-            pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime);
-            pBall->UpdateBallPosition(fLapsedTime);
-            CheckCollisions(rTuple);
-        }
+        bool bIsPaused = rTuple.pWorldGameState->GetCurrentGameState() == eGameState::Paused;
+        
+        pBall->UpdateBallPosition(fLapsedTime, bIsPaused);
+        pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime, bIsPaused);
+        pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime, bIsPaused);
+        CheckCollisions(rTuple);
         
         //rTuple.pMessage->setString(DebugTextGameState(rTuple.pWorldGameState->GetCurrentGameState()));
-        rTuple.pMessage->setString(DebugTextBallState(rTuple.pBall->GetCurrentBallState()));
+        //rTuple.pMessage->setString(DebugTextBallState(rTuple.pBall->GetCurrentBallState()));
         rTuple.pRenderWindow->clear();
 
         rTuple.pRenderWindow->draw( *rTuple.pMessage );
@@ -93,6 +92,102 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
     }
 
     return 1;
+}
+
+//----------------------------------------------------------
+
+void GameScreen::ResetGame(DataStruct rTuple)
+{
+    sf::Vector2u vScreenArea = rTuple.pRenderWindow->getSize();
+    rTuple.pBat1->SetPosition(sf::Vector2f(50.0f,vScreenArea.y/2));
+    rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
+
+    rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
+    rTuple.pBat2->SetPosition(sf::Vector2f(vScreenArea.x-50.0f,vScreenArea.y/2) );
+
+    rTuple.pBall->SetDesiredBallState(eBallState::ResetGamePosition);
+    rTuple.pBall->SetBallVector(sf::Vector3f(vScreenArea.x/2,vScreenArea.y/2, 0.00f));
+    rTuple.pBall->SetXSpeed(rTuple.pBall->GetInitialSpeed().x);
+    rTuple.pBall->SetYSpeed(rTuple.pBall->GetInitialSpeed().y);
+}
+
+//----------------------------------------------------------
+
+void GameScreen::CheckCollisions(const DataStruct rTuple)
+{
+    bool bIsCollidingWithP1 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat1->GetShape().getGlobalBounds());
+    bool bIsCollidingWithP2 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat2->GetShape().getGlobalBounds());
+    bool bIsCollidingWithWalls = isBallHittingWall(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
+    bool bDidPLayerScore = isBallHittingGoal(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
+
+    rTuple.pBall->OnBatCollision(bIsCollidingWithP1 || bIsCollidingWithP2);
+    rTuple.pBall->OnWallCollision(bIsCollidingWithWalls);
+    
+
+    sf::Vector3f const ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
+    rTuple.pPlayer1SoundEffect->setPosition(ballPosition);
+    rTuple.pPlayer2SoundEffect->setPosition(ballPosition);
+
+    if(bDidPLayerScore)
+    {
+        bool isleft = rTuple.pBall->GetTranslationPosition().x < 300.0f;
+        rTuple.pBall->OnScoreGoal(bDidPLayerScore, isleft);
+        rTuple.pWorldGameState->SetDesiredGamestate(eGameState::GameOver);
+        rTuple.pBall->StateMachine();
+        ResetGame(rTuple);
+    }
+    else if(bIsCollidingWithP1)
+    {
+        rTuple.pPlayer1SoundEffect->play();
+    }
+    else if(bIsCollidingWithP2)
+    {
+        rTuple.pPlayer2SoundEffect->play();
+    }
+}
+
+//----------------------------------------------------------
+
+bool GameScreen::isBallCollidingWithTarget(const sf::FloatRect box1, const sf::FloatRect box2)
+{
+    if( box1.intersects(box2) )
+    {
+        return true;
+    }
+    return false;
+}
+
+//----------------------------------------------------------
+
+bool GameScreen::isBallHittingWall(const sf::FloatRect box1, sf::RenderWindow* pRenderWindow)
+{
+    const float rectTop = 0.0f;
+    const float rectBottom = pRenderWindow->getSize().y - 15.0f;
+    const float top = box1.top;
+    if (top > rectBottom || top < rectTop)
+    {
+        return true;
+    }
+    return false;
+}
+
+//----------------------------------------------------------
+
+bool GameScreen::isBallHittingGoal(const sf::FloatRect box1, sf::RenderWindow* pRenderWindow )
+{
+    const float fLeftGoalPosition = 0.0f;
+    const float fRightGoalPosition = pRenderWindow->getSize().x;
+    const float fBoxXpos = box1.left;
+
+    if (fBoxXpos <= fLeftGoalPosition )
+    {
+        return true;
+    }
+    else if (fBoxXpos + 15 > fRightGoalPosition)
+    {
+        return true;
+    }
+    return false;
 }
 
 //----------------------------------------------------------
@@ -156,96 +251,3 @@ sf::String GameScreen::DebugTextBallState( eBallState eBallState )
 }
 
 //----------------------------------------------------------
-
-bool GameScreen::isBallCollidingWithTarget(sf::FloatRect box1, sf::FloatRect box2)
-{
-    if( box1.intersects(box2) )
-    {
-        return true;
-    }
-    return false;
-}
-
-//----------------------------------------------------------
-
-bool GameScreen::isBallHittingWall(sf::FloatRect box1, sf::RenderWindow* pRenderWindow)
-{
-    float rectTop = 0.0f;
-    float rectBottom = pRenderWindow->getSize().y;
-    if (box1.top+(box1.height) > rectBottom || box1.top < rectTop)
-    {
-        return true;
-    }
-    return false;
-}
-
-//----------------------------------------------------------
-
-bool GameScreen::isBallHittingGoal( sf::FloatRect box1, sf::RenderWindow* pRenderWindow )
-{
-    float fLeftGoalPosition = 0.0f;
-    float fRightGoalPosition = pRenderWindow->getSize().x;
-
-    if  (box1.left < fLeftGoalPosition )
-    {
-        return true;
-    }
-    else if (box1.left+box1.width > fRightGoalPosition)
-    {
-        return true;
-    }
-    return false;
-}
-
-//----------------------------------------------------------
-
-void GameScreen::ResetGame(DataStruct rTuple)
-{
-    sf::Vector2u vScreenArea = rTuple.pRenderWindow->getSize();
-    rTuple.pBat1->SetPosition(sf::Vector2f(50.0f,vScreenArea.y/2));
-    rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
-
-    rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
-    rTuple.pBat2->SetPosition(sf::Vector2f(vScreenArea.x-50.0f,vScreenArea.y/2) );
-
-    rTuple.pBall->SetDesiredBallState(eBallState::ResetGamePosition);
-    rTuple.pBall->SetBallVector(sf::Vector3f(vScreenArea.x/2,vScreenArea.y/2, 0.00f));
-    rTuple.pBall->SetXSpeed(rTuple.pBall->GetInitialSpeed().x);
-    rTuple.pBall->SetYSpeed(rTuple.pBall->GetInitialSpeed().y);
-}
-
-
-void GameScreen::CheckCollisions(DataStruct rTuple)
-{
-    bool bIsCollidingWithP1 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat1->GetShape().getGlobalBounds());
-    bool bIsCollidingWithP2 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat2->GetShape().getGlobalBounds());
-    bool bIsCollidingWithWalls = isBallHittingWall(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
-    bool bDidPLayerScore = isBallHittingGoal(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
-
-    rTuple.pBall->OnBatCollision(bIsCollidingWithP1 || bIsCollidingWithP2);
-    rTuple.pBall->OnWallCollision(bIsCollidingWithWalls);
-    
-
-    sf::Vector3f ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
-    rTuple.pPlayer1SoundEffect->setPosition(ballPosition);
-    rTuple.pPlayer2SoundEffect->setPosition(ballPosition);
-
-    if(bDidPLayerScore)
-    {
-        //this is bugged valve please fix
-
-        //DONT IGNORE 
-        rTuple.pBall->OnScoreGoal(bDidPLayerScore, 0);
-        rTuple.pWorldGameState->SetDesiredGamestate(eGameState::GameOver);
-    }
-    else if(bIsCollidingWithP1)
-    {
-        rTuple.pPlayer1SoundEffect->play();
-    }
-    else if(bIsCollidingWithP2)
-    {
-
-        rTuple.pPlayer2SoundEffect->play();
-    }
-
-}
