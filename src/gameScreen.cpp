@@ -1,4 +1,5 @@
 #include <headers/gameScreen.h>
+#include <string>
 
 GameScreen::GameScreen(DataStruct& rTuple)
 {
@@ -10,8 +11,11 @@ GameScreen::GameScreen(DataStruct& rTuple)
 
 void GameScreen::CreateGameScreen(DataStruct& rTuple)
 {
+    m_aScore[0] = 0;
+    m_aScore[1] = 0;
     SetScreenCenter(CalculateScreenCenter(rTuple.pRenderWindow));
     rTuple.pWorldGameState = new GameState;
+    
 }
 
 //-----------------------------------------------------------------
@@ -39,6 +43,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
     sf::Music wololo;
     wololo.openFromFile("sfx/song.mp3");
     wololo.play();
+    wololo.setLoop(true);
 
     Bat* pBat1 = rTuple.pBat1;
     Bat* pBat2 = rTuple.pBat2;
@@ -60,20 +65,21 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             }
         }
 
-        rTuple.pWorldGameState->DetermineGameState();
         float fLapsedTime = rGameClock.getElapsedTime().asSeconds();
+        rTuple.pWorldGameState->DetermineGameState();
 
         sf::RectangleShape pBallShape = pBall->ReferenceShape();
-        if (rTuple.pWorldGameState->GetCurrentGameState() == Boot)
+        if (rTuple.pWorldGameState->GetCurrentGameState() == Boot )
         {
             ResetGame(rTuple);
         }
 
         bool bIsPaused = rTuple.pWorldGameState->GetCurrentGameState() == eGameState::Paused;
         
-        pBall->UpdateBallPosition(fLapsedTime, bIsPaused);
         pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime, bIsPaused);
         pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime, bIsPaused);
+        pBall->UpdateBallPosition(fLapsedTime, bIsPaused);
+        
         CheckCollisions(rTuple);
         
         //rTuple.pMessage->setString(DebugTextGameState(rTuple.pWorldGameState->GetCurrentGameState()));
@@ -115,10 +121,10 @@ void GameScreen::ResetGame(DataStruct rTuple)
 
 void GameScreen::CheckCollisions(const DataStruct rTuple)
 {
-    bool bIsCollidingWithP1 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat1->GetShape().getGlobalBounds());
-    bool bIsCollidingWithP2 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat2->GetShape().getGlobalBounds());
-    bool bIsCollidingWithWalls = isBallHittingWall(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
-    bool bDidPLayerScore = isBallHittingGoal(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
+    const bool bIsCollidingWithP1 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat1->GetShape().getGlobalBounds());
+    const bool bIsCollidingWithP2 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat2->GetShape().getGlobalBounds());
+    const bool bIsCollidingWithWalls = isBallHittingWall(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
+    const bool bDidPLayerScore = isBallHittingGoal(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
 
     rTuple.pBall->OnBatCollision(bIsCollidingWithP1 || bIsCollidingWithP2);
     rTuple.pBall->OnWallCollision(bIsCollidingWithWalls);
@@ -130,7 +136,7 @@ void GameScreen::CheckCollisions(const DataStruct rTuple)
 
     if(bDidPLayerScore)
     {
-        bool isleft = rTuple.pBall->GetTranslationPosition().x < 300.0f;
+        const bool isleft = rTuple.pBall->GetTranslationPosition().x < 300.0f;
         rTuple.pBall->OnScoreGoal(bDidPLayerScore, isleft);
         rTuple.pWorldGameState->SetDesiredGamestate(eGameState::GameOver);
         rTuple.pBall->StateMachine();
@@ -138,10 +144,12 @@ void GameScreen::CheckCollisions(const DataStruct rTuple)
     }
     else if(bIsCollidingWithP1)
     {
+        rTuple.pBall->SetYSpeed(rTuple.pBat1->GetVelocity()/4 - rTuple.pBall->GetYSpeed());
         rTuple.pPlayer1SoundEffect->play();
     }
     else if(bIsCollidingWithP2)
     {
+        rTuple.pBall->SetYSpeed(rTuple.pBat1->GetVelocity()/4 + rTuple.pBall->GetYSpeed());
         rTuple.pPlayer2SoundEffect->play();
     }
 }
@@ -179,12 +187,14 @@ bool GameScreen::isBallHittingGoal(const sf::FloatRect box1, sf::RenderWindow* p
     const float fRightGoalPosition = pRenderWindow->getSize().x;
     const float fBoxXpos = box1.left;
 
-    if (fBoxXpos <= fLeftGoalPosition )
+    if (fBoxXpos <= fLeftGoalPosition && m_fTimeElapsed > 0.1f) // this is work around for an annoying bug
     {
+        m_aScore[1] ++;
         return true;
     }
     else if (fBoxXpos + 15 > fRightGoalPosition)
-    {
+    {        
+        m_aScore[0] ++;
         return true;
     }
     return false;

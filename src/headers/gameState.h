@@ -20,6 +20,6 @@ public:
     void SetDesiredGamestate( eGameState _gamestate ){ m_eDesiredGameState = _gamestate ;}
 private:
 
-    eGameState m_eCurrentGameState = eGameState::Boot;
+    eGameState m_eCurrentGameState;
     eGameState m_eDesiredGameState = eGameState::Boot;
 };

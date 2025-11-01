@@ -5,7 +5,7 @@ Bat::Bat(sf::Vector2f vPosition , ePlayerNumber ePlayer)
 {
     m_hRectShape.setPosition(vPosition);
     m_vPosition = vPosition;
-    m_hRectShape.setSize(sf::Vector2f(15.0f,80.0f));
+    m_hRectShape.setSize(sf::Vector2f(15.0f,150.0f));
     m_hRectShape.setFillColor(sf::Color::White);
     m_hRectShape.setOrigin( sf::Vector2f(m_hRectShape.getSize().x/2, m_hRectShape.getSize().y/2));
     m_ePlayerNumber = ePlayer;
