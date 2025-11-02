@@ -10,6 +10,7 @@
 
 struct DataStruct{
     
+    //--GameEntities---
     GameState* pWorldGameState = nullptr;
     Bat* pBat1 = nullptr;
     Bat* pBat2 = nullptr;
@@ -23,6 +24,8 @@ struct DataStruct{
     sf::SoundBuffer* pPlayer2SoundBuffer = nullptr;
     sf::Sound* pPlayer1SoundEffect = nullptr;
     sf::Sound* pPlayer2SoundEffect = nullptr;
-    
-};
 
+    //---GlobalConsts---
+    float* fScreenWidth = nullptr;
+    float* fScreenHeight = nullptr;
+};

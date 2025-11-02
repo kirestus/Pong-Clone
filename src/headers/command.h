@@ -76,6 +76,28 @@ public:
 
 //----------------------------------------------------------
 
+class DebugTextState1Command : public Command
+{
+public:
+  virtual void execute(DataStruct& rTuple)
+  {
+    //enable a bool on the gamescreen to show debug text
+  }
+};
+
+//----------------------------------------------------------
+
+class DebugTextState2Command : public Command
+{
+public:
+  virtual void execute(DataStruct& rTuple)
+  {
+    //enable a bool on the gamescreen to show debug text
+  }
+};
+
+//----------------------------------------------------------
+
 class QuitCommand : public Command
 {
 public:

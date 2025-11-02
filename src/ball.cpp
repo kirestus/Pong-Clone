@@ -1,4 +1,5 @@
 #include <headers/ball.h>
+#include <assert.h>
 
 Ball::Ball(sf::RenderWindow* pRenderWindow)
 {
@@ -11,63 +12,52 @@ Ball::Ball(sf::RenderWindow* pRenderWindow)
 
 //----------------------------------------------------------
 
-void Ball::StateMachine()
+void Ball::StateMachine(float fScreenWidth)
 {
-    eBallState eNewBallState;
+    eBallState eNewBallState = m_eCurrentBallState;
     if (m_eCurrentBallState == eBallState::ResetGamePosition )
     {
-            m_sShape.setPosition(m_vBallVector.x ,m_vBallVector.y);
+        m_sShape.setPosition(m_vBallVector.x ,m_vBallVector.y);
         //game reset state will go to either left or right
         if (m_eDesiredBallState == eBallState::RIGHT)
         {
             eNewBallState = eBallState::RIGHT;
+            m_v2InitialSpeed.x = abs(m_v2InitialSpeed.x) * -1;
         }
         else
         {
             eNewBallState = eBallState::LEFT;
+            m_v2InitialSpeed.x = abs(m_v2InitialSpeed.x);
         }
     }
-    else if(m_eCurrentBallState == eBallState::LEFT || m_eCurrentBallState == eBallState::RIGHT)
+    else if(m_eCurrentBallState == LEFT || m_eCurrentBallState == RIGHT )
     {
-        if ( m_eDesiredBallState == eBallState::HitBall )
+        //check if our collision valid
+        bool bIsCollisionValid = m_eCurrentBallState == LEFT && fScreenWidth/2 > m_vBallVector.x ||
+        fScreenWidth/2 <  m_vBallVector.x ;
+
+        if ( m_eDesiredBallState == eBallState::HitBall && bIsCollisionValid )
         {
-            eBallState eOppositeDirection = m_eCurrentBallState == LEFT ? RIGHT : LEFT;
-            // send the ball back the other way
-
-
-            if (eOppositeDirection == LEFT && (GetShape().getGlobalBounds().getPosition().x > 300.0f) ||
-             (eOppositeDirection == RIGHT &&  (GetShape().getGlobalBounds().getPosition().x < 300.0f)))
+            //inverse the desired move state
+            eNewBallState = m_eCurrentBallState == LEFT ? RIGHT : LEFT;
+            m_v2CurrentBallSpeed.x *= -1;
+            if (abs(m_v2CurrentBallSpeed.x) < m_fTopSpeed )
             {
-                eNewBallState = eOppositeDirection;
-
-                if (abs(m_v2CurrentBallSpeed.x) < m_fTopSpeed )
-                {
-                    m_v2CurrentBallSpeed.x = eOppositeDirection == LEFT ? m_v2CurrentBallSpeed.x -= m_fSpeedUpIncriment : 
-                    m_v2CurrentBallSpeed.x += m_fSpeedUpIncriment; 
-                }
-
-                m_v2CurrentBallSpeed.x *= -1;
-                SetYSpeed(GetYSpeed()+20.0f);
+                m_v2CurrentBallSpeed.x = m_v2CurrentBallSpeed.x > 0 ? m_v2CurrentBallSpeed.x += m_fSpeedUpIncriment : m_v2CurrentBallSpeed.x -= m_fSpeedUpIncriment;
             }
-            else
-            {
-                eNewBallState = m_eCurrentBallState;
-            }
-           
-            //todo change the balls rotation so the ball isnt just moving back and fourth
-            //maybe add some degree of randomization to it or even calculate spin based on the paddle speed on contact
-        }
-        else if( m_eCurrentBallState == eBallState::GoalOnPlayer1 ||
-        m_eCurrentBallState == eBallState::GoalOnPlayer2 )
-        {
-            eNewBallState = eBallState::ResetGamePosition;
         }
         else if(m_eDesiredBallState == eBallState::HitWall)
         {
             SetYSpeed(GetYSpeed()*-1);
             eNewBallState = m_eCurrentBallState;
         }
+        else if( m_eDesiredBallState == eBallState::GoalOnPlayer1 ||
+        m_eDesiredBallState == eBallState::GoalOnPlayer2 )
+        {
+            eNewBallState = eBallState::ResetGamePosition;
+        }
     }
+    assert(eNewBallState != eBallState::None && "StateMachine is NONE Update When Called to after scoring a goal");
     m_eCurrentBallState = eNewBallState;
 }
 
@@ -86,29 +76,29 @@ void Ball::UpdateBallPosition(float fDeltaT, bool isPaused)
 
 //----------------------------------------------------------
 
-void Ball::OnBatCollision(bool isColliding)
+void Ball::OnBatCollision(bool isColliding, float fScreenWidth)
 {
     if (isColliding)
     {
         SetDesiredBallState(eBallState::HitBall);
-        StateMachine();
+        StateMachine(fScreenWidth);
     }
 }
 
 //----------------------------------------------------------
 
-void Ball::OnWallCollision(bool isColliding)
+void Ball::OnWallCollision(bool isColliding, float fScreenWidth)
 {
     if (isColliding)
     {
         SetDesiredBallState(eBallState::HitWall);
-        StateMachine();
+        StateMachine(fScreenWidth);
     }
 }
 
 //----------------------------------------------------------
 
-void Ball::OnScoreGoal(bool isColliding, bool isLeft)
+void Ball::OnScoreGoal(bool isColliding, bool isLeft, float fScreenWidth)
 {
         if (isLeft)
         {
@@ -118,5 +108,5 @@ void Ball::OnScoreGoal(bool isColliding, bool isLeft)
         {
             SetDesiredBallState(eBallState::GoalOnPlayer2);
         }
-        StateMachine();
+        StateMachine(fScreenWidth);
 }

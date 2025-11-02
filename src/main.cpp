@@ -6,8 +6,6 @@
 
 int main()
 {
-    //create a bunch of game objects and add pointers of them to a struct
-
     DataStruct DataTuple; 
     sf::Vector2f vScreenArea(1024, 768);
 
@@ -22,11 +20,11 @@ int main()
     sf::Font fPongFont;
     fPongFont.loadFromFile("fonts/Vector.ttf");
 
-    sf::Text sText("", fPongFont);
+    sf::Text sText("PONG", fPongFont);
     sText.setFillColor(sf::Color::White);
-    sText.setCharacterSize(55);
+    sText.setCharacterSize(90);
     sText.setOrigin(sText.getLocalBounds().getSize().x/2,sText.getLocalBounds().getSize().y/2);
-    sText.setPosition(sf::Vector2f(vScreenArea.x/2-150,vScreenArea.y+-100.0f) ); // should set this in the middle of the screen will do later
+    sText.setPosition(sf::Vector2f(vScreenArea.x/2,vScreenArea.y+-100.0f) ); // should set this in the middle of the screen will do later
 
     sf::SoundBuffer player1SoundBuffer;
     sf::SoundBuffer player2SoundBuffer;
@@ -40,6 +38,8 @@ int main()
     p2SoundEffect.setBuffer(player2SoundBuffer);
 
     DataTuple.pRenderWindow = &window;
+    DataTuple.fScreenWidth = &vScreenArea.x;
+    DataTuple.fScreenHeight = &vScreenArea.y;
     DataTuple.pBat1 = &Player1Bat;
     DataTuple.pBat2 = &Player2Bat;
     DataTuple.pBall = &Ball;

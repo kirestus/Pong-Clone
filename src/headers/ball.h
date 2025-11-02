@@ -32,6 +32,8 @@ class Ball
         float GetYSpeed() const { return m_v2CurrentBallSpeed.y ;}
         void SetYSpeed( float _speed) { m_v2CurrentBallSpeed.y = _speed ;}
 
+        float GetTopSpeed() const { return m_fTopSpeed; }
+
         sf::Vector2f GetInitialSpeed() const { return m_v2InitialSpeed ;}
 
 
@@ -43,23 +45,23 @@ class Ball
 
         eBallState GetCurrentBallState() const { return m_eCurrentBallState ;}
 
-        void StateMachine();
+        void StateMachine(float);
         void UpdateBallPosition(float, bool);
 
-        void OnBatCollision(bool);
-        void OnWallCollision(bool);
-        void OnScoreGoal(bool, bool isLeft);
+        void OnBatCollision(bool, float );
+        void OnWallCollision(bool, float );
+        void OnScoreGoal(bool, bool isLeft, float);
 
 
     private:
-
+        unsigned* pDataStruct = nullptr;
         eBallState m_eCurrentBallState = eBallState::ResetGamePosition;
         eBallState m_eDesiredBallState = eBallState::None;
         sf::Vector3f m_vBallVector;
         sf::RectangleShape m_sShape;
-        const float m_fTopSpeed = 15000.00f;
-        const sf::Vector2f m_v2InitialSpeed = sf::Vector2f(3000.0f,600.0f);
+        const float m_fTopSpeed = 15500.00f;
+        sf::Vector2f m_v2InitialSpeed = sf::Vector2f(3000.0f,00.0f);
         sf::Vector2f m_v2CurrentBallSpeed = m_v2InitialSpeed;
-        const float m_fSpeedUpIncriment = 1000.0f;
+        const float m_fSpeedUpIncriment = 500.0f;
 
 };

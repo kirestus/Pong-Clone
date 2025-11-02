@@ -3,16 +3,18 @@
 InputHandler::InputHandler()
 {
     //add all of the commands to an array
-    m_aCommandArray[0] = m_pPlayer1ButtonUp_;
-    m_aCommandArray[1] = m_pPlayer1ButtonDown_;
-    m_aCommandArray[2] = m_pPlayer2ButtonUp_;
-    m_aCommandArray[3] = m_pPlayer2ButtonDown_;
+    m_aCommandArray[0] = m_pPlayer1ButtonUp_; 
+    m_aCommandArray[1] = m_pPlayer1ButtonDown_; 
+    m_aCommandArray[2] = m_pPlayer2ButtonUp_; 
+    m_aCommandArray[3] = m_pPlayer2ButtonDown_; 
     m_aCommandArray[4] = m_pReleasePlayer1ButtonUp_;
     m_aCommandArray[5] = m_pReleasePlayer2ButtonUp_;
     m_aCommandArray[6] = m_pReleasePlayer1ButtonDown_;
     m_aCommandArray[7] = m_pReleasePlayer2ButtonDown_;
     m_aCommandArray[8] = m_pStartGame_;
     m_aCommandArray[9] = m_pQuitGame_;
+    m_aCommandArray[10] = m_pPressDebugState1;
+    m_aCommandArray[11] = m_pPressDebugState2;
 }
 
 
