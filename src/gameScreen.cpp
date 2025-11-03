@@ -59,6 +59,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 
         //rTuple.pMessage->setString(DebugText::DebugTextGameState(rTuple.pWorldGameState->GetCurrentGameState()));
         //rTuple.pMessage->setString(DebugText::DebugTextBallState(rTuple.pBall->GetCurrentBallState()));
+        
         bool bIsPaused = rTuple.pWorldGameState->GetCurrentGameState() == eGameState::Paused;
         rTuple.pWorldGameState->DetermineGameState();
 
@@ -112,9 +113,12 @@ void GameScreen::ResetGame(DataStruct &rTuple)
 {
     rTuple.pBat1->SetPosition(sf::Vector2f(50.0f,*rTuple.fScreenHeight/2));
     rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
+    rTuple.pBat1->UpdateShapeToDesiredTransform();
+    //rTuple.pBat1->GetShape().setOrigin(rTuple.pBat1->GetShape().getSize().x/2,rTuple.pBat1->GetShape().getSize().y/2);
 
+    rTuple.pBat2->SetPosition(sf::Vector2f(*rTuple.fScreenWidth -50.0f,*rTuple.fScreenHeight / 2 ));
     rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
-    rTuple.pBat2->SetPosition(sf::Vector2f(*rTuple.fScreenWidth -50.0f,*rTuple.fScreenWidth / 2) );
+    rTuple.pBat2->UpdateShapeToDesiredTransform();
 
     rTuple.pBall->SetBallVector(sf::Vector3f(*rTuple.fScreenWidth/2,*rTuple.fScreenHeight/2, 0.00f));
 
@@ -157,19 +161,23 @@ void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, cons
     {
         const bool bIsCollidingWithP1 = eCollidingwith == eCollisionType::CollisionWithPlayer1 ? true : false; 
         const Bat* pBat = bIsCollidingWithP1 ? rTuple.pBat1 : rTuple.pBat2 ;
-        const eBallState eBallGoingDir = bIsCollidingWithP1 ? RIGHT : LEFT;
+        const bool bIsBallOnLeft = (rTuple.pBall->GetTranslationPosition().x < *rTuple.fScreenWidth/2);
+        if ( bIsCollidingWithP1 && bIsBallOnLeft || !bIsCollidingWithP1 && !bIsBallOnLeft )
+        {
+            const eBallState eBallGoingDir = bIsCollidingWithP1 ? RIGHT : LEFT;
 
-        sf::Vector3f const ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
-        rTuple.pPlayer1SoundEffect->setPosition(ballPosition);
-        rTuple.pPlayer2SoundEffect->setPosition(ballPosition);
+            sf::Vector3f const ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
+            rTuple.pPlayer1SoundEffect->setPosition(ballPosition);
+            rTuple.pPlayer2SoundEffect->setPosition(ballPosition);
 
-        rTuple.pBall->OnBatCollision(*rTuple.fScreenHeight);
-        
-        rTuple.pBall->SetYSpeed(pBat->GetVelocity() + rTuple.pBall->GetYSpeed());
-        rTuple.pBall->SetDesiredBallState(eBallGoingDir);
-        rTuple.pBall->StateMachine(*rTuple.fScreenWidth);
-        sf::Sound* pPlayThisSound = eBallGoingDir != LEFT ? rTuple.pPlayer1SoundEffect :rTuple.pPlayer2SoundEffect;
-        pPlayThisSound->play();
+            rTuple.pBall->OnBatCollision(*rTuple.fScreenHeight);
+            
+            rTuple.pBall->SetYSpeed(pBat->GetVelocity() + rTuple.pBall->GetYSpeed());
+            rTuple.pBall->SetDesiredBallState(eBallGoingDir);
+            rTuple.pBall->StateMachine(*rTuple.fScreenWidth);
+            sf::Sound* pPlayThisSound = eBallGoingDir != LEFT ? rTuple.pPlayer1SoundEffect :rTuple.pPlayer2SoundEffect;
+            pPlayThisSound->play();
+        }
         return;
     }
     else if(eCollidingwith == eCollisionType::CollisionWithWall)

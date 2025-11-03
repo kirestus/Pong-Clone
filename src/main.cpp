@@ -13,8 +13,8 @@ int main()
     window.requestFocus();
     sf::RenderWindow* ptrWindow = &window;
     
-    Bat Player1Bat(sf::Vector2f(50.0f,vScreenArea.y/2), ePlayerNumber::PLAYER1);
-    Bat Player2Bat(sf::Vector2f(vScreenArea.x-50.0f,vScreenArea.y/2), ePlayerNumber::PLAYER2);
+    Bat Player1Bat(sf::Vector2f(50.0f,ptrWindow->getSize().y/2), ePlayerNumber::PLAYER1);
+    Bat Player2Bat(sf::Vector2f(vScreenArea.x-50.0f,ptrWindow->getSize().y/2), ePlayerNumber::PLAYER2);
     Ball Ball(ptrWindow);
 
     sf::Font fPongFont;

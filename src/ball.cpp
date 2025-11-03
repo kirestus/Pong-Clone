@@ -33,8 +33,8 @@ void Ball::StateMachine(float fScreenWidth)
     else if(m_eCurrentBallState == LEFT || m_eCurrentBallState == RIGHT )
     {
         //check if our collision valid
-        bool bIsCollisionValid = m_eCurrentBallState == LEFT && fScreenWidth/2 > m_vBallVector.x ||
-        fScreenWidth/2 <  m_vBallVector.x ;
+        bool bIsCollisionValid = m_eCurrentBallState == LEFT && fScreenWidth/2 > GetTranslationPosition().x ||
+        m_eCurrentBallState == RIGHT && fScreenWidth/2 <  m_vBallVector.x ;
 
         if ( m_eDesiredBallState == eBallState::HitBall && bIsCollisionValid )
         {

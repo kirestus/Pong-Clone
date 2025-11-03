@@ -80,7 +80,7 @@ bool Bat::IsBouncing(float fSpeed)
 void Bat::CalculateBatSpeed(sf::RenderWindow* pRenderWindow, float fLapsedTime, bool isGamePaused = false)
 {
     eBatMoveDirection newMoveDirection = DetermCurrentMoveDirection(pRenderWindow);
-    UpdateDesiredToShapeTransform();
+    //UpdateDesiredToShapeTransform();
     float fSpeed =  GetVelocity()*fLapsedTime;
     
     if (( fSpeed < GetTopSpeed() || fSpeed > GetTopSpeed() *-1 )&& !isGamePaused)
