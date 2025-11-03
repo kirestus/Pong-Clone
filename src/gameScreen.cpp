@@ -111,10 +111,14 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 
 void GameScreen::ResetGame(DataStruct &rTuple)
 {
+    if (GetisWinConditionMet())
+    {
+        rTuple.pWorldGameState->SetCurrentGamestate(eGameState::Quit);
+    }
+
     rTuple.pBat1->SetPosition(sf::Vector2f(50.0f,*rTuple.fScreenHeight/2));
     rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
     rTuple.pBat1->UpdateShapeToDesiredTransform();
-    //rTuple.pBat1->GetShape().setOrigin(rTuple.pBat1->GetShape().getSize().x/2,rTuple.pBat1->GetShape().getSize().y/2);
 
     rTuple.pBat2->SetPosition(sf::Vector2f(*rTuple.fScreenWidth -50.0f,*rTuple.fScreenHeight / 2 ));
     rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
@@ -183,6 +187,8 @@ void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, cons
     else if(eCollidingwith == eCollisionType::CollisionWithWall)
     {
         rTuple.pBall->OnWallCollision(true, *rTuple.fScreenHeight);
+        sf::Sound* pSound = rTuple.pHitWallSoundEffect;
+        pSound->play();
         return;
     }
 return;

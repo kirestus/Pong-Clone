@@ -22,6 +22,9 @@ struct DataStruct{
     //---SFX----
     sf::SoundBuffer* pPlayer1SoundBuffer = nullptr;
     sf::SoundBuffer* pPlayer2SoundBuffer = nullptr;
+    sf::SoundBuffer* pHitWallSoundBuffer = nullptr;
+
+    sf::Sound* pHitWallSoundEffect = nullptr;
     sf::Sound* pPlayer1SoundEffect = nullptr;
     sf::Sound* pPlayer2SoundEffect = nullptr;
 

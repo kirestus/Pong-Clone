@@ -39,7 +39,10 @@ class GameScreen
 
         GameState* GetGameState() const { return m_pGameScreenGameState ;}
 
+        bool GetisWinConditionMet() {m_aScore[0] >= m_iScoreLimit-1 ;}
+
     private:
+        int m_iScoreLimit = 10;
         GameState* m_pGameScreenGameState = nullptr;
         InputHandler m_hInputHandler;         
         sf::Vector2f m_vScreenCenter;

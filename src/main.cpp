@@ -28,6 +28,7 @@ int main()
 
     sf::SoundBuffer player1SoundBuffer;
     sf::SoundBuffer player2SoundBuffer;
+    sf::SoundBuffer hitWallSoundBuffer;
 
     player1SoundBuffer.loadFromFile("sfx/player1Hit.wav");
     sf::Sound p1SoundEffect;
@@ -37,6 +38,10 @@ int main()
     sf::Sound p2SoundEffect;
     p2SoundEffect.setBuffer(player2SoundBuffer);
 
+    hitWallSoundBuffer.loadFromFile("sfx/hitWall.wav");
+    sf::Sound hitWallSoundEffect;
+    hitWallSoundEffect.setBuffer(hitWallSoundBuffer);
+
     DataTuple.pRenderWindow = &window;
     DataTuple.fScreenWidth = &vScreenArea.x;
     DataTuple.fScreenHeight = &vScreenArea.y;
@@ -45,10 +50,13 @@ int main()
     DataTuple.pBall = &Ball;
     DataTuple.pMessage = &sText;
     DataTuple.pFont = &fPongFont;
+    
     DataTuple.pPlayer1SoundBuffer = &player1SoundBuffer;
     DataTuple.pPlayer1SoundEffect = &p1SoundEffect;
     DataTuple.pPlayer2SoundBuffer = &player2SoundBuffer;
     DataTuple.pPlayer2SoundEffect = &p2SoundEffect;
+    DataTuple.pHitWallSoundBuffer = &hitWallSoundBuffer;
+    DataTuple.pHitWallSoundEffect = &hitWallSoundEffect;
 
     GameScreen gameScreen = GameScreen(DataTuple);
 
