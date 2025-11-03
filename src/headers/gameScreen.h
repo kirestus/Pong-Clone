@@ -6,6 +6,8 @@
 #include <headers/dataStruct.h>
 #include <headers/inputHandler.h>
 #include <headers/gameState.h>
+#include <headers/collision.h>
+
 
 class GameScreen 
 {
@@ -15,7 +17,8 @@ class GameScreen
         virtual ~GameScreen();
 
         void ResetGame(DataStruct &rTuple);
-        void CheckCollisions(DataStruct &rTuple, const bool);
+        eCollisionType CheckCollisions(DataStruct &rTuple);
+        void HandleCollisions(DataStruct &rTuple, const bool, const eCollisionType);
 
         bool isBallCollidingWithTarget(const sf::FloatRect box1, const sf::FloatRect box2);
         bool isBallHittingWall(const sf::FloatRect box1, sf::RenderWindow* pRenderWindow);

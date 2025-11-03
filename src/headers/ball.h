@@ -48,7 +48,7 @@ class Ball
         void StateMachine(float);
         void UpdateBallPosition(float, bool);
 
-        void OnBatCollision(bool, float );
+        void OnBatCollision( float );
         void OnWallCollision(bool, float );
         void OnScoreGoal(bool, bool isLeft, float);
 

@@ -1,29 +1,12 @@
 #include <headers/dataStruct.h>
 #include <SFML/Graphics.hpp>
 
-class cogCollider
+enum class eCollisionType
 {
-public:
-    cogCollider();
-    virtual ~cogCollider();
-
-    sf::RectangleShape* GetObjectsCollisionRect() const { return m_pColliderRect ; }
-
-private:
-    sf::RectangleShape* m_pColliderRect;
-    bool m_bIsColliding = false;
+    CollisionWithPlayer1,
+    CollisionWithPlayer2,
+    CollisionWithWall,
+    CollisionWithGoalZone,
+    NoCollision
 };
 
-
-
-
-class CollisionHandler
-{
-
-public:
-
-
-
-private:
-
-};

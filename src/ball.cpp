@@ -76,13 +76,10 @@ void Ball::UpdateBallPosition(float fDeltaT, bool isPaused)
 
 //----------------------------------------------------------
 
-void Ball::OnBatCollision(bool isColliding, float fScreenWidth)
+void Ball::OnBatCollision(float fScreenWidth)
 {
-    if (isColliding)
-    {
-        SetDesiredBallState(eBallState::HitBall);
-        StateMachine(fScreenWidth);
-    }
+    SetDesiredBallState(eBallState::HitBall);
+    StateMachine(fScreenWidth);
 }
 
 //----------------------------------------------------------

@@ -81,8 +81,8 @@ void Bat::CalculateBatSpeed(sf::RenderWindow* pRenderWindow, float fLapsedTime, 
 {
     eBatMoveDirection newMoveDirection = DetermCurrentMoveDirection(pRenderWindow);
     UpdateDesiredToShapeTransform();
-    float fSpeed =  GetVelocity() * fLapsedTime;
-
+    float fSpeed =  GetVelocity()*fLapsedTime;
+    
     if (( fSpeed < GetTopSpeed() || fSpeed > GetTopSpeed() *-1 )&& !isGamePaused)
     {
         SetPosition(sf::Vector2f(GetPosition().x, GetPosition().y + fSpeed ));
@@ -92,25 +92,25 @@ void Bat::CalculateBatSpeed(sf::RenderWindow* pRenderWindow, float fLapsedTime, 
     {
         if (!IsBouncing(fSpeed) )
         {
-            ModifyVelocity( - ( GetAccel() ));
+            ModifyVelocity( - ( GetAccel()*fLapsedTime ));
         }
         else{
-            ModifyVelocity( - ( GetAccel()*1.4 ));
+            ModifyVelocity( - ( GetAccel()*fLapsedTime ));
         }
     }
     else if (newMoveDirection == eBatMoveDirection::DOWN && abs(fSpeed) < GetTopSpeed())
     { 
         if (!IsBouncing(fSpeed))
         {
-            ModifyVelocity( ( GetAccel() ));
+            ModifyVelocity( ( GetAccel()*fLapsedTime ));
         }
         else{
-            ModifyVelocity(  ( GetAccel()*1.4 ));
+            ModifyVelocity(  ( GetAccel()*1.4*fLapsedTime ));
         }
     }
     else
     {
-        DecayVelocity();
+        SetVelocity(fSpeed*0.96/fLapsedTime);
     }
 
     if( ( IsHittingBottom(pRenderWindow->getSize()) || IsHittingTop() ))

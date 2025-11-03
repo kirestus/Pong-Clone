@@ -45,3 +45,4 @@ file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/fonts"
 
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/sfx"
         DESTINATION "${CMAKE_BINARY_DIR}/bin/")
+        

@@ -46,7 +46,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
     //wololo.play();
     wololo.setLoop(true);
 
-    //rTuple.pRenderWindow->setFramerateLimit(100.0);
+    rTuple.pRenderWindow->setFramerateLimit(244.0);
     Bat* pBat1 = rTuple.pBat1;
     Bat* pBat2 = rTuple.pBat2;
     Ball* pBall = rTuple.pBall;
@@ -56,23 +56,28 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         float fFrameTime = rGameClock.restart().asSeconds();
         float fFps = 1.0 / fFrameTime;
         std::cout << fFps << " Frames Per Second: \n";
+
+        //rTuple.pMessage->setString(DebugText::DebugTextGameState(rTuple.pWorldGameState->GetCurrentGameState()));
+        //rTuple.pMessage->setString(DebugText::DebugTextBallState(rTuple.pBall->GetCurrentBallState()));
+        bool bIsPaused = rTuple.pWorldGameState->GetCurrentGameState() == eGameState::Paused;
         rTuple.pWorldGameState->DetermineGameState();
 
         if (rTuple.pWorldGameState->GetCurrentGameState() == Boot )
         {
             ResetGame(rTuple);
+            UpdateScoreText(rTuple);
         }
 
-        bool bIsPaused = rTuple.pWorldGameState->GetCurrentGameState() == eGameState::Paused;
-        
-        pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime/10, bIsPaused);
-        pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime/10, bIsPaused);
+        pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
+        pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
         pBall->UpdateBallPosition(fFrameTime/10, bIsPaused);
         
-        CheckCollisions(rTuple, bIsPaused);
-        
-        //rTuple.pMessage->setString(DebugText::DebugTextGameState(rTuple.pWorldGameState->GetCurrentGameState()));
-        //rTuple.pMessage->setString(DebugText::DebugTextBallState(rTuple.pBall->GetCurrentBallState()));
+        eCollisionType eCollidingWith = CheckCollisions(rTuple);
+        if ( eCollidingWith != eCollisionType::NoCollision )
+        {
+            UpdateScoreText(rTuple);
+            HandleCollisions(rTuple, bIsPaused, eCollidingWith);
+        }
 
         sf::Event event;
         while (rTuple.pRenderWindow->pollEvent(event))
@@ -120,48 +125,59 @@ void GameScreen::ResetGame(DataStruct &rTuple)
 
 //----------------------------------------------------------
 
-void GameScreen::CheckCollisions(DataStruct &rTuple, const bool bIsPaused)
-{
+eCollisionType GameScreen::CheckCollisions(DataStruct &rTuple)
+{  
     const bool bIsCollidingWithP1 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat1->GetShape().getGlobalBounds());
     const bool bIsCollidingWithP2 = isBallCollidingWithTarget(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pBat2->GetShape().getGlobalBounds());
     const bool bIsCollidingWithWalls = isBallHittingWall(rTuple.pBall->GetShape().getGlobalBounds(), rTuple.pRenderWindow );
     const bool bDidPLayerScore = isBallHittingGoal(rTuple.pBall->GetShape().getGlobalBounds(),rTuple );
 
-    rTuple.pBall->OnBatCollision(bIsCollidingWithP1 || bIsCollidingWithP2, *rTuple.fScreenHeight);
-    rTuple.pBall->OnWallCollision(bIsCollidingWithWalls, *rTuple.fScreenHeight);
-    
-    sf::Vector3f const ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
-    rTuple.pPlayer1SoundEffect->setPosition(ballPosition);
-    rTuple.pPlayer2SoundEffect->setPosition(ballPosition);
+    //order here could matter in the rare edge case of a player hitting a wall and hitting the goal
+    if ( bDidPLayerScore ){ return eCollisionType::CollisionWithGoalZone ;}
+    else if ( bIsCollidingWithP1 ){ return eCollisionType::CollisionWithPlayer1 ;}
+    else if ( bIsCollidingWithP2 ){ return eCollisionType::CollisionWithPlayer2 ;}
+    else if ( bIsCollidingWithWalls ){ return eCollisionType::CollisionWithWall ;}
+    return eCollisionType::NoCollision ;
+}
 
-    if(bDidPLayerScore)
+//----------------------------------------------------------
+
+void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, const eCollisionType eCollidingwith )
+{
+    if (eCollidingwith == eCollisionType::CollisionWithGoalZone)
     {
         const bool isleft = rTuple.pBall->GetTranslationPosition().x < *rTuple.fScreenWidth/2;
-        rTuple.pBall->OnScoreGoal(bDidPLayerScore, isleft, *rTuple.fScreenWidth);
+        rTuple.pBall->OnScoreGoal(true, isleft, *rTuple.fScreenWidth);
         rTuple.pWorldGameState->SetDesiredGamestate(eGameState::GameOver);
         ResetGame(rTuple);
+        return;
     }
-    //should simplifiy this by making a function and combining the 2
-    else if(bIsCollidingWithP1)
+    else if (eCollidingwith == eCollisionType::CollisionWithPlayer1||
+        eCollidingwith == eCollisionType::CollisionWithPlayer2)
     {
-        if( (abs(rTuple.pBat1->GetVelocity()/3) + abs(rTuple.pBall->GetYSpeed()))< rTuple.pBall->GetTopSpeed()*0.5 )
-        {
-            rTuple.pBall->SetYSpeed(rTuple.pBat1->GetVelocity()/3 + rTuple.pBall->GetYSpeed());
-            rTuple.pBall->SetDesiredBallState(RIGHT);
-            rTuple.pBall->StateMachine(*rTuple.fScreenWidth);
-        }
-        rTuple.pPlayer1SoundEffect->play();
+        const bool bIsCollidingWithP1 = eCollidingwith == eCollisionType::CollisionWithPlayer1 ? true : false; 
+        const Bat* pBat = bIsCollidingWithP1 ? rTuple.pBat1 : rTuple.pBat2 ;
+        const eBallState eBallGoingDir = bIsCollidingWithP1 ? RIGHT : LEFT;
+
+        sf::Vector3f const ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
+        rTuple.pPlayer1SoundEffect->setPosition(ballPosition);
+        rTuple.pPlayer2SoundEffect->setPosition(ballPosition);
+
+        rTuple.pBall->OnBatCollision(*rTuple.fScreenHeight);
+        
+        rTuple.pBall->SetYSpeed(pBat->GetVelocity() + rTuple.pBall->GetYSpeed());
+        rTuple.pBall->SetDesiredBallState(eBallGoingDir);
+        rTuple.pBall->StateMachine(*rTuple.fScreenWidth);
+        sf::Sound* pPlayThisSound = eBallGoingDir != LEFT ? rTuple.pPlayer1SoundEffect :rTuple.pPlayer2SoundEffect;
+        pPlayThisSound->play();
+        return;
     }
-    else if(bIsCollidingWithP2)
+    else if(eCollidingwith == eCollisionType::CollisionWithWall)
     {
-        if( (abs(rTuple.pBat1->GetVelocity()/3) + abs(rTuple.pBall->GetYSpeed()))< rTuple.pBall->GetTopSpeed()*0.5 )
-        {
-            rTuple.pBall->SetYSpeed(rTuple.pBat2->GetVelocity()/3 + rTuple.pBall->GetYSpeed());
-            rTuple.pBall->SetDesiredBallState(LEFT);
-            rTuple.pBall->StateMachine(*rTuple.fScreenWidth);
-        }
-        rTuple.pPlayer2SoundEffect->play();
+        rTuple.pBall->OnWallCollision(true, *rTuple.fScreenHeight);
+        return;
     }
+return;
 }
 
 //----------------------------------------------------------
