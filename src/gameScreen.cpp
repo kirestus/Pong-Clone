@@ -1,6 +1,7 @@
 #include <headers/gameScreen.h>
 #include <string>
 #include <debugText.cpp>
+#include <iostream>
 
 //-----------------------------------------------------------------
 
@@ -45,12 +46,34 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
     //wololo.play();
     wololo.setLoop(true);
 
+    //rTuple.pRenderWindow->setFramerateLimit(100.0);
     Bat* pBat1 = rTuple.pBat1;
     Bat* pBat2 = rTuple.pBat2;
     Ball* pBall = rTuple.pBall;
 
     while (rTuple.pRenderWindow->isOpen())
     {
+        float fFrameTime = rGameClock.restart().asSeconds();
+        float fFps = 1.0 / fFrameTime;
+        std::cout << fFps << " Frames Per Second: \n";
+        rTuple.pWorldGameState->DetermineGameState();
+
+        if (rTuple.pWorldGameState->GetCurrentGameState() == Boot )
+        {
+            ResetGame(rTuple);
+        }
+
+        bool bIsPaused = rTuple.pWorldGameState->GetCurrentGameState() == eGameState::Paused;
+        
+        pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime/10, bIsPaused);
+        pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime/10, bIsPaused);
+        pBall->UpdateBallPosition(fFrameTime/10, bIsPaused);
+        
+        CheckCollisions(rTuple, bIsPaused);
+        
+        //rTuple.pMessage->setString(DebugText::DebugTextGameState(rTuple.pWorldGameState->GetCurrentGameState()));
+        //rTuple.pMessage->setString(DebugText::DebugTextBallState(rTuple.pBall->GetCurrentBallState()));
+
         sf::Event event;
         while (rTuple.pRenderWindow->pollEvent(event))
         {
@@ -66,36 +89,13 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             }
         }
 
-        float fLapsedTime = rGameClock.getElapsedTime().asSeconds();
-        rTuple.pWorldGameState->DetermineGameState();
-
-        sf::RectangleShape pBallShape = pBall->ReferenceShape();
-        if (rTuple.pWorldGameState->GetCurrentGameState() == Boot )
-        {
-            ResetGame(rTuple);
-        }
-
-        bool bIsPaused = rTuple.pWorldGameState->GetCurrentGameState() == eGameState::Paused;
-        
-        pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime, bIsPaused);
-        pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fLapsedTime, bIsPaused);
-        pBall->UpdateBallPosition(fLapsedTime, bIsPaused);
-        
-        CheckCollisions(rTuple, bIsPaused);
-        
-        //rTuple.pMessage->setString(DebugText::DebugTextGameState(rTuple.pWorldGameState->GetCurrentGameState()));
-        //rTuple.pMessage->setString(DebugText::DebugTextBallState(rTuple.pBall->GetCurrentBallState()));
         rTuple.pRenderWindow->clear();
-
         rTuple.pRenderWindow->draw( *rTuple.pMessage );
         rTuple.pRenderWindow->draw( pBat1->GetShape());
         rTuple.pRenderWindow->draw( pBat2->GetShape());
-        rTuple.pRenderWindow->draw( pBallShape );
+        rTuple.pRenderWindow->draw( pBall->ReferenceShape() );
+        
         rTuple.pRenderWindow->display();
-
-        m_fTimeElapsed += rGameClock.getElapsedTime().asSeconds();
-
-        rGameClock.restart();
     }
 
     return 1;
@@ -197,7 +197,7 @@ bool GameScreen::isBallHittingGoal(const sf::FloatRect box1, DataStruct &rTuple 
     const float fRightGoalPosition = *rTuple.fScreenWidth;
     const float fBoxXpos = box1.left;
 
-    if (fBoxXpos <= fLeftGoalPosition && m_fTimeElapsed > 0.1f) // this is work around for an annoying bug
+    if (fBoxXpos <= fLeftGoalPosition  > 0.1f )
     {
         m_aScore[1] ++;
         

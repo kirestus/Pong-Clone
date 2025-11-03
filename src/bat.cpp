@@ -34,7 +34,6 @@ eBatMoveDirection Bat::DetermCurrentMoveDirection(sf::RenderWindow* pRenderWindo
     {
         case eBatMoveDirection::NONE :
             eNewMoveDirection = eDesiredMoveDirection;
-            DecayVelocity();
             break;
         case eBatMoveDirection::DOWN :
         {
@@ -108,6 +107,10 @@ void Bat::CalculateBatSpeed(sf::RenderWindow* pRenderWindow, float fLapsedTime, 
         else{
             ModifyVelocity(  ( GetAccel()*1.4 ));
         }
+    }
+    else
+    {
+        DecayVelocity();
     }
 
     if( ( IsHittingBottom(pRenderWindow->getSize()) || IsHittingTop() ))

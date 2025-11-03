@@ -41,7 +41,6 @@ class GameScreen
         InputHandler m_hInputHandler;         
         sf::Vector2f m_vScreenCenter;
         sf::Clock m_hClock;
-        float m_fTimeElapsed = 0.00f;
         int m_aScore[2] = {0};
 };
 

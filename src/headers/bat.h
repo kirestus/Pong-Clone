@@ -41,7 +41,7 @@ public:
     ePlayerNumber GetPlayerNumber() const { return m_ePlayerNumber ;}
 
     void ModifyVelocity( float _speedMod ){ m_fVelocity += _speedMod ;}
-    void DecayVelocity(){ m_fVelocity *= m_fYdecaySpeed ;}
+    void DecayVelocity(){ m_fVelocity *= m_fYdecayRate ;}
 
     void UpdateTargetYPosition (float _fTargetYpos){ m_vPosition.y += _fTargetYpos;}
 
@@ -75,7 +75,7 @@ private:
 
     const float m_fYaccel = 12.0f;
     const float m_fYtopSpeed = 12.00f;
-    const float m_fYdecaySpeed = 0.995f;
+    const float m_fYdecayRate = 0.995f;
     float m_fVelocity = 0.0f;
     float m_fSpeed = 0.0f;
 };
