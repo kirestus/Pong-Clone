@@ -24,6 +24,8 @@ file(GLOB all_SRCS
         "${PROJECT_SOURCE_DIR}/src/*.cpp"
         "${PROJECT_SOURCE_DIR}/src/*.c"
         "${PROJECT_SOURCE_DIR}/src/fonts/*.ttf"
+        "${PROJECT_SOURCE_DIR}/src/sfx/*.wav"
+        "${PROJECT_SOURCE_DIR}/src/sfx/*.mp3"
         )
 
 add_executable(main ${all_SRCS})
