@@ -58,17 +58,17 @@ class StartCommand : public Command
 public:
   virtual void execute(DataStruct& rTuple)
   {
-    if ( rTuple.pWorldGameState->GetCurrentGameState() == eGameState::Paused )
+    if ( rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused )
     {
-        rTuple.pWorldGameState->SetDesiredGamestate(eGameState::Running);
+        rTuple.pWorldState->SetDesiredGamestate(eGameState::Running);
     }
-    else if (rTuple.pWorldGameState->GetCurrentGameState() == eGameState::GameOver)
+    else if (rTuple.pWorldState->GetCurrentGameState() == eGameState::GameOver)
     {
-        rTuple.pWorldGameState->SetDesiredGamestate(eGameState::Boot);
+        rTuple.pWorldState->SetDesiredGamestate(eGameState::Boot);
     }
     else
     {
-        rTuple.pWorldGameState->SetDesiredGamestate(eGameState::Paused);
+        rTuple.pWorldState->SetDesiredGamestate(eGameState::Paused);
     }
   }
 

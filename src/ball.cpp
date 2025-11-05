@@ -1,7 +1,7 @@
 #include <headers/ball.h>
 #include <assert.h>
 
-Ball::Ball(sf::RenderWindow* pRenderWindow)
+Ball::Ball(std::shared_ptr<sf::RenderWindow> pRenderWindow)
 {
     m_vBallVector = sf::Vector3f( pRenderWindow->getSize().x/2, pRenderWindow->getSize().y/2, 0 );
     m_sShape.setSize(sf::Vector2f(15.0f,15.0f));

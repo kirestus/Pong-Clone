@@ -22,8 +22,8 @@ public:
     Bat(sf::Vector2f, ePlayerNumber);
     Bat();
 
-    void CalculateBatSpeed(sf::RenderWindow *pRenderWindow, float fLapsedTime, bool isGamePaused);
-    void NudgeBat(sf::RenderWindow* pRenderWindow);
+    void CalculateBatSpeed(std::shared_ptr<sf::RenderWindow> pRenderWindow, float fLapsedTime, bool isGamePaused);
+    void NudgeBat(std::shared_ptr<sf::RenderWindow> pRenderWindow);
 
     sf::Vector2f GetPosition() const { return m_vPosition ;}
     void SetPosition(sf::Vector2f _position) { m_vPosition = _position ; }
@@ -53,7 +53,7 @@ public:
 
     bool IsBouncing(float fSpeed);
 
-    eBatMoveDirection DetermCurrentMoveDirection(sf::RenderWindow* pRenderWindow );
+    eBatMoveDirection DetermCurrentMoveDirection(std::shared_ptr<sf::RenderWindow> pRenderWindow );
 
     eBatMoveDirection GetDesiredMoveDirection() const { return m_eDesiredMoveDirection; }
     void SetDesiredMoveDirection( eBatMoveDirection _direction ){ m_eDesiredMoveDirection = _direction ;}

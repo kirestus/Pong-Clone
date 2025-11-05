@@ -24,7 +24,7 @@ Bat::Bat()
 
 //-----------------------------------------------------------------
 
-eBatMoveDirection Bat::DetermCurrentMoveDirection(sf::RenderWindow* pRenderWindow)
+eBatMoveDirection Bat::DetermCurrentMoveDirection(std::shared_ptr<sf::RenderWindow> pRenderWindow)
 {
     eBatMoveDirection eCurrentMoveDirection = GetCurrentMoveDirection();
     eBatMoveDirection eDesiredMoveDirection = GetDesiredMoveDirection();
@@ -77,7 +77,7 @@ bool Bat::IsBouncing(float fSpeed)
 
 //-----------------------------------------------------------------
 
-void Bat::CalculateBatSpeed(sf::RenderWindow* pRenderWindow, float fLapsedTime, bool isGamePaused = false)
+void Bat::CalculateBatSpeed(std::shared_ptr<sf::RenderWindow> pRenderWindow, float fLapsedTime, bool isGamePaused = false)
 {
     eBatMoveDirection newMoveDirection = DetermCurrentMoveDirection(pRenderWindow);
     //UpdateDesiredToShapeTransform();
@@ -125,7 +125,7 @@ void Bat::CalculateBatSpeed(sf::RenderWindow* pRenderWindow, float fLapsedTime, 
 //-----------------------------------------------------------------
 
 
-void Bat::NudgeBat(sf::RenderWindow* pRenderWindow)
+void Bat::NudgeBat(std::shared_ptr<sf::RenderWindow> pRenderWindow)
 {
         //Nudge the bat if its at the top or bottom so it doesnt glitch out
     if( IsHittingTop() )

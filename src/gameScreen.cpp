@@ -16,18 +16,12 @@ GameScreen::GameScreen(DataStruct &rTuple)
 void GameScreen::CreateGameScreen(DataStruct& rTuple)
 {
     SetScreenCenter(CalculateScreenCenter(rTuple.pRenderWindow));
-    rTuple.pWorldGameState = new GameState;
-    rTuple.fScreenHeight = rTuple.pRenderWindow->getSize().y;
-    rTuple.fScreenWidth = rTuple.pRenderWindow->getSize().x;
     rTuple.pPlayer1SoundBuffer->loadFromFile("sfx/player1Hit.wav");
     rTuple.pPlayer2SoundBuffer->loadFromFile("sfx/player2Hit.wav");
     rTuple.pHitWallSoundBuffer->loadFromFile("sfx/wallHit.wav");
-    rTuple.pBat1 = new Bat(sf::Vector2f(50.0f,rTuple.pRenderWindow->getSize().y/2), ePlayerNumber::PLAYER1);
-    rTuple.pBat2 = new Bat(sf::Vector2f(rTuple.pRenderWindow->getSize().x-50.0f,rTuple.pRenderWindow->getSize().y/2), ePlayerNumber::PLAYER2);
-    rTuple.pBall= new Ball(rTuple.pRenderWindow);
 
-    rTuple.vectorFont.loadFromFile("fonts/Vector.ttf");
-    rTuple.pMessage->setFont(rTuple.vectorFont);
+    rTuple.pVectorFont->loadFromFile("fonts/Vector.ttf");
+    rTuple.pMessage->setFont(*rTuple.pVectorFont);
     rTuple.pMessage->setFillColor(sf::Color::White);
     rTuple.pMessage->setCharacterSize(90);
     rTuple.pMessage->setOrigin(rTuple.pMessage->getLocalBounds().getSize().x/2,rTuple.pMessage->getLocalBounds().getSize().y/2);
@@ -36,14 +30,8 @@ void GameScreen::CreateGameScreen(DataStruct& rTuple)
 
 //-----------------------------------------------------------------
 
-GameScreen::~GameScreen()
-{
-    delete m_pGameScreenGameState;
-}
 
-//-----------------------------------------------------------------
-
-sf::Vector2f GameScreen::CalculateScreenCenter(sf::RenderWindow* pRenderWindow)
+sf::Vector2f GameScreen::CalculateScreenCenter(std::shared_ptr<sf::RenderWindow> pRenderWindow)
 {
     sf::Vector2f vScreenCenter;
     vScreenCenter.x = pRenderWindow->getSize().x/2;
@@ -58,35 +46,31 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 {
     sf::Music wololo;
     wololo.openFromFile("sfx/song.mp3");
-    //wololo.play();
+    wololo.play();
     wololo.setLoop(true);
 
     rTuple.pRenderWindow->setFramerateLimit(244.0);
-    Bat* pBat1 = rTuple.pBat1;
-    Bat* pBat2 = rTuple.pBat2;
-    Ball* pBall = rTuple.pBall;
 
     while (rTuple.pRenderWindow->isOpen())
     {
         float fFrameTime = rGameClock.restart().asSeconds();
         float fFps = 1.0 / fFrameTime;
         //std::cout << fFps << " Frames Per Second: \n";
-
         //rTuple.pMessage->setString(DebugText::DebugTextGameState(rTuple.pWorldGameState->GetCurrentGameState()));
         //rTuple.pMessage->setString(DebugText::DebugTextBallState(rTuple.pBall->GetCurrentBallState()));
         
-        bool bIsPaused = rTuple.pWorldGameState->GetCurrentGameState() == eGameState::Paused;
-        rTuple.pWorldGameState->DetermineGameState();
+        bool bIsPaused = rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused;
+        rTuple.pWorldState->DetermineGameState();
 
-        if (rTuple.pWorldGameState->GetCurrentGameState() == Boot )
+        if (rTuple.pWorldState->GetCurrentGameState() == Boot )
         {
             ResetGame(rTuple);
             UpdateScoreText(rTuple);
         }
 
-        pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
-        pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
-        pBall->UpdateBallPosition(fFrameTime/10, bIsPaused);
+        rTuple.pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
+        rTuple.pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
+        rTuple.pBall->UpdateBallPosition(fFrameTime/10, bIsPaused);
         
         eCollisionType eCollidingWith = CheckCollisions(rTuple);
         if ( eCollidingWith != eCollisionType::NoCollision )
@@ -112,9 +96,9 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 
         rTuple.pRenderWindow->clear();
         rTuple.pRenderWindow->draw( *rTuple.pMessage );
-        rTuple.pRenderWindow->draw( pBat1->GetShape());
-        rTuple.pRenderWindow->draw( pBat2->GetShape());
-        rTuple.pRenderWindow->draw( pBall->ReferenceShape() );
+        rTuple.pRenderWindow->draw( rTuple.pBat1->GetShape());
+        rTuple.pRenderWindow->draw( rTuple.pBat2->GetShape());
+        rTuple.pRenderWindow->draw( rTuple.pBall->ReferenceShape() );
         
         rTuple.pRenderWindow->display();
     }
@@ -128,7 +112,7 @@ void GameScreen::ResetGame(DataStruct &rTuple)
 {
     if (GetisWinConditionMet())
     {
-        rTuple.pWorldGameState->SetCurrentGamestate(eGameState::Quit);
+        rTuple.pWorldState->SetCurrentGamestate(eGameState::Quit);
     }
 
     rTuple.pBat1->SetPosition(sf::Vector2f(50.0f, rTuple.fScreenHeight/2));
@@ -171,14 +155,15 @@ void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, cons
     {
         const bool isleft = rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2;
         rTuple.pBall->OnScoreGoal(true, isleft, rTuple.fScreenWidth);
-        rTuple.pWorldGameState->SetDesiredGamestate(eGameState::GameOver);
+        rTuple.pWorldState->SetDesiredGamestate(eGameState::GameOver);
         ResetGame(rTuple);
     }
     else if (eCollidingwith == eCollisionType::CollisionWithPlayer1||
         eCollidingwith == eCollisionType::CollisionWithPlayer2)
     {
         const bool bIsCollidingWithP1 = eCollidingwith == eCollisionType::CollisionWithPlayer1 ? true : false; 
-        const Bat* pBat = bIsCollidingWithP1 ? rTuple.pBat1 : rTuple.pBat2 ;
+        
+        std::shared_ptr<Bat> pBat = bIsCollidingWithP1 ? rTuple.pBat1 : rTuple.pBat2 ;
         const bool bIsBallOnLeft = (rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2);
         if ( bIsCollidingWithP1 && bIsBallOnLeft || !bIsCollidingWithP1 && !bIsBallOnLeft )
         {
@@ -214,12 +199,11 @@ bool GameScreen::isBallCollidingWithTarget(const sf::FloatRect box1, const sf::F
 
 //----------------------------------------------------------
 
-bool GameScreen::isBallHittingWall(const sf::FloatRect box1, sf::RenderWindow* pRenderWindow)
+bool GameScreen::isBallHittingWall(const sf::FloatRect box1, std::shared_ptr<sf::RenderWindow> pRenderWindow)
 {
     const float rectTop = 0.0f;
     const float rectBottom = pRenderWindow->getSize().y - 15.0f;
-    const float top = box1.top;
-    if (top > rectBottom || top < rectTop)
+    if (box1.top > rectBottom || box1.top < rectTop)
     {
         return true;
     }
@@ -234,7 +218,7 @@ bool GameScreen::isBallHittingGoal(const sf::FloatRect box1, DataStruct &rTuple 
     const float fRightGoalPosition = rTuple.fScreenWidth;
     const float fBoxXpos = box1.left;
 
-    if (fBoxXpos <= fLeftGoalPosition  > 0.1f )
+    if (fBoxXpos < fLeftGoalPosition )
     {
         m_aScore[1] ++;
         
@@ -261,9 +245,7 @@ std::string GameScreen::SetScoreText(int &iPlayer1Score, int &iPlayer2Score)
 
 void GameScreen::UpdateScoreText(DataStruct& rTuple)
 {
-    sf::Text* pText = rTuple.pMessage;
     std::string scoreString = GameScreen::SetScoreText(m_aScore[0],m_aScore[1]);
-    pText->setString(sf::String(scoreString));
-    pText->setOrigin(pText->getLocalBounds().getSize().x/2,pText->getLocalBounds().getSize().y/2);
-
+    rTuple.pMessage->setString(sf::String(scoreString));
+    rTuple.pMessage->setOrigin(rTuple.pMessage->getLocalBounds().getSize().x/2,rTuple.pMessage->getLocalBounds().getSize().y/2);
 }

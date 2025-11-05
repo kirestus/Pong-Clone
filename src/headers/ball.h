@@ -17,7 +17,7 @@ enum eBallState{
 class Ball
 {
     public:
-        Ball(sf::RenderWindow*);
+        Ball(std::shared_ptr<sf::RenderWindow> pRenderWindow);
 
         void SetDesiredBallState(eBallState _desiredState){ m_eDesiredBallState = _desiredState ;}
 
