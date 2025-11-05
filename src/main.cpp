@@ -1,7 +1,5 @@
 #include <SFML/Graphics.hpp>
 #include <headers/gameScreen.h>
-#include <SFML/System/String.hpp>
-#include <headers/bat.h>
 #include <headers/dataStruct.h>
 
 int main()

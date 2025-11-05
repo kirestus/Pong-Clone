@@ -37,13 +37,10 @@ class GameScreen
 
         sf::Clock GetGameClock() const { return m_hClock; }
 
-        //GameState* GetGameState() const { return m_pGameScreenGameState ;}
-
         bool GetisWinConditionMet() {return (m_aScore[0] >= m_iScoreLimit-1) ;}
 
     private:
-        int m_iScoreLimit = 10;
-        //GameState* m_pGameScreenGameState = nullptr;
+        const int m_iScoreLimit = 10;
         InputHandler m_hInputHandler;         
         sf::Vector2f m_vScreenCenter;
         sf::Clock m_hClock;
