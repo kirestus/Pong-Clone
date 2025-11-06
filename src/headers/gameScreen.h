@@ -11,39 +11,42 @@
 
 class GameScreen 
 {
-    public:
+public:
 
-        GameScreen( DataStruct& );
-        //virtual ~GameScreen();
+    GameScreen( DataStruct& );
 
-        void ResetGame(DataStruct &rTuple);
-        eCollisionType CheckCollisions(DataStruct &rTuple);
-        void HandleCollisions(DataStruct &rTuple, const bool, const eCollisionType);
+    void ResetGame(DataStruct &rTuple);
+    eCollisionType CheckCollisions(DataStruct &rTuple);
+    void HandleCollisions(DataStruct &rTuple, const bool, const eCollisionType);
 
-        bool isBallCollidingWithTarget(const sf::FloatRect box1, const sf::FloatRect box2);
-        bool isBallHittingWall(const sf::FloatRect box1, std::shared_ptr<sf::RenderWindow> pRenderWindow);
-        bool isBallHittingGoal( const sf::FloatRect box1, DataStruct &rTuple);
+    bool GetShouldUpdateScore()const{ return m_bShouldUpdateScore; }
+    void SetShouldUpdateScore(bool bShouldIt){ m_bShouldUpdateScore = bShouldIt; }
 
-        std::string SetScoreText(int &iPlayer1Score, int &iPlayer2Score);
+    bool isBallCollidingWithTarget(const sf::FloatRect box1, const sf::FloatRect box2);
+    bool isBallHittingWall(const sf::FloatRect box1, std::shared_ptr<sf::RenderWindow> pRenderWindow);
+    bool isBallHittingGoal( const sf::FloatRect box1, DataStruct &rTuple);
 
-        sf::Vector2f CalculateScreenCenter(std::shared_ptr<sf::RenderWindow> pRenderWindow);
-        sf::Vector2f GetScreenCenter() const {return m_vScreenCenter;}
-        void SetScreenCenter(sf::Vector2f fScreenCenter){m_vScreenCenter = fScreenCenter;} 
+    std::string SetScoreText(int &iPlayer1Score, int &iPlayer2Score);
 
-        void CreateGameScreen(DataStruct& rTuple); 
-        int UpdateGamescreen(DataStruct& rTuple, sf::Clock &rTimer);
+    sf::Vector2f CalculateScreenCenter(std::shared_ptr<sf::RenderWindow> pRenderWindow);
+    sf::Vector2f GetScreenCenter() const {return m_vScreenCenter;}
+    void SetScreenCenter(sf::Vector2f fScreenCenter){m_vScreenCenter = fScreenCenter;} 
 
-        void UpdateScoreText(DataStruct& rTuple);
+    void CreateGameScreen(DataStruct& rTuple); 
+    int UpdateGamescreen(DataStruct& rTuple, sf::Clock &rTimer);
 
-        sf::Clock GetGameClock() const { return m_hClock; }
+    void UpdateScoreText(DataStruct& rTuple);
 
-        bool GetisWinConditionMet() {return (m_aScore[0] >= m_iScoreLimit-1) ;}
+    sf::Clock GetGameClock() const { return m_hClock; }
 
-    private:
-        const int m_iScoreLimit = 10;
-        InputHandler m_hInputHandler;         
-        sf::Vector2f m_vScreenCenter;
-        sf::Clock m_hClock;
-        int m_aScore[2] = {0};
+    bool GetisWinConditionMet() {return (m_aScore[0] >= m_iScoreLimit-1) ;}
+
+private:
+    bool m_bShouldUpdateScore = true;
+    const int m_iScoreLimit = 10;
+    InputHandler m_hInputHandler;         
+    sf::Vector2f m_vScreenCenter;
+    sf::Clock m_hClock;
+    int m_aScore[2] = {0};
 };
 

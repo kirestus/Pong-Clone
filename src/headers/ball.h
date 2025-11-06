@@ -1,18 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-
-enum eBallState{
-    None,
-    LEFT,
-    RIGHT,
-    HitBall,
-    HitWall,
-    AtPlayer1,
-    AtPlayer2,
-    GoalOnPlayer1,
-    GoalOnPlayer2,
-    ResetGamePosition,
-};
+#include <headers/eBallstate.h>
 
 class Ball
 {

@@ -1,4 +1,5 @@
 #include <headers/dataStruct.h>
+#include <headers/debugText.h>
 
 class Command
 {  
@@ -81,7 +82,7 @@ class DebugTextState1Command : public Command
 public:
   virtual void execute(DataStruct& rTuple)
   {
-    //enable a bool on the gamescreen to show debug text
+    rTuple.pMessage->setString(DebugText::DebugTextGameState(rTuple.pWorldState->GetCurrentGameState()));
   }
 };
 
@@ -92,7 +93,25 @@ class DebugTextState2Command : public Command
 public:
   virtual void execute(DataStruct& rTuple)
   {
-    //enable a bool on the gamescreen to show debug text
+    rTuple.pMessage->setString(DebugText::DebugTextBallState(rTuple.pBall->GetCurrentBallState()));
+  }
+};
+
+//----------------------------------------------------------
+
+class DebugTextState3Command : public Command
+{
+public:
+  virtual void execute(DataStruct& rTuple)
+  {
+    if (!rTuple.pGameMusic->Paused)
+    {
+      rTuple.pGameMusic->pause();
+    }
+    else
+    {
+      rTuple.pGameMusic->play();
+    }
   }
 };
 

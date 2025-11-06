@@ -21,8 +21,9 @@ private:
     
     Command* m_pPressDebugState1 = new DebugTextState1Command ;
     Command* m_pPressDebugState2 = new DebugTextState2Command ;
+    Command* m_pPressDebugState3 = new DebugTextState3Command ;
     Command* m_pStartGame_ = new StartCommand ;
     Command* m_pQuitGame_ = new QuitCommand ;
 
-    Command* m_aCommandArray[12];
+    Command* m_aCommandArray[13];
 };

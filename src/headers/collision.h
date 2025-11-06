@@ -1,7 +1,7 @@
 #include <headers/dataStruct.h>
 #include <SFML/Graphics.hpp>
 
-enum class eCollisionType
+enum eCollisionType
 {
     CollisionWithPlayer1,
     CollisionWithPlayer2,

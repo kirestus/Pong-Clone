@@ -1,12 +1,12 @@
 #include <headers/gameScreen.h>
 #include <string>
-#include <debugText.cpp>
 #include <iostream>
 
 //-----------------------------------------------------------------
 
 GameScreen::GameScreen(DataStruct &rTuple)
 {
+
     CreateGameScreen(rTuple);
     UpdateGamescreen(rTuple,m_hClock);
 }
@@ -19,6 +19,7 @@ void GameScreen::CreateGameScreen(DataStruct& rTuple)
     rTuple.pPlayer1SoundBuffer->loadFromFile("sfx/player1Hit.wav");
     rTuple.pPlayer2SoundBuffer->loadFromFile("sfx/player2Hit.wav");
     rTuple.pHitWallSoundBuffer->loadFromFile("sfx/wallHit.wav");
+    rTuple.pScoreGoalSoundBuffer->loadFromFile("sfx/goalScored.wav");
 
     rTuple.pVectorFont->loadFromFile("fonts/Vector.ttf");
     rTuple.pMessage->setFont(*rTuple.pVectorFont);
@@ -44,22 +45,19 @@ sf::Vector2f GameScreen::CalculateScreenCenter(std::shared_ptr<sf::RenderWindow>
 
 int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 {
-    sf::Music wololo;
-    wololo.openFromFile("sfx/song.mp3");
-    wololo.play();
-    wololo.setLoop(true);
+    rTuple.pGameMusic->play();
+    rTuple.pGameMusic->setLoop(true);
 
     rTuple.pRenderWindow->setFramerateLimit(244.0);
 
     while (rTuple.pRenderWindow->isOpen())
     {
-        float fFrameTime = rGameClock.restart().asSeconds();
-        float fFps = 1.0 / fFrameTime;
+        const float fFrameTime = rGameClock.restart().asSeconds();
+        const float fFps = 1.0 / fFrameTime;
         //std::cout << fFps << " Frames Per Second: \n";
-        //rTuple.pMessage->setString(DebugText::DebugTextGameState(rTuple.pWorldGameState->GetCurrentGameState()));
-        //rTuple.pMessage->setString(DebugText::DebugTextBallState(rTuple.pBall->GetCurrentBallState()));
-        
-        bool bIsPaused = rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused;
+
+        const bool bIsPaused = rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused;
+
         rTuple.pWorldState->DetermineGameState();
 
         if (rTuple.pWorldState->GetCurrentGameState() == Boot )
@@ -72,10 +70,13 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         rTuple.pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
         rTuple.pBall->UpdateBallPosition(fFrameTime/10, bIsPaused);
         
-        eCollisionType eCollidingWith = CheckCollisions(rTuple);
+        const eCollisionType eCollidingWith = CheckCollisions(rTuple);
         if ( eCollidingWith != eCollisionType::NoCollision )
         {
-            UpdateScoreText(rTuple);
+            if (GetShouldUpdateScore())
+            {
+                UpdateScoreText(rTuple);
+            }
             HandleCollisions(rTuple, bIsPaused, eCollidingWith);
         }
 
@@ -217,18 +218,20 @@ bool GameScreen::isBallHittingGoal(const sf::FloatRect box1, DataStruct &rTuple 
     const float fLeftGoalPosition = 0.0f;
     const float fRightGoalPosition = rTuple.fScreenWidth;
     const float fBoxXpos = box1.left;
+    sf::Sound* pSound = rTuple.pScoreGoalSoundEffect;
 
     if (fBoxXpos < fLeftGoalPosition )
     {
+        pSound->play();
         m_aScore[1] ++;
-        
-        UpdateScoreText(rTuple);
+
         return true;
     }
     else if (fBoxXpos + 15 > fRightGoalPosition)
-    {        
+    {
+        pSound->play();        
         m_aScore[0] ++;
-        UpdateScoreText(rTuple);
+        
         return true;
     }
     return false;
