@@ -6,7 +6,6 @@
 
 GameScreen::GameScreen(DataStruct &rTuple)
 {
-
     CreateGameScreen(rTuple);
     UpdateGamescreen(rTuple,m_hClock);
 }

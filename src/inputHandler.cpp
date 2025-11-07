@@ -11,11 +11,13 @@ InputHandler::InputHandler()
     m_aCommandArray[5] = m_pReleasePlayer2ButtonUp_;
     m_aCommandArray[6] = m_pReleasePlayer1ButtonDown_;
     m_aCommandArray[7] = m_pReleasePlayer2ButtonDown_;
-    m_aCommandArray[8] = m_pStartGame_;
+    m_aCommandArray[8] = m_pPressSpace;
     m_aCommandArray[9] = m_pQuitGame_;
-    m_aCommandArray[10] = m_pPressDebugState1;
-    m_aCommandArray[11] = m_pPressDebugState2;
-    m_aCommandArray[12] = m_pPressDebugState3;
+    m_aCommandArray[10] = m_pPressKeyNum1;
+    m_aCommandArray[11] = m_pPressKeyNum2;
+    m_aCommandArray[12] = m_pPressKeyNum4;
+    m_aCommandArray[13] = m_pPressKeyNum5;
+    //m_aCommandArray[13] = m_
 }
 
 
@@ -24,7 +26,7 @@ InputHandler::~InputHandler()
     //clean up all the commands on the heap when the input handler is destroyed
     for(Command* command : m_aCommandArray)
     {
-        delete[] command;
+        delete command;
     }
 }
 
@@ -45,19 +47,25 @@ Command* InputHandler::HandleInput( sf::Event* pEvent )
         return m_pPlayer2ButtonDown_;
 
         else if ( pEvent->key.code == sf::Keyboard::Space)
-        return m_pStartGame_;
+        return m_pPressSpace;
 
         else if ( pEvent->key.code == sf::Keyboard::Escape)
         return m_pQuitGame_;
 
         else if ( pEvent->key.code == sf::Keyboard::Num1)
-        return m_pPressDebugState1;
+        return m_pPressKeyNum1;
 
         else if ( pEvent->key.code == sf::Keyboard::Num2)
-        return m_pPressDebugState2;
+        return m_pPressKeyNum2;
 
         else if ( pEvent->key.code == sf::Keyboard::Num3)
-        return m_pPressDebugState3;
+        return m_pPressKeyNum3;
+
+        else if ( pEvent->key.code == sf::Keyboard::Num3)
+        return m_pPressKeyNum4;
+
+        else if ( pEvent->key.code == sf::Keyboard::Num3)
+        return m_pPressKeyNum5;
     }
 
     if (pEvent->type == pEvent->KeyReleased)

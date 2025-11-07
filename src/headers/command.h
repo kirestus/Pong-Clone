@@ -77,7 +77,21 @@ public:
 
 //----------------------------------------------------------
 
-class DebugTextState1Command : public Command
+class RestartGameCommand : public Command
+{
+public:
+  virtual void execute(DataStruct& rTuple)
+  {
+    // need to make the gamestate gatherable
+    //void GameScreen::ResetGame(DataStruct &rTuple)
+  }
+};
+
+//----------------------------------------------------------
+
+
+
+class DebugTextGameStateCommand : public Command
 {
 public:
   virtual void execute(DataStruct& rTuple)
@@ -88,7 +102,7 @@ public:
 
 //----------------------------------------------------------
 
-class DebugTextState2Command : public Command
+class DebugTextBallStateCommand : public Command
 {
 public:
   virtual void execute(DataStruct& rTuple)
@@ -99,7 +113,7 @@ public:
 
 //----------------------------------------------------------
 
-class DebugTextState3Command : public Command
+class PauseMusicCommand : public Command
 {
 public:
   virtual void execute(DataStruct& rTuple)
@@ -117,12 +131,24 @@ public:
 
 //----------------------------------------------------------
 
+class UnlockFPS : public Command
+{
+public:
+  virtual void execute(DataStruct& rTuple)
+  {
+    
+  }
+};
+
+//----------------------------------------------------------
+
 class QuitCommand : public Command
 {
 public:
   virtual void execute(DataStruct& rTuple)
   {
       rTuple.pRenderWindow->close();
+      rTuple.~DataStruct();
   }
 };
 

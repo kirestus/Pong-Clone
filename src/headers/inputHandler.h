@@ -19,11 +19,14 @@ private:
     Command* m_pReleasePlayer1ButtonDown_ = new StopPlayer1DownCommand; 
     Command* m_pReleasePlayer2ButtonDown_ = new StopPlayer2DownCommand ;
     
-    Command* m_pPressDebugState1 = new DebugTextState1Command ;
-    Command* m_pPressDebugState2 = new DebugTextState2Command ;
-    Command* m_pPressDebugState3 = new DebugTextState3Command ;
-    Command* m_pStartGame_ = new StartCommand ;
+    Command* m_pPressKeyNum1 = new DebugTextGameStateCommand ;
+    Command* m_pPressKeyNum2 = new DebugTextBallStateCommand ;
+    Command* m_pPressKeyNum3 = new PauseMusicCommand ;
+    Command* m_pPressKeyNum4 = new PauseMusicCommand ;
+    Command* m_pPressKeyNum5 = new PauseMusicCommand ;
+    
+    Command* m_pPressSpace = new StartCommand ;
     Command* m_pQuitGame_ = new QuitCommand ;
 
-    Command* m_aCommandArray[13];
+    Command* m_aCommandArray[14];
 };

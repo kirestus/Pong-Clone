@@ -15,9 +15,10 @@ public:
 
     GameScreen( DataStruct& );
 
-    void ResetGame(DataStruct &rTuple);
     eCollisionType CheckCollisions(DataStruct &rTuple);
     void HandleCollisions(DataStruct &rTuple, const bool, const eCollisionType);
+
+    void ResetGame(DataStruct&);
 
     bool GetShouldUpdateScore()const{ return m_bShouldUpdateScore; }
     void SetShouldUpdateScore(bool bShouldIt){ m_bShouldUpdateScore = bShouldIt; }

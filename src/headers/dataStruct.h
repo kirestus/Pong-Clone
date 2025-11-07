@@ -28,11 +28,13 @@ struct DataStruct{
     std::unique_ptr<sf::SoundBuffer> pPlayer2SoundBuffer = std::make_unique<sf::SoundBuffer>();
     std::unique_ptr<sf::SoundBuffer> pHitWallSoundBuffer = std::make_unique<sf::SoundBuffer>();
     std::unique_ptr<sf::SoundBuffer> pScoreGoalSoundBuffer = std::make_unique<sf::SoundBuffer>();
+    std::unique_ptr<sf::SoundBuffer> pYouWinSoundBuffer = std::make_unique<sf::SoundBuffer>();
 
     sf::Sound* pPlayer1SoundEffect = new sf::Sound(*pPlayer1SoundBuffer);
     sf::Sound* pPlayer2SoundEffect = new sf::Sound(*pPlayer2SoundBuffer);
     sf::Sound* pHitWallSoundEffect = new sf::Sound(*pHitWallSoundBuffer);
     sf::Sound* pScoreGoalSoundEffect = new sf::Sound(*pScoreGoalSoundBuffer);
+    sf::Sound* pYouWinSoundEffect = new sf::Sound(*pYouWinSoundBuffer);
     sf::Music* pGameMusic = new sf::Music;
 
 
@@ -52,6 +54,7 @@ struct DataStruct{
         delete pHitWallSoundEffect;
         delete pGameMusic;
         delete pScoreGoalSoundEffect;
+        delete pYouWinSoundEffect;
         std::cout << "DataStruct Destroyed";
     }
 };
