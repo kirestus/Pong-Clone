@@ -48,7 +48,7 @@ class Ball
         sf::Vector3f m_vBallVector;
         sf::RectangleShape m_sShape;
         const float m_fTopSpeed = 15500.00f;
-        sf::Vector2f m_v2InitialSpeed = sf::Vector2f(3000.0f,00.0f);
+        const sf::Vector2f m_v2InitialSpeed = sf::Vector2f(3000.0f,00.0f);
         sf::Vector2f m_v2CurrentBallSpeed = m_v2InitialSpeed;
         const float m_fSpeedUpIncriment = 500.0f;
 

@@ -17,6 +17,8 @@ InputHandler::InputHandler()
     m_aCommandArray[11] = m_pPressKeyNum2;
     m_aCommandArray[12] = m_pPressKeyNum4;
     m_aCommandArray[13] = m_pPressKeyNum5;
+    m_aCommandArray[14] = m_pPlayer1ButtonShoot;
+    m_aCommandArray[15] = m_pPlayer2ButtonShoot;
     //m_aCommandArray[13] = m_
 }
 
@@ -48,6 +50,12 @@ Command* InputHandler::HandleInput( sf::Event* pEvent )
 
         else if ( pEvent->key.code == sf::Keyboard::Space)
         return m_pPressSpace;
+
+        else if ( pEvent->key.code == sf::Keyboard::F)
+        return m_pPlayer1ButtonShoot;
+
+        else if ( pEvent->key.code == sf::Keyboard::Slash)
+        return m_pPlayer2ButtonShoot;
 
         else if ( pEvent->key.code == sf::Keyboard::Escape)
         return m_pQuitGame_;

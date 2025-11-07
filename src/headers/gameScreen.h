@@ -19,6 +19,7 @@ public:
     void HandleCollisions(DataStruct &rTuple, const bool, const eCollisionType);
 
     void ResetGame(DataStruct&);
+    void AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball> pBall);
 
     bool GetShouldUpdateScore()const{ return m_bShouldUpdateScore; }
     void SetShouldUpdateScore(bool bShouldIt){ m_bShouldUpdateScore = bShouldIt; }

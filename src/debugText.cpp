@@ -50,6 +50,14 @@ sf::String DebugText::DebugTextBallState( eBallState eBallState )
     {
         return sf::String("RESET:");
     }
+    else if (eBallState == eBallState::AtPlayer1)
+    {
+        return sf::String("AT P1:");
+    }
+    else if (eBallState == eBallState::AtPlayer2)
+    {
+        return sf::String("AT P2:");
+    }
     else
     {
         std::string sEnumValue = std::to_string(eBallState);

@@ -178,6 +178,36 @@ public:
 
 //----------------------------------------------------------
 
+class Player1ButtonShootCommand : public Command
+{
+public:
+  virtual void execute( DataStruct& rTuple )
+  {
+    if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1)
+    {
+       rTuple.pBall->SetDesiredBallState(eBallState::RIGHT);
+       rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+    }
+  }
+};
+
+//----------------------------------------------------------
+
+class Player2ButtonShootCommand : public Command
+{
+public:
+  virtual void execute( DataStruct& rTuple )
+  {
+    if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2)
+    {
+       rTuple.pBall->SetDesiredBallState(eBallState::LEFT);
+       rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+    }
+  }
+};
+
+//----------------------------------------------------------
+
 class StopPlayer1UpCommand : public Command
 {
 public:

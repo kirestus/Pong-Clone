@@ -19,8 +19,13 @@ public:
 
     eGameState GetDesiredGameState() const {return m_eDesiredGameState ;}
     void SetDesiredGamestate( eGameState _gamestate ){ m_eDesiredGameState = _gamestate ;}
+
+    bool GetLastGoalScoredOnP1()const{ return m_bLastGoalScoredOnP1 ;}
+    void SetLastGoalScoredOnP1( bool bIsScoredOnP1 ){ m_bLastGoalScoredOnP1 =  bIsScoredOnP1 ;}
 private:
 
     eGameState m_eCurrentGameState;
     eGameState m_eDesiredGameState = eGameState::Boot;
+
+    bool m_bLastGoalScoredOnP1 = false;
 };

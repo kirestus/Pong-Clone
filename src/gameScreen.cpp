@@ -79,6 +79,19 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             HandleCollisions(rTuple, bIsPaused, eCollidingWith);
         }
 
+        if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 )
+        {
+            AttachBallToBat(rTuple.pBat1, rTuple.pBall);
+            rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+            rTuple.pBall->SetYSpeed(rTuple.pBat1->GetVelocity()*-1.5f);
+        }
+        else if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2 )
+        {
+            AttachBallToBat(rTuple.pBat2, rTuple.pBall);
+            rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+            rTuple.pBall->SetYSpeed(rTuple.pBat2->GetVelocity()*-1.5f );
+        }
+
         sf::Event event;
         while (rTuple.pRenderWindow->pollEvent(event))
         {
@@ -155,7 +168,7 @@ void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, cons
     {
         const bool isleft = rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2;
         rTuple.pBall->OnScoreGoal(true, isleft, rTuple.fScreenWidth);
-        rTuple.pWorldState->SetDesiredGamestate(eGameState::GameOver);
+        //rTuple.pWorldState->SetDesiredGamestate(eGameState::GameOver);
         ResetGame(rTuple);
     }
     else if (eCollidingwith == eCollisionType::CollisionWithPlayer1||
@@ -250,4 +263,13 @@ void GameScreen::UpdateScoreText(DataStruct& rTuple)
     std::string scoreString = GameScreen::SetScoreText(m_aScore[0],m_aScore[1]);
     rTuple.pMessage->setString(sf::String(scoreString));
     rTuple.pMessage->setOrigin(rTuple.pMessage->getLocalBounds().getSize().x/2,rTuple.pMessage->getLocalBounds().getSize().y/2);
+}
+
+//------------------------------------------------------------
+
+void GameScreen::AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball> pBall)
+{
+    const sf::Vector2f vBatPosition = pBat->GetShape().getPosition();
+    const float fOffset = pBat->GetPlayerNumber() == ePlayerNumber::PLAYER1  ? 20.0f : -20.0f;
+    pBall->SetBallVector(sf::Vector3f( vBatPosition.x + fOffset, vBatPosition.y, 0.0f));
 }

@@ -19,15 +19,41 @@ void Ball::StateMachine(float fScreenWidth)
     {
         m_sShape.setPosition(m_vBallVector.x ,m_vBallVector.y);
         //game reset state will go to either left or right
-        if (m_eDesiredBallState == eBallState::RIGHT)
+        if (m_eDesiredBallState == eBallState::AtPlayer1)
         {
-            eNewBallState = eBallState::RIGHT;
-            m_v2InitialSpeed.x = abs(m_v2InitialSpeed.x) * -1;
+            eNewBallState = eBallState::AtPlayer1;
+        }
+        else if (m_eDesiredBallState == eBallState::AtPlayer2)
+        {
+            eNewBallState = eBallState::AtPlayer2;
         }
         else
         {
             eNewBallState = eBallState::LEFT;
-            m_v2InitialSpeed.x = abs(m_v2InitialSpeed.x);
+        }
+    }
+    else if (m_eCurrentBallState == GoalOnPlayer1 )
+    {
+        eNewBallState = eBallState::AtPlayer1;
+    }
+        else if (m_eCurrentBallState == GoalOnPlayer2 )
+    {
+        eNewBallState = eBallState::AtPlayer2;
+    }
+    else if (m_eCurrentBallState == eBallState::AtPlayer1 )
+    {
+        if( m_eDesiredBallState == RIGHT) 
+        {
+            m_v2CurrentBallSpeed.x = abs(m_v2InitialSpeed.x)*-1;
+            eNewBallState = m_eDesiredBallState;
+        }
+    }
+    else if (m_eCurrentBallState == eBallState::AtPlayer2)
+    {
+        if (m_eDesiredBallState == LEFT)
+        {
+            m_v2CurrentBallSpeed.x = abs(m_v2InitialSpeed.x);
+            eNewBallState = m_eDesiredBallState;
         }
     }
     else if(m_eCurrentBallState == LEFT || m_eCurrentBallState == RIGHT )
@@ -51,12 +77,16 @@ void Ball::StateMachine(float fScreenWidth)
             SetYSpeed(GetYSpeed()*-1);
             eNewBallState = m_eCurrentBallState;
         }
-        else if( m_eDesiredBallState == eBallState::GoalOnPlayer1 ||
-        m_eDesiredBallState == eBallState::GoalOnPlayer2 )
+        else if( m_eDesiredBallState == eBallState::GoalOnPlayer1)
         {
-            eNewBallState = eBallState::ResetGamePosition;
+            eNewBallState = eBallState::AtPlayer2;
+        }
+        else if ( m_eDesiredBallState == eBallState::GoalOnPlayer2 )
+        {
+            eNewBallState = eBallState::AtPlayer1;
         }
     }
+
     assert(eNewBallState != eBallState::None && "StateMachine is NONE Update When Called to after scoring a goal");
     m_eCurrentBallState = eNewBallState;
 }
