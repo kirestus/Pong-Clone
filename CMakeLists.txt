@@ -28,7 +28,11 @@ file(GLOB all_SRCS
         "${PROJECT_SOURCE_DIR}/src/sfx/*.mp3"
         )
 
-add_executable(main ${all_SRCS})
+if(WIN32)
+        add_executable(main WIN32 ${all_SRCS})
+else()
+        add_executable(main ${all_SRCS})
+endif()
 
 target_link_libraries(main PRIVATE sfml-graphics sfml-audio)
 target_compile_features(main PRIVATE cxx_std_17)

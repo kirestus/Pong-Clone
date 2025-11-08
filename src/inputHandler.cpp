@@ -19,6 +19,7 @@ InputHandler::InputHandler()
     m_aCommandArray[13] = m_pPressKeyNum5;
     m_aCommandArray[14] = m_pPlayer1ButtonShoot;
     m_aCommandArray[15] = m_pPlayer2ButtonShoot;
+
 }
 
 

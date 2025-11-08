@@ -1,6 +1,21 @@
 #include <SFML/Graphics.hpp>
 #include <headers/gameScreen.h>
 #include <headers/dataStruct.h>
+
+#if defined(_WIN32) || defined(_WIN64)
+    #include <windows.h>
+
+    int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+    {
+
+        // Call this function at the very beginning of main
+        DataStruct DataTuple; 
+        GameScreen GameLoop(DataTuple);
+
+        return 0;
+    }
+#elif defined(__APPLE__) || defined(__MACH__)
+
 #include <iostream>
 #include <string>
 #include <limits.h>
@@ -37,3 +52,8 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+    
+
+
+#endif
+

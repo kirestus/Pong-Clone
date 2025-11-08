@@ -104,7 +104,6 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             if (command) 
             {  
                 command->execute(rTuple);
-                command->~Command();
             }
         }
 
