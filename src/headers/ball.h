@@ -33,12 +33,12 @@ class Ball
 
         eBallState GetCurrentBallState() const { return m_eCurrentBallState ;}
 
-        void StateMachine(float);
-        void UpdateBallPosition(float, bool);
+        void StateMachine(const float);
+        void UpdateBallPosition(const float, const bool);
 
-        void OnBatCollision( float );
-        void OnWallCollision(bool, float );
-        void OnScoreGoal(bool, bool isLeft, float);
+        void OnBatCollision( const float );
+        void OnWallCollision( const bool, const float );
+        void OnScoreGoal(const bool, const bool isLeft, const float);
 
 
     private:
@@ -48,7 +48,7 @@ class Ball
         sf::Vector3f m_vBallVector;
         sf::RectangleShape m_sShape;
         const float m_fTopSpeed = 15500.00f;
-        const sf::Vector2f m_v2InitialSpeed = sf::Vector2f(3000.0f,00.0f);
+        const sf::Vector2f m_v2InitialSpeed = sf::Vector2f(3500.0f,00.0f);
         sf::Vector2f m_v2CurrentBallSpeed = m_v2InitialSpeed;
         const float m_fSpeedUpIncriment = 500.0f;
 

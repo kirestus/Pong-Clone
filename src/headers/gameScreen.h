@@ -25,12 +25,12 @@ public:
     void SetShouldUpdateScore(bool bShouldIt){ m_bShouldUpdateScore = bShouldIt; }
 
     bool isBallCollidingWithTarget(const sf::FloatRect box1, const sf::FloatRect box2);
-    bool isBallHittingWall(const sf::FloatRect box1, std::shared_ptr<sf::RenderWindow> pRenderWindow);
+    bool isBallHittingWall(const sf::FloatRect box1, const std::shared_ptr<sf::RenderWindow> pRenderWindow);
     bool isBallHittingGoal( const sf::FloatRect box1, DataStruct &rTuple);
 
-    std::string SetScoreText(int &iPlayer1Score, int &iPlayer2Score);
+    std::string SetScoreText(const int &iPlayer1Score, const int &iPlayer2Score);
 
-    sf::Vector2f CalculateScreenCenter(std::shared_ptr<sf::RenderWindow> pRenderWindow);
+    sf::Vector2f CalculateScreenCenter(const std::shared_ptr<sf::RenderWindow> pRenderWindow);
     sf::Vector2f GetScreenCenter() const {return m_vScreenCenter;}
     void SetScreenCenter(sf::Vector2f fScreenCenter){m_vScreenCenter = fScreenCenter;} 
 
@@ -41,7 +41,7 @@ public:
 
     sf::Clock GetGameClock() const { return m_hClock; }
 
-    bool GetisWinConditionMet() {return (m_aScore[0] >= m_iScoreLimit-1) ;}
+    bool GetisWinConditionMet() {return (m_aScore[0] >= m_iScoreLimit-1 || m_aScore[1] >= m_iScoreLimit-1); }
 
 private:
     bool m_bShouldUpdateScore = true;

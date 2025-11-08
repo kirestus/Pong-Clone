@@ -3,8 +3,8 @@
 
 void GameState::DetermineGameState()
 {
-    eGameState eCurrentGameState = GetCurrentGameState();
-    eGameState eDesiredGameState = GetDesiredGameState();
+    const eGameState eCurrentGameState = GetCurrentGameState();
+    const eGameState eDesiredGameState = GetDesiredGameState();
     eGameState eNewGameState = eCurrentGameState;
 
     if ( eDesiredGameState == eGameState::Quit)
@@ -52,9 +52,12 @@ void GameState::DetermineGameState()
             eNewGameState = Paused;
         }
     }
-
     if ( eNewGameState != eCurrentGameState )
     {
         SetCurrentGamestate(eNewGameState);
+    }
+    else
+    {
+        static_assert("Unhandled Transition");
     }
 }

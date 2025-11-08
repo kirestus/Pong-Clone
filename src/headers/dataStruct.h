@@ -52,9 +52,9 @@ struct DataStruct{
         delete pPlayer1SoundEffect; 
         delete pPlayer2SoundEffect; 
         delete pHitWallSoundEffect;
-        delete pGameMusic;
         delete pScoreGoalSoundEffect;
         delete pYouWinSoundEffect;
+        delete pGameMusic;
         std::cout << "DataStruct Destroyed";
     }
 };

@@ -26,12 +26,13 @@ void GameScreen::CreateGameScreen(DataStruct& rTuple)
     rTuple.pMessage->setCharacterSize(90);
     rTuple.pMessage->setOrigin(rTuple.pMessage->getLocalBounds().getSize().x/2,rTuple.pMessage->getLocalBounds().getSize().y/2);
     rTuple.pMessage->setPosition(sf::Vector2f(rTuple.fScreenWidth/2, rTuple.fScreenHeight-100.0f) ); // should set this in the middle of the screen will do later
+    SetScoreText(m_aScore[0],m_aScore[1]);
+    UpdateScoreText(rTuple);
 }
 
 //-----------------------------------------------------------------
 
-
-sf::Vector2f GameScreen::CalculateScreenCenter(std::shared_ptr<sf::RenderWindow> pRenderWindow)
+sf::Vector2f GameScreen::CalculateScreenCenter(const std::shared_ptr<sf::RenderWindow> pRenderWindow)
 {
     sf::Vector2f vScreenCenter;
     vScreenCenter.x = pRenderWindow->getSize().x/2;
@@ -168,7 +169,12 @@ void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, cons
     {
         const bool isleft = rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2;
         rTuple.pBall->OnScoreGoal(true, isleft, rTuple.fScreenWidth);
-        //rTuple.pWorldState->SetDesiredGamestate(eGameState::GameOver);
+
+        if ( GetisWinConditionMet() )
+        {
+            rTuple.pWorldState->SetDesiredGamestate(eGameState::GameOver);
+        }
+
         ResetGame(rTuple);
     }
     else if (eCollidingwith == eCollisionType::CollisionWithPlayer1||
@@ -212,7 +218,7 @@ bool GameScreen::isBallCollidingWithTarget(const sf::FloatRect box1, const sf::F
 
 //----------------------------------------------------------
 
-bool GameScreen::isBallHittingWall(const sf::FloatRect box1, std::shared_ptr<sf::RenderWindow> pRenderWindow)
+bool GameScreen::isBallHittingWall(const sf::FloatRect box1, const std::shared_ptr<sf::RenderWindow> pRenderWindow)
 {
     const float rectTop = 0.0f;
     const float rectBottom = pRenderWindow->getSize().y - 15.0f;
@@ -251,7 +257,7 @@ bool GameScreen::isBallHittingGoal(const sf::FloatRect box1, DataStruct &rTuple 
 
 //----------------------------------------------------------
 
-std::string GameScreen::SetScoreText(int &iPlayer1Score, int &iPlayer2Score)
+std::string GameScreen::SetScoreText(const int &iPlayer1Score, const int &iPlayer2Score)
 {
    return std::to_string(iPlayer1Score)+" - "+ std::to_string(iPlayer2Score);
 }

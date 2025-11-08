@@ -4,9 +4,8 @@
 
 int main()
 {
-
     DataStruct DataTuple; 
-    GameScreen gameScreen = GameScreen(DataTuple);
+    GameScreen GameLoop(DataTuple);
 
     return 0;
 }

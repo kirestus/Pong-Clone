@@ -12,7 +12,7 @@ Ball::Ball(std::shared_ptr<sf::RenderWindow> pRenderWindow)
 
 //----------------------------------------------------------
 
-void Ball::StateMachine(float fScreenWidth)
+void Ball::StateMachine(const float fScreenWidth)
 {
     eBallState eNewBallState = m_eCurrentBallState;
     if (m_eCurrentBallState == eBallState::ResetGamePosition )
@@ -93,7 +93,7 @@ void Ball::StateMachine(float fScreenWidth)
 
 //----------------------------------------------------------
 
-void Ball::UpdateBallPosition(float fDeltaT, bool isPaused)
+void Ball::UpdateBallPosition(const float fDeltaT,  const bool isPaused)
 {
     if (isPaused)
     { 
@@ -106,7 +106,7 @@ void Ball::UpdateBallPosition(float fDeltaT, bool isPaused)
 
 //----------------------------------------------------------
 
-void Ball::OnBatCollision(float fScreenWidth)
+void Ball::OnBatCollision(const float fScreenWidth)
 {
     SetDesiredBallState(eBallState::HitBall);
     StateMachine(fScreenWidth);
@@ -114,7 +114,7 @@ void Ball::OnBatCollision(float fScreenWidth)
 
 //----------------------------------------------------------
 
-void Ball::OnWallCollision(bool isColliding, float fScreenWidth)
+void Ball::OnWallCollision(const bool isColliding, const float fScreenWidth)
 {
     if (isColliding)
     {
@@ -125,7 +125,7 @@ void Ball::OnWallCollision(bool isColliding, float fScreenWidth)
 
 //----------------------------------------------------------
 
-void Ball::OnScoreGoal(bool isColliding, bool isLeft, float fScreenWidth)
+void Ball::OnScoreGoal(const bool isColliding, const bool isLeft, const float fScreenWidth)
 {
         if (isLeft)
         {
