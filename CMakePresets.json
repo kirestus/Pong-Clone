@@ -1,17 +1,6 @@
 {
     "version": 8,
     "configurePresets": [
-         {
-            "name": "ClangIOS",
-            "displayName": "Clang 15.0.0 arm64-apple-darwin23.5.0",
-            "description": "Using compilers: C = /usr/bin/clang, CXX = /usr/bin/clang++",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "cacheVariables": {
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
-                "CMAKE_C_COMPILER": "/usr/bin/clang",
-                "CMAKE_CXX_COMPILER": "/usr/bin/clang++"
-            }
-        },
         {
             "name": "vs64",
             "displayName": "VisualStuidio 22 - amd64",
@@ -25,10 +14,32 @@
                 "CMAKE_C_COMPILER": "cl.exe",
                 "CMAKE_CXX_COMPILER": "cl.exe"
             }
-        }
+        },
+        {
+            "name": "clang Debug",
+            "displayName": "Clang 15.0.0 arm64-apple-darwin23.5.0",
+            "description": "Using compilers: C = /usr/bin/clang, CXX = /usr/bin/clang++",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "clang Release",
+            "displayName": "Clang 15.0.0 arm64-apple-darwin23.5.0",
+            "description": "Using compilers: C = /usr/bin/clang, CXX = /usr/bin/clang++",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+                "CMAKE_BUILD_TYPE": "Release"
+    }
+}
     ],
-
-
     "buildPresets": [
         {
             "name": "vs64-debug",
@@ -45,13 +56,13 @@
         {
             "name": "clang-debug",
             "displayName": "Clang 15.0.0 arm64-apple-darwin23.5.0 Debug",
-            "configurePreset": "ClangIOS",
+            "configurePreset": "clang Debug",
             "configuration": "Debug"
         },
         {
             "name": "clang-release",
-            "displayName": "Clang 15.0.0 arm64-apple-darwin23.5.0 Debug",
-            "configurePreset": "ClangIOS",
+            "displayName": "Clang 15.0.0 arm64-apple-darwin23.5.0 Release",
+            "configurePreset": "clang Release",
             "configuration": "Release"
         }
     ]

@@ -27,7 +27,6 @@ void GameScreen::CreateGameScreen(DataStruct& rTuple)
     rTuple.pMessage->setOrigin(rTuple.pMessage->getLocalBounds().getSize().x/2,rTuple.pMessage->getLocalBounds().getSize().y/2);
     rTuple.pMessage->setPosition(sf::Vector2f(rTuple.fScreenWidth/2, rTuple.fScreenHeight-100.0f) ); // should set this in the middle of the screen will do later
     SetScoreText(m_aScore[0],m_aScore[1]);
-    UpdateScoreText(rTuple);
 }
 
 //-----------------------------------------------------------------
@@ -45,7 +44,7 @@ sf::Vector2f GameScreen::CalculateScreenCenter(const std::shared_ptr<sf::RenderW
 
 int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 {
-    rTuple.pGameMusic->play();
+    rTuple.pGameMusic->pause();
     rTuple.pGameMusic->setLoop(true);
 
     rTuple.pRenderWindow->setFramerateLimit(244.0);
@@ -63,7 +62,6 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         if (rTuple.pWorldState->GetCurrentGameState() == Boot )
         {
             ResetGame(rTuple);
-            UpdateScoreText(rTuple);
         }
 
         rTuple.pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
@@ -73,10 +71,6 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         const eCollisionType eCollidingWith = CheckCollisions(rTuple);
         if ( eCollidingWith != eCollisionType::NoCollision )
         {
-            if (GetShouldUpdateScore())
-            {
-                UpdateScoreText(rTuple);
-            }
             HandleCollisions(rTuple, bIsPaused, eCollidingWith);
         }
 
@@ -92,6 +86,8 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             rTuple.pBall->StateMachine(rTuple.fScreenWidth);
             rTuple.pBall->SetYSpeed(rTuple.pBat2->GetVelocity()*-1.5f );
         }
+
+        UpdateUIText(bIsPaused, rTuple);
 
         sf::Event event;
         while (rTuple.pRenderWindow->pollEvent(event))
@@ -187,10 +183,12 @@ void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, cons
         {
             const eBallState eBallGoingDir = bIsCollidingWithP1 ? RIGHT : LEFT;
             sf::Vector3f const ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
+            
             rTuple.pBall->OnBatCollision(rTuple.fScreenHeight);
             rTuple.pBall->SetYSpeed(pBat->GetVelocity() + rTuple.pBall->GetYSpeed());
             rTuple.pBall->SetDesiredBallState(eBallGoingDir);
             rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+            
             sf::Sound* pPlayThisSound = eBallGoingDir != LEFT ? rTuple.pPlayer1SoundEffect :rTuple.pPlayer2SoundEffect;
             pPlayThisSound->setPosition(ballPosition);
             pPlayThisSound->play();
@@ -221,7 +219,7 @@ bool GameScreen::isBallHittingWall(const sf::FloatRect box1, const std::shared_p
 {
     const float rectTop = 0.0f;
     const float rectBottom = pRenderWindow->getSize().y - 15.0f;
-    if (box1.top > rectBottom || box1.top < rectTop)
+    if (box1.top > rectBottom || box1.top <= rectTop)
     {
         return true;
     }
@@ -267,7 +265,15 @@ void GameScreen::UpdateScoreText(DataStruct& rTuple)
 {
     std::string scoreString = GameScreen::SetScoreText(m_aScore[0],m_aScore[1]);
     rTuple.pMessage->setString(sf::String(scoreString));
+    rTuple.pMessage->setCharacterSize(90);
     rTuple.pMessage->setOrigin(rTuple.pMessage->getLocalBounds().getSize().x/2,rTuple.pMessage->getLocalBounds().getSize().y/2);
+}
+
+void GameScreen::UpdateScoreText(DataStruct& rTuple, std::string sDesiredText)
+{
+    rTuple.pMessage->setString(sf::String(sDesiredText));
+    rTuple.pMessage->setOrigin(rTuple.pMessage->getLocalBounds().getSize().x/2,rTuple.pMessage->getLocalBounds().getSize().y/2);
+    rTuple.pMessage->setCharacterSize(60);
 }
 
 //------------------------------------------------------------
@@ -277,4 +283,25 @@ void GameScreen::AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball
     const sf::Vector2f vBatPosition = pBat->GetShape().getPosition();
     const float fOffset = pBat->GetPlayerNumber() == ePlayerNumber::PLAYER1  ? 20.0f : -20.0f;
     pBall->SetBallVector(sf::Vector3f( vBatPosition.x + fOffset, vBatPosition.y, 0.0f));
+}
+
+void GameScreen::UpdateUIText(bool bIsPaused, DataStruct& rTuple)
+{
+    if (bIsPaused)
+    {
+        UpdateScoreText(rTuple,std::string("SPACE 2 START"));
+        rTuple.pMessage->setCharacterSize(60);
+    }
+    else if (rTuple.pBall->GetCurrentBallState() == AtPlayer1 )
+    {
+        UpdateScoreText(rTuple,"PRESS F TO SERVE");
+    }
+    else if (rTuple.pBall->GetCurrentBallState() == AtPlayer2 )
+    {
+        UpdateScoreText(rTuple,"PRESS / TO SERVE");
+    }
+    else if (GetShouldUpdateScore())
+    {
+        UpdateScoreText(rTuple);
+    }
 }

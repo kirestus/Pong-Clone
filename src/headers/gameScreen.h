@@ -38,6 +38,8 @@ public:
     int UpdateGamescreen(DataStruct& rTuple, sf::Clock &rTimer);
 
     void UpdateScoreText(DataStruct& rTuple);
+    void UpdateScoreText(DataStruct& rTuple, std::string);
+    void UpdateUIText(bool, DataStruct& );
 
     sf::Clock GetGameClock() const { return m_hClock; }
 

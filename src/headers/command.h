@@ -118,11 +118,11 @@ class PauseMusicCommand : public Command
 public:
   virtual void execute(DataStruct& rTuple)
   {
-    if (!rTuple.pGameMusic->Paused)
+    if (rTuple.pGameMusic->Playing)
     {
       rTuple.pGameMusic->pause();
     }
-    else
+    else if (rTuple.pGameMusic->Stopped || rTuple.pGameMusic->Paused)
     {
       rTuple.pGameMusic->play();
     }
