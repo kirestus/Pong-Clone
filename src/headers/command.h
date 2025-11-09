@@ -4,10 +4,9 @@
 class Command
 {  
 public:
-    virtual ~Command() {}
+    virtual ~Command() {std::cout<<"Destroying Command";}
     virtual void execute(DataStruct& rTuple) = 0;
 };
-
 //----------------------------------------------------------
 
 class Player1DownCommand : public Command
@@ -148,7 +147,7 @@ public:
   virtual void execute(DataStruct& rTuple)
   {
       rTuple.pRenderWindow->close();
-      rTuple.~DataStruct();
+      //rTuple.~DataStruct();
   }
 };
 

@@ -1,6 +1,11 @@
 #include <headers/gameScreen.h>
 #include <string>
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
+
+//forward declaring
+static float CreateRandomAngle(int minRange, int maxRange);
 
 //-----------------------------------------------------------------
 
@@ -46,6 +51,9 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 {
     rTuple.pGameMusic->pause();
     rTuple.pGameMusic->setLoop(true);
+    srand(time(0));
+    rTuple.pBall->SetYSpeed(CreateRandomAngle(-2000.0f,2000.0f));
+
 
     rTuple.pRenderWindow->setFramerateLimit(244.0);
 
@@ -62,6 +70,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         if (rTuple.pWorldState->GetCurrentGameState() == Boot )
         {
             ResetGame(rTuple);
+            
         }
 
         rTuple.pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
@@ -87,8 +96,6 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             rTuple.pBall->SetYSpeed(rTuple.pBat2->GetVelocity()*-1.5f );
         }
 
-        UpdateUIText(bIsPaused, rTuple);
-
         sf::Event event;
         while (rTuple.pRenderWindow->pollEvent(event))
         {
@@ -102,6 +109,8 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
                 command->execute(rTuple);
             }
         }
+
+        UpdateUIText(bIsPaused, rTuple);
 
         rTuple.pRenderWindow->clear();
         rTuple.pRenderWindow->draw( *rTuple.pMessage );
@@ -135,8 +144,6 @@ void GameScreen::ResetGame(DataStruct &rTuple)
     rTuple.pBall->SetBallVector(sf::Vector3f(rTuple.fScreenWidth/2, rTuple.fScreenHeight/2, 0.00f));
 
     rTuple.pBall->StateMachine(rTuple.fScreenWidth);
-    rTuple.pBall->SetXSpeed(rTuple.pBall->GetInitialSpeed().x);
-    rTuple.pBall->SetYSpeed(rTuple.pBall->GetInitialSpeed().y);
 }
 
 //----------------------------------------------------------
@@ -185,7 +192,7 @@ void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, cons
             sf::Vector3f const ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
             
             rTuple.pBall->OnBatCollision(rTuple.fScreenHeight);
-            rTuple.pBall->SetYSpeed(pBat->GetVelocity() + rTuple.pBall->GetYSpeed());
+            rTuple.pBall->SetYSpeed(pBat->GetVelocity() + rTuple.pBall->GetYSpeed()+CreateRandomAngle(-500.0f,500.0f));
             rTuple.pBall->SetDesiredBallState(eBallGoingDir);
             rTuple.pBall->StateMachine(rTuple.fScreenWidth);
             
@@ -304,4 +311,11 @@ void GameScreen::UpdateUIText(bool bIsPaused, DataStruct& rTuple)
     {
         UpdateScoreText(rTuple);
     }
+}
+
+//------------------------------------------------------------
+
+static float CreateRandomAngle(int minRange, int maxRange)
+{
+    return rand() % (maxRange - minRange + 1 ) + minRange;
 }

@@ -90,23 +90,11 @@ void Bat::CalculateBatSpeed(std::shared_ptr<sf::RenderWindow> pRenderWindow, flo
 
     if (newMoveDirection == eBatMoveDirection::UP && abs(fSpeed) < GetTopSpeed())
     {
-        if (!IsBouncing(fSpeed) )
-        {
-            ModifyVelocity( - ( GetAccel()*fLapsedTime ));
-        }
-        else{
-            ModifyVelocity( - ( GetAccel()*fLapsedTime ));
-        }
+        ModifyVelocity( - ( GetAccel()*fLapsedTime ));
     }
     else if (newMoveDirection == eBatMoveDirection::DOWN && abs(fSpeed) < GetTopSpeed())
     { 
-        if (!IsBouncing(fSpeed))
-        {
-            ModifyVelocity( ( GetAccel()*fLapsedTime ));
-        }
-        else{
-            ModifyVelocity(  ( GetAccel()*1.4*fLapsedTime ));
-        }
+        ModifyVelocity(  ( GetAccel()*fLapsedTime ));
     }
     else
     {
