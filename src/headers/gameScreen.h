@@ -43,7 +43,7 @@ public:
 
     sf::Clock GetGameClock() const { return m_hClock; }
 
-    bool GetisWinConditionMet() {return (m_aScore[0] >= m_iScoreLimit-1 || m_aScore[1] >= m_iScoreLimit-1); }
+    bool GetisWinConditionMet() {return (m_aScore[0] == m_iScoreLimit || m_aScore[1] == m_iScoreLimit); }
 
 private:
     bool m_bShouldUpdateScore = true;

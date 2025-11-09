@@ -219,7 +219,7 @@ bool GameScreen::isBallHittingWall(const sf::FloatRect box1, const std::shared_p
 {
     const float rectTop = 0.0f;
     const float rectBottom = pRenderWindow->getSize().y - 15.0f;
-    if (box1.top > rectBottom || box1.top <= rectTop)
+    if (box1.top >= rectBottom || box1.top <= rectTop)
     {
         return true;
     }
