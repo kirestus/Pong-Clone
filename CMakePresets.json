@@ -1,9 +1,8 @@
 {
     "version": 8,
     "configurePresets": [
-        
         {
-            "name": "Release",
+            "name": "Debug",
             "displayName": "Clang 15.0.0 arm64-apple-darwin23.5.0",
             "description": "Using compilers: C = /usr/bin/clang, CXX = /usr/bin/clang++",
             "binaryDir": "${sourceDir}/out/build/${presetName}",
@@ -11,9 +10,19 @@
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
                 "CMAKE_C_COMPILER": "/usr/bin/clang",
                 "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "Release",
+            "displayName": "Release Build (Clang/Ninja)",
+            "description": "Optimized release build using compilers specified in PATH",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
                 "CMAKE_BUILD_TYPE": "Release"
-            }   
+            },
+            "inherits": "Debug"
         }
-        
     ]
 }

@@ -29,26 +29,31 @@ file(GLOB all_SRCS
         )
 
 if(WIN32)
-        add_executable(main WIN32 ${all_SRCS})
+        add_executable(Pong WIN32 ${all_SRCS})
 else()
-        add_executable(main ${all_SRCS})
+        add_executable(Pong ${all_SRCS})
 endif()
 
-target_link_libraries(main PRIVATE sfml-graphics sfml-audio)
-target_compile_features(main PRIVATE cxx_std_17)
+target_link_libraries(Pong PRIVATE sfml-graphics sfml-audio)
+target_compile_features(Pong PRIVATE cxx_std_17)
 
 
 if(WIN32)
     add_custom_command(
-        TARGET main
+        TARGET Pong
         COMMENT "Copy OpenAL DLL"
-        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:main>
+        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${SFML_SOURCE_DIR}/extlibs/bin/$<IF:$<EQUAL:${CMAKE_SIZEOF_VOID_P},8>,x64,x86>/openal32.dll $<TARGET_FILE_DIR:Pong>
         VERBATIM)
 endif()
 
-file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/fonts"
-     DESTINATION "${CMAKE_BINARY_DIR}/bin/")
+add_custom_command(
+        TARGET Pong
+        COMMENT "Copy SFX"
+        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/src/sfx/" $<TARGET_FILE_DIR:Pong>/sfx
+        VERBATIM)
 
-file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/src/sfx"
-        DESTINATION "${CMAKE_BINARY_DIR}/bin/")
-        
+add_custom_command(
+        TARGET Pong
+        COMMENT "Copy Font"
+        PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/src/fonts/" $<TARGET_FILE_DIR:Pong>/fonts
+        VERBATIM)
