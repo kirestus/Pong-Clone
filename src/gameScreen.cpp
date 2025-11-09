@@ -289,16 +289,16 @@ void GameScreen::UpdateUIText(bool bIsPaused, DataStruct& rTuple)
 {
     if (bIsPaused)
     {
-        UpdateScoreText(rTuple,std::string("SPACE 2 START"));
+        UpdateScoreText(rTuple,std::string("SPACE TO UNPAUSE:"));
         rTuple.pMessage->setCharacterSize(60);
     }
     else if (rTuple.pBall->GetCurrentBallState() == AtPlayer1 )
     {
-        UpdateScoreText(rTuple,"PRESS F TO SERVE");
+        UpdateScoreText(rTuple,"PRESS F TO SERVE:");
     }
     else if (rTuple.pBall->GetCurrentBallState() == AtPlayer2 )
     {
-        UpdateScoreText(rTuple,"PRESS / TO SERVE");
+        UpdateScoreText(rTuple,"PRESS / TO SERVE:");
     }
     else if (GetShouldUpdateScore())
     {
