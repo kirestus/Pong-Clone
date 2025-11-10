@@ -7,7 +7,7 @@ public:
     InputHandler();
     ~InputHandler();
     Command* GetCommandArray()const{return *m_aCommandArray ;}
-    Command* HandleInput( sf::Event* pEvent );
+    Command* HandleInput( sf::Event* pEvent, bool );
 
 private:
     Command* m_pPlayer1ButtonUp_ = new Player1UpCommand; 
@@ -27,9 +27,10 @@ private:
     Command* m_pPressKeyNum3 = new PauseMusicCommand ;
     Command* m_pPressKeyNum4 = new PauseMusicCommand ;
     Command* m_pPressKeyNum5 = new PauseMusicCommand ;
+    Command* m_pPressKeyNum0 = new ResetGameCommand ;
     
     Command* m_pPressSpace = new StartCommand ;
     Command* m_pQuitGame_ = new QuitCommand ;
 
-    Command* m_aCommandArray[16];
+    Command* m_aCommandArray[17];
 };

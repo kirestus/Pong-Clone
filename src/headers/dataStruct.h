@@ -13,7 +13,7 @@
 struct DataStruct{
     //--GameEntities---
 
-    std::shared_ptr<sf::RenderWindow> pRenderWindow = std::make_shared<sf::RenderWindow>(sf::VideoMode(1024,768), "PongClone");
+    std::shared_ptr<sf::RenderWindow> pRenderWindow = std::make_shared<sf::RenderWindow>(sf::VideoMode(1024,768), "Turbo Pong", sf::Style::Titlebar);
     std::shared_ptr<Bat> pBat1 = std::make_shared<Bat>(sf::Vector2f(50.0f,pRenderWindow->getSize().y/2), ePlayerNumber::PLAYER1);
     std::shared_ptr<Bat> pBat2 = std::make_shared<Bat>(sf::Vector2f(pRenderWindow->getSize().x-50.0f, pRenderWindow->getSize().y/2), ePlayerNumber::PLAYER2);
     std::shared_ptr<Ball> pBall = std::make_shared<Ball>(pRenderWindow);
@@ -59,21 +59,3 @@ struct DataStruct{
     }
 };
 
-
-//Unused singleton keeping it here for use later
-/*
-class FileSystem
-{
-public:
-    static FileSystem& instance()
-    {
-        static FileSystem* instance = new FileSystem();
-        return *instance;
-    }
-    
-
-private:
-    FileSystem(){}
-
-};
-*/

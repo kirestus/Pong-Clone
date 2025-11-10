@@ -76,20 +76,6 @@ public:
 
 //----------------------------------------------------------
 
-class RestartGameCommand : public Command
-{
-public:
-  virtual void execute(DataStruct& rTuple)
-  {
-    // need to make the gamestate gatherable
-    //void GameScreen::ResetGame(DataStruct &rTuple)
-  }
-};
-
-//----------------------------------------------------------
-
-
-
 class DebugTextGameStateCommand : public Command
 {
 public:
@@ -148,6 +134,18 @@ public:
   {
       rTuple.pRenderWindow->close();
       //rTuple.~DataStruct();
+  }
+};
+
+//----------------------------------------------------------
+
+
+class ResetGameCommand : public Command
+{
+public:
+  virtual void execute(DataStruct& rTuple)
+  {
+    rTuple.pWorldState->SetDesiredGamestate(eGameState::Reset);
   }
 };
 

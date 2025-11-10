@@ -39,7 +39,7 @@ public:
 
     void UpdateScoreText(DataStruct& rTuple);
     void UpdateScoreText(DataStruct& rTuple, std::string);
-    void UpdateUIText(bool, DataStruct& );
+    void UpdateUIText(bool, bool, DataStruct& );
 
     sf::Clock GetGameClock() const { return m_hClock; }
 

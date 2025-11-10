@@ -28,7 +28,6 @@ void GameScreen::CreateGameScreen(DataStruct& rTuple)
     rTuple.pVectorFont->loadFromFile("fonts/Vector.ttf");
     rTuple.pMessage->setFont(*rTuple.pVectorFont);
     rTuple.pMessage->setFillColor(sf::Color::White);
-    rTuple.pMessage->setCharacterSize(90);
     rTuple.pMessage->setOrigin(rTuple.pMessage->getLocalBounds().getSize().x/2,rTuple.pMessage->getLocalBounds().getSize().y/2);
     rTuple.pMessage->setPosition(sf::Vector2f(rTuple.fScreenWidth/2, rTuple.fScreenHeight-100.0f) ); // should set this in the middle of the screen will do later
     SetScoreText(m_aScore[0],m_aScore[1]);
@@ -54,8 +53,8 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
     srand(time(0));
     rTuple.pBall->SetYSpeed(CreateRandomAngle(-2000.0f,2000.0f));
 
-
     rTuple.pRenderWindow->setFramerateLimit(244.0);
+    rTuple.pRenderWindow->setMouseCursorVisible(false);
 
     while (rTuple.pRenderWindow->isOpen())
     {
@@ -63,14 +62,13 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         const float fFps = 1.0 / fFrameTime;
         //std::cout << fFps << " Frames Per Second: \n";
 
-        const bool bIsPaused = rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused;
+        bool bIsPaused = rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused;
 
         rTuple.pWorldState->DetermineGameState();
 
         if (rTuple.pWorldState->GetCurrentGameState() == Boot )
         {
             ResetGame(rTuple);
-            
         }
 
         rTuple.pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
@@ -87,13 +85,13 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         {
             AttachBallToBat(rTuple.pBat1, rTuple.pBall);
             rTuple.pBall->StateMachine(rTuple.fScreenWidth);
-            rTuple.pBall->SetYSpeed(rTuple.pBat1->GetVelocity()*-1.5f);
+            rTuple.pBall->SetYSpeed(rTuple.pBat1->GetVelocity()*-1.9f);
         }
         else if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2 )
         {
             AttachBallToBat(rTuple.pBat2, rTuple.pBall);
             rTuple.pBall->StateMachine(rTuple.fScreenWidth);
-            rTuple.pBall->SetYSpeed(rTuple.pBat2->GetVelocity()*-1.5f );
+            rTuple.pBall->SetYSpeed(rTuple.pBat2->GetVelocity()*-1.9f );
         }
 
         sf::Event event;
@@ -103,14 +101,13 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             {
                 rTuple.pRenderWindow->close();
             }
-            Command* command = m_hInputHandler.HandleInput( &event );
+            Command* command = m_hInputHandler.HandleInput( &event, GetisWinConditionMet());
             if (command) 
             {  
                 command->execute(rTuple);
             }
         }
-
-        UpdateUIText(bIsPaused, rTuple);
+        UpdateUIText( GetisWinConditionMet(), bIsPaused, rTuple );
 
         rTuple.pRenderWindow->clear();
         rTuple.pRenderWindow->draw( *rTuple.pMessage );
@@ -128,11 +125,6 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 
 void GameScreen::ResetGame(DataStruct &rTuple)
 {
-    if (GetisWinConditionMet())
-    {
-        rTuple.pWorldState->SetCurrentGamestate(eGameState::Quit);
-    }
-
     rTuple.pBat1->SetPosition(sf::Vector2f(50.0f, rTuple.fScreenHeight/2));
     rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
     rTuple.pBat1->UpdateShapeToDesiredTransform();
@@ -142,7 +134,6 @@ void GameScreen::ResetGame(DataStruct &rTuple)
     rTuple.pBat2->UpdateShapeToDesiredTransform();
 
     rTuple.pBall->SetBallVector(sf::Vector3f(rTuple.fScreenWidth/2, rTuple.fScreenHeight/2, 0.00f));
-
     rTuple.pBall->StateMachine(rTuple.fScreenWidth);
 }
 
@@ -292,9 +283,17 @@ void GameScreen::AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball
     pBall->SetBallVector(sf::Vector3f( vBatPosition.x + fOffset, vBatPosition.y, 0.0f));
 }
 
-void GameScreen::UpdateUIText(bool bIsPaused, DataStruct& rTuple)
+void GameScreen::UpdateUIText(bool bIsGameOver, bool bIsPaused, DataStruct& rTuple)
 {
-    if (bIsPaused)
+    if (bIsGameOver && rTuple.pWorldState->GetLastGoalScoredOnP1())
+    {
+        UpdateScoreText(rTuple,std::string("Player 2 Wins!:"));
+    }
+    else if (bIsGameOver && !rTuple.pWorldState->GetLastGoalScoredOnP1())
+    {
+        UpdateScoreText(rTuple,std::string("Player 1 Wins!:"));
+    }
+    else if (bIsPaused)
     {
         UpdateScoreText(rTuple,std::string("SPACE TO UNPAUSE:"));
         rTuple.pMessage->setCharacterSize(60);

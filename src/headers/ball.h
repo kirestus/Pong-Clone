@@ -42,7 +42,6 @@ class Ball
 
 
     private:
-        unsigned* pDataStruct = nullptr;
         eBallState m_eCurrentBallState = eBallState::ResetGamePosition;
         eBallState m_eDesiredBallState = eBallState::None;
         sf::Vector3f m_vBallVector;

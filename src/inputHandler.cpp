@@ -17,8 +17,9 @@ InputHandler::InputHandler()
     m_aCommandArray[11] = m_pPressKeyNum2;
     m_aCommandArray[12] = m_pPressKeyNum4;
     m_aCommandArray[13] = m_pPressKeyNum5;
-    m_aCommandArray[14] = m_pPlayer1ButtonShoot;
-    m_aCommandArray[15] = m_pPlayer2ButtonShoot;
+    m_aCommandArray[14] = m_pPressKeyNum0;
+    m_aCommandArray[15] = m_pPlayer1ButtonShoot;
+    m_aCommandArray[16] = m_pPlayer2ButtonShoot;
 
 }
 
@@ -32,9 +33,34 @@ InputHandler::~InputHandler()
     }
 }
 
-Command* InputHandler::HandleInput( sf::Event* pEvent )
+Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
 {
-    if(pEvent->type == sf::Event::KeyPressed )
+    if (pEvent->type == sf::Event::KeyPressed )
+    {
+        if ( pEvent->key.code == sf::Keyboard::Escape)
+        return m_pQuitGame_;
+
+        else if ( pEvent->key.code == sf::Keyboard::Num1)
+        return m_pPressKeyNum1;
+
+        else if ( pEvent->key.code == sf::Keyboard::Num2)
+        return m_pPressKeyNum2;
+
+        else if ( pEvent->key.code == sf::Keyboard::Num3)
+        return m_pPressKeyNum3;
+
+        else if ( pEvent->key.code == sf::Keyboard::Num3)
+        return m_pPressKeyNum4;
+
+        else if ( pEvent->key.code == sf::Keyboard::Num3)
+        return m_pPressKeyNum5;
+
+        else if (pEvent->key.code == sf::Keyboard::Num0)
+        return m_pPressKeyNum0;
+    }
+
+    //not an else if because both conditions will be true 
+    if(pEvent->type == sf::Event::KeyPressed && !bIsWinConditionMet )
     {
         if ( pEvent->key.code ==  sf::Keyboard::W )
         return m_pPlayer1ButtonUp_;
@@ -57,23 +83,6 @@ Command* InputHandler::HandleInput( sf::Event* pEvent )
         else if ( pEvent->key.code == sf::Keyboard::Slash)
         return m_pPlayer2ButtonShoot;
 
-        else if ( pEvent->key.code == sf::Keyboard::Escape)
-        return m_pQuitGame_;
-
-        else if ( pEvent->key.code == sf::Keyboard::Num1)
-        return m_pPressKeyNum1;
-
-        else if ( pEvent->key.code == sf::Keyboard::Num2)
-        return m_pPressKeyNum2;
-
-        else if ( pEvent->key.code == sf::Keyboard::Num3)
-        return m_pPressKeyNum3;
-
-        else if ( pEvent->key.code == sf::Keyboard::Num3)
-        return m_pPressKeyNum4;
-
-        else if ( pEvent->key.code == sf::Keyboard::Num3)
-        return m_pPressKeyNum5;
     }
 
     if (pEvent->type == pEvent->KeyReleased)

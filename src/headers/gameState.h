@@ -6,6 +6,7 @@ enum eGameState
     Paused,
     GameOver,
     Running,
+    Reset,
     Quit
 };
 
