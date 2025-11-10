@@ -24,7 +24,7 @@ void GameScreen::CreateGameScreen(DataStruct& rTuple)
     rTuple.pPlayer2SoundBuffer->loadFromFile("sfx/player2Hit.wav");
     rTuple.pHitWallSoundBuffer->loadFromFile("sfx/wallHit.wav");
     rTuple.pScoreGoalSoundBuffer->loadFromFile("sfx/goalScored2.wav");
-    rTuple.pYouWinSoundBuffer->loadFromFile("sfx/goalScored1.wav");
+    rTuple.pYouWinSoundBuffer->loadFromFile("sfx/goalScored.wav");
     rTuple.pSpitBallSoundBuffer->loadFromFile("sfx/spitBall.wav");
 
     rTuple.pVectorFont->loadFromFile("fonts/Vector.ttf");
@@ -95,6 +95,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             rTuple.pBall->StateMachine(rTuple.fScreenWidth);
             rTuple.pBall->SetYSpeed(rTuple.pBat2->GetVelocity()*-1.9f );
         }
+        UpdateUIText( GetisWinConditionMet(), bIsPaused, rTuple );
 
         sf::Event event;
         while (rTuple.pRenderWindow->pollEvent(event))
@@ -109,7 +110,6 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
                 command->execute(rTuple);
             }
         }
-        UpdateUIText( GetisWinConditionMet(), bIsPaused, rTuple );
 
         rTuple.pRenderWindow->clear();
         rTuple.pRenderWindow->draw( *rTuple.pMessage );
@@ -167,7 +167,12 @@ void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, cons
 
         if ( GetisWinConditionMet() )
         {
+            rTuple.pYouWinSoundEffect->play();
             rTuple.pWorldState->SetDesiredGamestate(eGameState::GameOver);
+        }
+        else
+        {
+            rTuple.pScoreGoalSoundEffect->play();
         }
 
         ResetGame(rTuple);
@@ -233,18 +238,15 @@ bool GameScreen::isBallHittingGoal(const sf::FloatRect box1, DataStruct &rTuple 
     const float fLeftGoalPosition = 0.0f;
     const float fRightGoalPosition = rTuple.fScreenWidth;
     const float fBoxXpos = box1.left;
-    sf::Sound* pSound = rTuple.pScoreGoalSoundEffect;
 
     if (fBoxXpos < fLeftGoalPosition )
     {
-        pSound->play();
         m_aScore[1] ++;
 
         return true;
     }
     else if (fBoxXpos + 15 > fRightGoalPosition)
-    {
-        pSound->play();        
+    {   
         m_aScore[0] ++;
         
         return true;
@@ -287,6 +289,7 @@ void GameScreen::AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball
 
 void GameScreen::UpdateUIText(bool bIsGameOver, bool bIsPaused, DataStruct& rTuple)
 {
+    rTuple.pMessage->setCharacterSize(60);
     if (bIsGameOver && rTuple.pWorldState->GetLastGoalScoredOnP1())
     {
         UpdateScoreText(rTuple,std::string("Player 2 Wins!:"));
@@ -298,9 +301,8 @@ void GameScreen::UpdateUIText(bool bIsGameOver, bool bIsPaused, DataStruct& rTup
     else if (bIsPaused)
     {
         UpdateScoreText(rTuple,std::string("SPACE TO UNPAUSE:"));
-        rTuple.pMessage->setCharacterSize(60);
     }
-    else if (rTuple.pBall->GetCurrentBallState() == AtPlayer1 )
+    else if (rTuple.pBall->GetCurrentBallState() == AtPlayer1)
     {
         UpdateScoreText(rTuple,"PRESS F TO SERVE:");
     }
