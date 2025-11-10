@@ -23,7 +23,9 @@ void GameScreen::CreateGameScreen(DataStruct& rTuple)
     rTuple.pPlayer1SoundBuffer->loadFromFile("sfx/player1Hit.wav");
     rTuple.pPlayer2SoundBuffer->loadFromFile("sfx/player2Hit.wav");
     rTuple.pHitWallSoundBuffer->loadFromFile("sfx/wallHit.wav");
-    rTuple.pScoreGoalSoundBuffer->loadFromFile("sfx/goalScored.wav");
+    rTuple.pScoreGoalSoundBuffer->loadFromFile("sfx/goalScored2.wav");
+    rTuple.pYouWinSoundBuffer->loadFromFile("sfx/goalScored1.wav");
+    rTuple.pSpitBallSoundBuffer->loadFromFile("sfx/spitBall.wav");
 
     rTuple.pVectorFont->loadFromFile("fonts/Vector.ttf");
     rTuple.pMessage->setFont(*rTuple.pVectorFont);

@@ -184,6 +184,7 @@ public:
     {
        rTuple.pBall->SetDesiredBallState(eBallState::RIGHT);
        rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+       rTuple.pSpitBallSoundEffect->play();
     }
   }
 };
@@ -199,6 +200,7 @@ public:
     {
        rTuple.pBall->SetDesiredBallState(eBallState::LEFT);
        rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+       rTuple.pSpitBallSoundEffect->play();  
     }
   }
 };
