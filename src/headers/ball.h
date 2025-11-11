@@ -14,6 +14,8 @@ class Ball
         sf::RectangleShape GetShape() const { return m_sShape; }
         void SetShape( sf::RectangleShape _shape ) { m_sShape = _shape ;}
 
+        sf::RectangleShape* GetTrailShapeArray(){ return m_sShapeTrail ;}
+
         float GetXSpeed() const { return m_v2CurrentBallSpeed.x ;}
         void SetXSpeed( float _speed) { m_v2CurrentBallSpeed.x = _speed ;}
 
@@ -40,12 +42,16 @@ class Ball
         void OnWallCollision( const bool, const float );
         void OnScoreGoal(const bool, const bool isLeft, const float);
 
+        void UpdateBallTrail(int);
 
     private:
         eBallState m_eCurrentBallState = eBallState::ResetGamePosition;
         eBallState m_eDesiredBallState = eBallState::None;
         sf::Vector3f m_vBallVector;
+
         sf::RectangleShape m_sShape;
+        sf::RectangleShape m_sShapeTrail[6];
+
         const float m_fTopSpeed = 15500.00f;
         const sf::Vector2f m_v2InitialSpeed = sf::Vector2f(4000.0f,00.0f);
         sf::Vector2f m_v2CurrentBallSpeed = m_v2InitialSpeed;

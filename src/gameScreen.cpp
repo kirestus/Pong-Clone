@@ -92,7 +92,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 
         //included here because i want to check for none type also
         SetLastCollisionType(eCollidingWith);
-        ShakeScreen(rTuple,0.5f, eCollidingWith);
+        ShakeScreen(rTuple,0.5f, eCollidingWith, bIsPaused);
 
         if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 )
         {
@@ -129,10 +129,18 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         rTuple.pRenderWindow->draw( *rTuple.pScoreText );
         rTuple.pRenderWindow->draw( rTuple.pBat1->GetShape());
         rTuple.pRenderWindow->draw( rTuple.pBat2->GetShape());
+        for (int i = 5; i >= 0; i --)
+        {
+            rTuple.pRenderWindow->draw( rTuple.pBall->GetTrailShapeArray()[i] );
+        }
         rTuple.pRenderWindow->draw( rTuple.pBall->ReferenceShape() );
         
         rTuple.pRenderWindow->display();
         m_lDetermFrame ++;
+        if(!bIsPaused)
+        {
+            rTuple.pBall->UpdateBallTrail( m_lDetermFrame);
+        }
     }
 
     return 1;
@@ -368,8 +376,12 @@ static float CreateRandomAngle(int minRange, int maxRange)
 
 //------------------------------------------------------------
 
-void GameScreen::ShakeScreen(DataStruct &rTuple, const float fMagnitude, eCollisionType eJustHit )
+void GameScreen::ShakeScreen(DataStruct &rTuple, const float fMagnitude, eCollisionType eJustHit, const bool isPaused )
 {
+    if (isPaused)
+    {
+        return;
+    }
     if (eJustHit == CollisionWithWall)
     {
         m_lLastShakeFrame = m_lDetermFrame;

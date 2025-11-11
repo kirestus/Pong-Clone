@@ -46,7 +46,7 @@ public:
     sf::Clock GetGameClock() const { return m_hClock; }
     sf::Clock GetTextFadeTimer() const { return m_TextFadeOutTimer ;}
 
-    void ShakeScreen( DataStruct &rTuple, const float fMagnitude, eCollisionType eJustHit );
+    void ShakeScreen( DataStruct &rTuple, const float fMagnitude, eCollisionType eJustHit, bool );
     bool GetisWinConditionMet() {return (m_aScore[0] == m_iScoreLimit || m_aScore[1] == m_iScoreLimit); }
 
 private:

@@ -137,3 +137,29 @@ void Ball::OnScoreGoal(const bool isColliding, const bool isLeft, const float fS
         }
         StateMachine(fScreenWidth);
 }
+
+//----------------------------------------------------------
+
+void Ball::UpdateBallTrail(int iSimFrame)
+{
+    if (iSimFrame % 3 == 0)
+    {
+        //todo: make the length a const set in the class header so that i can tweak it easier
+        for (int i = 5; i >= 0; i --)
+        {
+            if ( i == 0 )
+            {
+                 m_sShapeTrail[i] = m_sShape;
+            }
+            else
+            {
+                m_sShapeTrail[i] = m_sShapeTrail[i-1];
+            }
+            m_sShapeTrail[i].setFillColor(sf::Color(255,255,255,255/i -30));
+            m_sShapeTrail[i].setScale(sf::Vector2f(1.0-i*0.1,1.0-i*0.1));
+
+        }
+    }
+}
+
+//----------------------------------------------------------
