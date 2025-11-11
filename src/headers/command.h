@@ -127,6 +127,18 @@ public:
 
 //----------------------------------------------------------
 
+class ToggleSFXCommand : public Command
+{
+public:
+  virtual void execute(DataStruct& rTuple)
+  {
+    bool toggleSFX = !rTuple.pWorldState->GetShouldPlaySFX();
+    rTuple.pWorldState->SetShouldPlaySFX(toggleSFX);
+  }
+};
+
+//----------------------------------------------------------
+
 class QuitCommand : public Command
 {
 public:
@@ -184,7 +196,10 @@ public:
     {
        rTuple.pBall->SetDesiredBallState(eBallState::RIGHT);
        rTuple.pBall->StateMachine(rTuple.fScreenWidth);
-       rTuple.pSpitBallSoundEffect->play();
+       if (rTuple.pWorldState->GetShouldPlaySFX())
+       {
+        rTuple.pSpitBallSoundEffect->play();
+       }
     }
   }
 };
@@ -200,7 +215,10 @@ public:
     {
        rTuple.pBall->SetDesiredBallState(eBallState::LEFT);
        rTuple.pBall->StateMachine(rTuple.fScreenWidth);
-       rTuple.pSpitBallSoundEffect->play();  
+       if (rTuple.pWorldState->GetShouldPlaySFX())
+       {
+        rTuple.pSpitBallSoundEffect->play();
+       } 
     }
   }
 };

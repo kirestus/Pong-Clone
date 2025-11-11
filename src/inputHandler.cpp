@@ -49,10 +49,10 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
         else if ( pEvent->key.code == sf::Keyboard::Num3)
         return m_pPressKeyNum3;
 
-        else if ( pEvent->key.code == sf::Keyboard::Num3)
+        else if ( pEvent->key.code == sf::Keyboard::Num4)
         return m_pPressKeyNum4;
 
-        else if ( pEvent->key.code == sf::Keyboard::Num3)
+        else if ( pEvent->key.code == sf::Keyboard::Num5)
         return m_pPressKeyNum5;
 
         else if (pEvent->key.code == sf::Keyboard::Num0)

@@ -23,10 +23,15 @@ public:
 
     bool GetLastGoalScoredOnP1()const{ return m_bLastGoalScoredOnP1 ;}
     void SetLastGoalScoredOnP1( bool bIsScoredOnP1 ){ m_bLastGoalScoredOnP1 =  bIsScoredOnP1 ;}
+
+    bool GetShouldPlaySFX()const{ return m_bShouldPlaySFX; }
+    void SetShouldPlaySFX(bool bShouldPlay) { m_bShouldPlaySFX = bShouldPlay; }
+
 private:
 
     eGameState m_eCurrentGameState;
     eGameState m_eDesiredGameState = eGameState::Boot;
 
     bool m_bLastGoalScoredOnP1 = false;
+    bool m_bShouldPlaySFX = true;
 };

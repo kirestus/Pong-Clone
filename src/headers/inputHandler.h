@@ -22,7 +22,7 @@ private:
     Command* m_pPlayer1ButtonShoot = new Player1ButtonShootCommand;
     Command* m_pPlayer2ButtonShoot = new Player2ButtonShootCommand;
     
-    Command* m_pPressKeyNum1 = new DebugTextGameStateCommand ;
+    Command* m_pPressKeyNum1 = new ToggleSFXCommand;
     Command* m_pPressKeyNum2 = new DebugTextBallStateCommand ;
     Command* m_pPressKeyNum3 = new PauseMusicCommand ;
     Command* m_pPressKeyNum4 = new PauseMusicCommand ;

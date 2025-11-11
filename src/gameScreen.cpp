@@ -92,7 +92,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 
         //included here because i want to check for none type also
         SetLastCollisionType(eCollidingWith);
-        ShakeScreen(rTuple,5.0f, eCollidingWith);
+        ShakeScreen(rTuple,0.5f, eCollidingWith);
 
         if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 )
         {
@@ -182,10 +182,14 @@ void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, cons
 
         if ( GetisWinConditionMet() )
         {
-            rTuple.pYouWinSoundEffect->play();
+            if (rTuple.pWorldState->GetShouldPlaySFX())
+            {
+                rTuple.pYouWinSoundEffect->play();  
+            }
+
             rTuple.pWorldState->SetDesiredGamestate(eGameState::GameOver);
         }
-        else
+        else if (rTuple.pWorldState->GetShouldPlaySFX())
         {
             rTuple.pScoreGoalSoundEffect->play();
         }
@@ -210,14 +214,23 @@ void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, cons
             
             sf::Sound* pPlayThisSound = eBallGoingDir != LEFT ? rTuple.pPlayer1SoundEffect :rTuple.pPlayer2SoundEffect;
             pPlayThisSound->setPosition(ballPosition);
-            pPlayThisSound->play();
+            if (rTuple.pWorldState->GetShouldPlaySFX())
+            {
+                pPlayThisSound->play();
+            }
         }
     }
     else if(eCollidingwith == eCollisionType::CollisionWithWall && 
         GetLastCollisionType()!=eCollisionType::CollisionWithWall)
     {
         rTuple.pBall->OnWallCollision(true, rTuple.fScreenWidth);
-        rTuple.pHitWallSoundEffect->play();
+        if (rTuple.pWorldState->GetShouldPlaySFX())
+        {
+            float fPitchShift = 0.8 + (abs(rTuple.pBall->GetYSpeed()/30000));
+            rTuple.pHitWallSoundEffect->setVolume(abs(rTuple.pBall->GetYSpeed()/100));
+            rTuple.pHitWallSoundEffect->setPitch(fPitchShift);
+            rTuple.pHitWallSoundEffect->play();
+        }
     }  
 
 }
@@ -313,11 +326,11 @@ void GameScreen::UpdateUIText(bool bIsGameOver, bool bIsPaused, DataStruct& rTup
 
     if (bIsGameOver && rTuple.pWorldState->GetLastGoalScoredOnP1())
     {
-        UpdateHudText(rTuple,std::string("Player 2 Wins!:"));
+        UpdateHudText(rTuple,std::string("PLAYER 2 WINS!:"));
     }
     else if (bIsGameOver && !rTuple.pWorldState->GetLastGoalScoredOnP1())
     {
-        UpdateHudText(rTuple,std::string("Player 1 Wins!:"));
+        UpdateHudText(rTuple,std::string("PLAYER 1 WINS!:"));
     }
     else if (bIsPaused)
     {
@@ -331,6 +344,11 @@ void GameScreen::UpdateUIText(bool bIsGameOver, bool bIsPaused, DataStruct& rTup
     else if (rTuple.pBall->GetCurrentBallState() == AtPlayer2 )
     {
         UpdateHudText(rTuple,"PRESS / TO SERVE:");
+        UpdateScoreText(rTuple);
+    }
+    else if (!rTuple.pWorldState->GetShouldPlaySFX())
+    {
+        UpdateHudText(rTuple,"SOUND MUTED:");
         UpdateScoreText(rTuple);
     }
     else
@@ -355,12 +373,12 @@ void GameScreen::ShakeScreen(DataStruct &rTuple, const float fMagnitude, eCollis
     if (eJustHit == CollisionWithWall)
     {
         m_lLastShakeFrame = m_lDetermFrame;
-        rTuple.pView->move(sf::Vector2f(0.0f,fMagnitude));
+        rTuple.pView->move(sf::Vector2f(0.0f,fMagnitude*rTuple.pBall->GetYSpeed()/400));
     }
     else if ( eJustHit == CollisionWithPlayer1 || eJustHit == CollisionWithPlayer2 )
     {
         m_lLastShakeFrame = m_lDetermFrame;
-        rTuple.pView->move(sf::Vector2f(fMagnitude/2,0.0f));
+        rTuple.pView->move(sf::Vector2f(fMagnitude*rTuple.pBall->GetXSpeed()/1200,0.0f));
     }
     else if (m_lLastShakeFrame + 15 <= m_lDetermFrame)
     {
