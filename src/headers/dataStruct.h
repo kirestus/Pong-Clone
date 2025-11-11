@@ -14,13 +14,16 @@ struct DataStruct{
     //--GameEntities---
 
     std::shared_ptr<sf::RenderWindow> pRenderWindow = std::make_shared<sf::RenderWindow>(sf::VideoMode(1024,768), "Turbo Pong", sf::Style::Titlebar);
+    sf::View* pView = new sf::View(sf::Vector2f(1024/2,768/2),sf::Vector2f(1024,768));
+
     std::shared_ptr<Bat> pBat1 = std::make_shared<Bat>(sf::Vector2f(50.0f,pRenderWindow->getSize().y/2), ePlayerNumber::PLAYER1);
     std::shared_ptr<Bat> pBat2 = std::make_shared<Bat>(sf::Vector2f(pRenderWindow->getSize().x-50.0f, pRenderWindow->getSize().y/2), ePlayerNumber::PLAYER2);
     std::shared_ptr<Ball> pBall = std::make_shared<Ball>(pRenderWindow);
 
     //---Text----
     std::unique_ptr<GameState> pWorldState = std::make_unique<GameState>();
-    std::unique_ptr<sf::Text> pMessage = std::make_unique<sf::Text>();
+    std::unique_ptr<sf::Text> pMessageText = std::make_unique<sf::Text>();
+    std::unique_ptr<sf::Text> pScoreText = std::make_unique<sf::Text>();
     std::unique_ptr<sf::Font> pVectorFont = std::make_unique<sf::Font>();
 
     //---SFX----
@@ -57,6 +60,7 @@ struct DataStruct{
         delete pScoreGoalSoundEffect;
         delete pYouWinSoundEffect;
         delete pGameMusic;
+        delete pView;
         std::cout << "DataStruct Destroyed";
     }
 };

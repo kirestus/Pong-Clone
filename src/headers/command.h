@@ -81,7 +81,7 @@ class DebugTextGameStateCommand : public Command
 public:
   virtual void execute(DataStruct& rTuple)
   {
-    rTuple.pMessage->setString(DebugText::DebugTextGameState(rTuple.pWorldState->GetCurrentGameState()));
+    rTuple.pMessageText->setString(DebugText::DebugTextGameState(rTuple.pWorldState->GetCurrentGameState()));
   }
 };
 
@@ -92,7 +92,7 @@ class DebugTextBallStateCommand : public Command
 public:
   virtual void execute(DataStruct& rTuple)
   {
-    rTuple.pMessage->setString(DebugText::DebugTextBallState(rTuple.pBall->GetCurrentBallState()));
+    rTuple.pMessageText->setString(DebugText::DebugTextBallState(rTuple.pBall->GetCurrentBallState()));
   }
 };
 
