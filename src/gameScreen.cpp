@@ -390,19 +390,20 @@ static float CreateRandomAngle(int minRange, int maxRange)
 void GameScreen::ShakeScreen(DataStruct &rTuple, const float fMagnitude, eCollisionType eJustHit, const bool isPaused )
 {
     sf::Vector2f vSlamForce;
-    static const int iTotalSlamFrames = 30;
+    static const int iTotalSlamFrames = 20;
     static const sf::Vector2 vForceScalingRatio(2,1);
-    static const float fForceScale = 800;
+    static const float fForceScale = 400;
     static const sf::Vector2f vScaledForces(vForceScalingRatio.x*fForceScale,vForceScalingRatio.y*fForceScale);
+
     if (isPaused)
     {
         return;
     }
+
     if (eJustHit == CollisionWithWall)
     {
         m_lLastShakeFrame = m_lDetermFrame;
         vSlamForce = sf::Vector2f(0.0f,fMagnitude*rTuple.pBall->GetYSpeed()/vScaledForces.y);
-        //rTuple.pView->move(sf::Vector2f(0.0f,fMagnitude*rTuple.pBall->GetYSpeed()/400));
     }
     else if ( eJustHit == CollisionWithPlayer1 || eJustHit == CollisionWithPlayer2 )
     {
@@ -410,17 +411,9 @@ void GameScreen::ShakeScreen(DataStruct &rTuple, const float fMagnitude, eCollis
         vSlamForce = sf::Vector2f(fMagnitude*rTuple.pBall->GetXSpeed()/vScaledForces.x,0.0f);
     }
 
-    if( m_lLastShakeFrame + iTotalSlamFrames/3 >= m_lDetermFrame )
+    if( m_lLastShakeFrame + (iTotalSlamFrames/2) > m_lDetermFrame )
     {
-        rTuple.pView->move(vSlamForce);
-    }
-    else if( m_lLastShakeFrame + iTotalSlamFrames/2 >= m_lDetermFrame )
-    {
-        rTuple.pView->move(sf::Vector2f(vSlamForce.x*-1.85,vSlamForce.y*-1.85));
-    }
-    else if ( m_lLastShakeFrame + iTotalSlamFrames > m_lDetermFrame)
-    {
-        rTuple.pView->move(sf::Vector2f(vSlamForce.x*1.75,vSlamForce.y*1.75));
+        rTuple.pView->move(sf::Vector2f(vSlamForce.x*-1.0,vSlamForce.y*1.0));
     }
     else if (m_lLastShakeFrame + iTotalSlamFrames <= m_lDetermFrame)
     {
