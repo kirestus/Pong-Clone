@@ -49,6 +49,8 @@ public:
     void ShakeScreen( DataStruct &rTuple, const float fMagnitude, eCollisionType eJustHit, bool );
     bool GetisWinConditionMet() {return (m_aScore[0] == m_iScoreLimit || m_aScore[1] == m_iScoreLimit); }
 
+    void CreateMiddleLine(DataStruct& rTuple);
+
 private:
     bool m_bShouldUpdateScore = true;
     const int m_iScoreLimit = 10;
@@ -61,5 +63,7 @@ private:
     long m_lDetermFrame = 0;
     long m_lLastShakeFrame = 0;
     long m_lLastGoalScoredFrame = 0;
+    static const short m_iNumberOfLines = 8;
+    sf::RectangleShape m_DashedLineRect[m_iNumberOfLines+1];
 };
 

@@ -215,10 +215,7 @@ public:
     {
        rTuple.pBall->SetDesiredBallState(eBallState::LEFT);
        rTuple.pBall->StateMachine(rTuple.fScreenWidth);
-       if (rTuple.pWorldState->GetShouldPlaySFX())
-       {
-        rTuple.pSpitBallSoundEffect->play();
-       } 
+       rTuple.pSpitBallSoundEffect->play();  
     }
   }
 };

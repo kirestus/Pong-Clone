@@ -39,6 +39,7 @@ void GameScreen::CreateGameScreen(DataStruct& rTuple)
     rTuple.pScoreText->setPosition(sf::Vector2f(rTuple.fScreenWidth/2, 50.0f) ); // should set this in the middle of the screen will do later
     rTuple.pRenderWindow->setView(*rTuple.pView);
     
+    CreateMiddleLine(rTuple);
     SetScoreText(m_aScore[0],m_aScore[1]);
 }
 
@@ -125,6 +126,12 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         }
 
         rTuple.pRenderWindow->clear();
+
+        for(int i = m_iNumberOfLines; i>=0 ; i--)
+        {
+            rTuple.pRenderWindow->draw( m_DashedLineRect[i] );
+        }
+
         rTuple.pRenderWindow->draw( *rTuple.pMessageText );
         rTuple.pRenderWindow->draw( *rTuple.pScoreText );
         rTuple.pRenderWindow->draw( rTuple.pBat1->GetShape());
@@ -294,7 +301,7 @@ bool GameScreen::isBallHittingGoal(const sf::FloatRect box1, DataStruct &rTuple,
 
 std::string GameScreen::SetScoreText(const int &iPlayer1Score, const int &iPlayer2Score)
 {
-   return std::to_string(iPlayer1Score)+" - "+ std::to_string(iPlayer2Score);
+   return std::to_string(iPlayer1Score)+"-"+ std::to_string(iPlayer2Score);
 }
 
 //----------------------------------------------------------
@@ -313,6 +320,7 @@ void GameScreen::UpdateScoreText(DataStruct& rTuple, const int iSimFrame)
         rTuple.pScoreText->setScale(sf::Vector2f(1.0,1.0));
        rTuple.pScoreText->setCharacterSize(80.0f); 
        rTuple.pScoreText->setFillColor(sf::Color(255,255,255,150));
+       rTuple.pScoreText->setLetterSpacing(0.4);
     }
     rTuple.pScoreText->setOrigin(rTuple.pScoreText->getLocalBounds().getSize().x/2,rTuple.pScoreText->getLocalBounds().getSize().y/2);
 }
@@ -420,4 +428,21 @@ void GameScreen::ShakeScreen(DataStruct &rTuple, const float fMagnitude, eCollis
         rTuple.pView->setCenter(sf::Vector2f(rTuple.fScreenWidth/2,rTuple.fScreenHeight/2));
     }
     rTuple.pRenderWindow->setView(*rTuple.pView);
+}
+
+//------------------------------------------------------------
+
+void GameScreen::CreateMiddleLine(DataStruct& rTuple)
+{
+    static const float lineHeight = (rTuple.fScreenHeight/m_iNumberOfLines)/2;
+    static const float lineThickness = 7.5f;
+
+    for (int i = m_iNumberOfLines; i >= 0; i--)
+    {
+        m_DashedLineRect[i].setSize(sf::Vector2f(lineThickness,lineHeight));
+        m_DashedLineRect[i].setPosition(sf::Vector2f(rTuple.fScreenWidth/2, 0));
+        m_DashedLineRect[i].setFillColor(sf::Color( 255,255,225,100));
+        m_DashedLineRect[i].setPosition(sf::Vector2f(rTuple.fScreenWidth/2, i*2 *lineHeight - lineHeight*0.5 ));
+ 
+    }
 }
