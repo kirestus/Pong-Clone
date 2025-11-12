@@ -15,8 +15,8 @@ public:
 
     GameScreen( DataStruct& );
 
-    eCollisionType CheckCollisions(DataStruct &rTuple);
-    void HandleCollisions(DataStruct &rTuple, const bool, const eCollisionType);
+    eCollisionType CheckCollisions(DataStruct &rTuple, bool);
+    void HandleCollisions(DataStruct &rTuple, const bool, const eCollisionType, const int);
     void SetLastCollisionType(eCollisionType eJustHit){m_eLastCollisionType = eJustHit ;}
     eCollisionType GetLastCollisionType() const { return m_eLastCollisionType; }
 
@@ -28,7 +28,7 @@ public:
 
     bool isBallCollidingWithTarget(const sf::FloatRect box1, const sf::FloatRect box2);
     bool isBallHittingWall(const sf::FloatRect box1, const std::shared_ptr<sf::RenderWindow> pRenderWindow);
-    bool isBallHittingGoal( const sf::FloatRect box1, DataStruct &rTuple);
+    bool isBallHittingGoal( const sf::FloatRect box1, DataStruct &rTuple, bool );
 
     std::string SetScoreText(const int &iPlayer1Score, const int &iPlayer2Score);
 
@@ -39,7 +39,7 @@ public:
     void CreateGameScreen(DataStruct& rTuple); 
     int UpdateGamescreen(DataStruct& rTuple, sf::Clock &rTimer);
 
-    void UpdateScoreText(DataStruct& rTuple);
+    void UpdateScoreText(DataStruct& rTuple , int);
     void UpdateHudText(DataStruct& rTuple, std::string);
     void UpdateUIText(bool, bool, DataStruct& );
 
@@ -60,5 +60,6 @@ private:
     int m_aScore[2] = {0};
     long m_lDetermFrame = 0;
     long m_lLastShakeFrame = 0;
+    long m_lLastGoalScoredFrame = 0;
 };
 

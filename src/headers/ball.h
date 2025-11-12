@@ -5,6 +5,7 @@
 class Ball
 {
     public:
+
         Ball(std::shared_ptr<sf::RenderWindow> pRenderWindow);
 
         void SetDesiredBallState(eBallState _desiredState){ m_eDesiredBallState = _desiredState ;}
@@ -15,6 +16,7 @@ class Ball
         void SetShape( sf::RectangleShape _shape ) { m_sShape = _shape ;}
 
         sf::RectangleShape* GetTrailShapeArray(){ return m_sShapeTrail ;}
+        int GetTrailShapeArrayLength()const{ return m_iShapeTrailLen; }
 
         float GetXSpeed() const { return m_v2CurrentBallSpeed.x ;}
         void SetXSpeed( float _speed) { m_v2CurrentBallSpeed.x = _speed ;}
@@ -26,12 +28,10 @@ class Ball
 
         sf::Vector2f GetInitialSpeed() const { return m_v2InitialSpeed ;}
 
-
         sf::Vector2f GetTranslationPosition() const {return sf::Vector2f(m_vBallVector.x, m_vBallVector.y) ;}
         float GetBallRotation() const {return m_vBallVector.z ;}
 
         void SetBallVector(sf::Vector3f _vector){m_vBallVector = _vector ;}
-
 
         eBallState GetCurrentBallState() const { return m_eCurrentBallState ;}
 
@@ -44,13 +44,16 @@ class Ball
 
         void UpdateBallTrail(int);
 
+
     private:
+        static const  int m_iShapeTrailLen = 11;
         eBallState m_eCurrentBallState = eBallState::ResetGamePosition;
         eBallState m_eDesiredBallState = eBallState::None;
         sf::Vector3f m_vBallVector;
 
         sf::RectangleShape m_sShape;
-        sf::RectangleShape m_sShapeTrail[6];
+        sf::RectangleShape m_sShapeTrail[m_iShapeTrailLen+1];
+        //+1 is so i can use the single length value for both creating the array and accesing the elements
 
         const float m_fTopSpeed = 15500.00f;
         const sf::Vector2f m_v2InitialSpeed = sf::Vector2f(4000.0f,00.0f);
