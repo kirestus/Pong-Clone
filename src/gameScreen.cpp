@@ -80,7 +80,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         {
             ResetGame(rTuple);
         }
-
+        
         rTuple.pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
         rTuple.pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
         rTuple.pBall->UpdateBallPosition(fFrameTime/10, bIsPaused);
@@ -109,7 +109,10 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         }
         
         UpdateUIText( GetisWinConditionMet(), bIsPaused, rTuple );
-        UpdateScoreText(rTuple, m_lDetermFrame);
+        UpdateScoreText(rTuple, m_lDetermFrame, bIsPaused);
+        rTuple.pBat1->UpdateHitVFX(rTuple.pRenderWindow, m_lDetermFrame );
+        rTuple.pBat2->UpdateHitVFX(rTuple.pRenderWindow, m_lDetermFrame );
+
 
         sf::Event event;
         while (rTuple.pRenderWindow->pollEvent(event))
@@ -125,6 +128,8 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
             }
         }
 
+        // This Section handles all the rendering for the game
+
         rTuple.pRenderWindow->clear();
 
         for(int i = m_iNumberOfLines; i>=0 ; i--)
@@ -134,19 +139,33 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 
         rTuple.pRenderWindow->draw( *rTuple.pMessageText );
         rTuple.pRenderWindow->draw( *rTuple.pScoreText );
+
+        if (rTuple.pBall->GetCurrentBallState() != AtPlayer1 && 
+        rTuple.pBall->GetCurrentBallState() != AtPlayer2 )
+        {
+            for (int i = rTuple.pBall->GetTrailShapeArrayLength(); i >= 0; i --)
+            {
+                rTuple.pRenderWindow->draw( rTuple.pBall->GetTrailShapeArray()[i] );
+            }
+        }
+        
+        for (int i = rTuple.pBat1->GetBatVFXArrayLength(); i >= 0; i --)
+        {
+            rTuple.pRenderWindow->draw( rTuple.pBat1->GetBatVFXShapeArray()[i]);
+            rTuple.pRenderWindow->draw( rTuple.pBat2->GetBatVFXShapeArray()[i]);
+        }
+
         rTuple.pRenderWindow->draw( rTuple.pBat1->GetShape());
         rTuple.pRenderWindow->draw( rTuple.pBat2->GetShape());
-        for (int i = rTuple.pBall->GetTrailShapeArrayLength(); i >= 0; i --)
-        {
-            rTuple.pRenderWindow->draw( rTuple.pBall->GetTrailShapeArray()[i] );
-        }
+
         rTuple.pRenderWindow->draw( rTuple.pBall->ReferenceShape() );
         
         rTuple.pRenderWindow->display();
-        m_lDetermFrame ++;
         if(!bIsPaused)
         {
+            m_lDetermFrame ++;
             rTuple.pBall->UpdateBallTrail( m_lDetermFrame);
+            DimMiddleLine(rTuple,true);
         }
     }
 
@@ -226,6 +245,15 @@ void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, eCol
             rTuple.pBall->SetYSpeed(pBat->GetVelocity() + rTuple.pBall->GetYSpeed()+CreateRandomAngle(-500.0f,500.0f));
             rTuple.pBall->SetDesiredBallState(eBallGoingDir);
             rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+
+            if(eBallGoingDir != LEFT)
+            {
+                rTuple.pBat1->SetLastHitFrame(m_lDetermFrame);
+            }
+            else
+            {
+                rTuple.pBat2->SetLastHitFrame(m_lDetermFrame);
+            }
             
             sf::Sound* pPlayThisSound = eBallGoingDir != LEFT ? rTuple.pPlayer1SoundEffect :rTuple.pPlayer2SoundEffect;
             pPlayThisSound->setPosition(ballPosition);
@@ -306,8 +334,12 @@ std::string GameScreen::SetScoreText(const int &iPlayer1Score, const int &iPlaye
 
 //----------------------------------------------------------
 
-void GameScreen::UpdateScoreText(DataStruct& rTuple, const int iSimFrame)
+void GameScreen::UpdateScoreText(DataStruct& rTuple, const int iSimFrame, bool bIsPaused)
 {
+    if (bIsPaused)
+    {
+        return;
+    }
     std::string scoreString = GameScreen::SetScoreText(m_aScore[0],m_aScore[1]);
     rTuple.pScoreText->setString(sf::String(scoreString));
     if ( m_lLastGoalScoredFrame+30 >= m_lDetermFrame )
@@ -348,7 +380,6 @@ void GameScreen::AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball
 void GameScreen::UpdateUIText(bool bIsGameOver, bool bIsPaused, DataStruct& rTuple )
 {
     sf::Color fadeInColor(255,255,255,GetTextFadeTimer().getElapsedTime().asSeconds()*100);
-
     if (GetTextFadeTimer().getElapsedTime().asSeconds()*100 < 225 ) 
     {
         rTuple.pMessageText->setFillColor(sf::Color(255,255,255,m_TextFadeOutTimer.getElapsedTime().asSeconds()*100));
@@ -440,9 +471,38 @@ void GameScreen::CreateMiddleLine(DataStruct& rTuple)
     for (int i = m_iNumberOfLines; i >= 0; i--)
     {
         m_DashedLineRect[i].setSize(sf::Vector2f(lineThickness,lineHeight));
-        m_DashedLineRect[i].setPosition(sf::Vector2f(rTuple.fScreenWidth/2, 0));
+        m_DashedLineRect[i].setOrigin(sf::Vector2f(m_DashedLineRect[i].getSize().x/2,0.0f));
         m_DashedLineRect[i].setFillColor(sf::Color( 255,255,225,100));
-        m_DashedLineRect[i].setPosition(sf::Vector2f(rTuple.fScreenWidth/2, i*2 *lineHeight - lineHeight*0.5 ));
+        m_DashedLineRect[i].setPosition(sf::Vector2f(rTuple.fScreenWidth/2+7.5f, i*2 *lineHeight - lineHeight*0.5 ));
  
+    }
+}
+
+//------------------------------------------------------------
+
+void GameScreen::DimMiddleLine(DataStruct& rTuple, bool bShouldDimLine)
+{
+    static const int iDimValue = 45;
+    static const int iFullOpacityValue = 100;
+    for (int i = m_iNumberOfLines; i >= 0; i--)
+    {
+        //todo make this gradual so that its not so jarring
+        if (bShouldDimLine)
+        {
+            m_DashedLineRect[i].setFillColor(sf::Color( 255,255,225,iDimValue));
+        }
+        else if(!bShouldDimLine)
+        {
+            float iNewAlpha = m_DashedLineRect[i].getFillColor().a +1 ;
+            if (iNewAlpha <= iFullOpacityValue )
+            {
+                m_DashedLineRect[i].setFillColor(sf::Color( 255,255,225,iNewAlpha));
+            }
+            else
+            {
+                m_DashedLineRect[i].setFillColor(sf::Color( 255,255,225,iFullOpacityValue));
+            }
+
+        }
     }
 }

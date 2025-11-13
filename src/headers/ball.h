@@ -46,7 +46,7 @@ class Ball
 
 
     private:
-        static const  int m_iShapeTrailLen = 11;
+        static const  int m_iShapeTrailLen = 6;
         eBallState m_eCurrentBallState = eBallState::ResetGamePosition;
         eBallState m_eDesiredBallState = eBallState::None;
         sf::Vector3f m_vBallVector;

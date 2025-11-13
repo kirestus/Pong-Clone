@@ -82,32 +82,35 @@ void Bat::CalculateBatSpeed(std::shared_ptr<sf::RenderWindow> pRenderWindow, flo
     eBatMoveDirection newMoveDirection = DetermCurrentMoveDirection(pRenderWindow);
     //UpdateDesiredToShapeTransform();
     float fSpeed =  GetVelocity()*fLapsedTime;
-    
-    if (( fSpeed < GetTopSpeed() || fSpeed > GetTopSpeed() *-1 )&& !isGamePaused)
+    if (!isGamePaused)
     {
-        SetPosition(sf::Vector2f(GetPosition().x, GetPosition().y + fSpeed ));
+        if (( fSpeed < GetTopSpeed() || fSpeed > GetTopSpeed() *-1 ))
+        {
+            SetPosition(sf::Vector2f(GetPosition().x, GetPosition().y + fSpeed ));
+        }
+
+        if (newMoveDirection == eBatMoveDirection::UP && abs(fSpeed) < GetTopSpeed())
+        {
+            ModifyVelocity( - ( GetAccel()*fLapsedTime ));
+        }
+        else if (newMoveDirection == eBatMoveDirection::DOWN && abs(fSpeed) < GetTopSpeed())
+        { 
+            ModifyVelocity(  ( GetAccel()*fLapsedTime ));
+        }
+        else
+        {
+            SetVelocity(fSpeed*0.96/fLapsedTime);
+        }
+
+        if( ( IsHittingBottom(pRenderWindow->getSize()) || IsHittingTop() ))
+        {
+            NudgeBat(pRenderWindow);
+            SetVelocity(0.0f);
+        }
+        
+        UpdateShapeToDesiredTransform();
     }
 
-    if (newMoveDirection == eBatMoveDirection::UP && abs(fSpeed) < GetTopSpeed())
-    {
-        ModifyVelocity( - ( GetAccel()*fLapsedTime ));
-    }
-    else if (newMoveDirection == eBatMoveDirection::DOWN && abs(fSpeed) < GetTopSpeed())
-    { 
-        ModifyVelocity(  ( GetAccel()*fLapsedTime ));
-    }
-    else
-    {
-        SetVelocity(fSpeed*0.96/fLapsedTime);
-    }
-
-    if( ( IsHittingBottom(pRenderWindow->getSize()) || IsHittingTop() ))
-    {
-        NudgeBat(pRenderWindow);
-        SetVelocity(0.0f);
-    }
-    
-    UpdateShapeToDesiredTransform();
 }
 
 //-----------------------------------------------------------------
@@ -125,5 +128,46 @@ void Bat::NudgeBat(std::shared_ptr<sf::RenderWindow> pRenderWindow)
     {
         sf::Vector2f nudgeUp = sf::Vector2f(GetPosition().x,GetPosition().y-0.1);
         SetPosition(nudgeUp);
+    }
+}
+
+//-----------------------------------------------------------------
+
+void Bat::UpdateHitVFX(std::shared_ptr<sf::RenderWindow> pRenderWindow, int iSimFrame)
+{
+
+    static const int iFXFrameTime = 20;
+    //todo change color to more of a red the closer to the edge of the paddle that the ball is hit
+    //i will later tie this into ball controll so hits near the edge have more spread and the middle is the sweet spot
+
+    for(int i = m_iHitFXArrayLength; i >= 0 ; i--)
+    {
+        if ( m_iLastFrameBallWasHit + iFXFrameTime > iSimFrame)
+        {
+            if(GetPlayerNumber() == PLAYER2)
+            {
+                m_FXShape[i].setScale(sf::Vector2f(-1.0f,1.0f));
+            }
+            else
+            {
+                m_FXShape[i].setScale(sf::Vector2f(1.0f,1.0f));
+            }
+            m_FXShape[i].setFillColor( sf::Color( 150,150,255,10 ) );
+            m_FXShape[i].setPosition( m_hRectShape.getPosition().x ,m_hRectShape.getPosition().y );
+            m_FXShape[i].setSize( sf::Vector2f( m_hRectShape.getSize().x*i*0.8 +10 , m_hRectShape.getSize().y-(i*8)));
+            
+            if(GetPlayerNumber() == PLAYER2)
+            {
+                m_FXShape[i].scale(sf::Vector2f(m_FXShape->getScale().x * -1, 1.0));
+            }
+
+            m_FXShape[i].setOrigin( sf::Vector2f(0, m_FXShape[i].getSize().y/2 ));
+        }
+        else
+        {
+            // todo: going to tie the scale back on the x to the balls speed on hit
+            m_FXShape[i].scale(sf::Vector2f(0.85f,0.99f));
+        }
+
     }
 }

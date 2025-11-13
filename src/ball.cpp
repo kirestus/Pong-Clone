@@ -142,7 +142,7 @@ void Ball::OnScoreGoal(const bool isColliding, const bool isLeft, const float fS
 
 void Ball::UpdateBallTrail(int iSimFrame)
 {
-    if (iSimFrame % 5 == 0)
+    if (iSimFrame % 2 == 0)
     {
         //todo: make the length a const set in the class header so that i can tweak it
         for (int i = GetTrailShapeArrayLength(); i >= 0; i --)

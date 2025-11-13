@@ -39,7 +39,7 @@ public:
     void CreateGameScreen(DataStruct& rTuple); 
     int UpdateGamescreen(DataStruct& rTuple, sf::Clock &rTimer);
 
-    void UpdateScoreText(DataStruct& rTuple , int);
+    void UpdateScoreText(DataStruct& rTuple , int, bool);
     void UpdateHudText(DataStruct& rTuple, std::string);
     void UpdateUIText(bool, bool, DataStruct& );
 
@@ -50,6 +50,7 @@ public:
     bool GetisWinConditionMet() {return (m_aScore[0] == m_iScoreLimit || m_aScore[1] == m_iScoreLimit); }
 
     void CreateMiddleLine(DataStruct& rTuple);
+    void DimMiddleLine(DataStruct& rTuple, bool bShouldDimLine);
 
 private:
     bool m_bShouldUpdateScore = true;
@@ -62,8 +63,8 @@ private:
     int m_aScore[2] = {0};
     long m_lDetermFrame = 0;
     long m_lLastShakeFrame = 0;
-    long m_lLastGoalScoredFrame = 0;
-    static const short m_iNumberOfLines = 8;
+    long m_lLastGoalScoredFrame = -500;
+    static const short m_iNumberOfLines = 6;
     sf::RectangleShape m_DashedLineRect[m_iNumberOfLines+1];
 };
 
