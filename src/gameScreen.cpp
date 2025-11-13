@@ -68,6 +68,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 
     while (rTuple.pRenderWindow->isOpen())
     {
+        const int iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
         const float fFrameTime = rGameClock.restart().asSeconds();
         const float fFps = 1.0 / fFrameTime;
         //std::cout << fFps << " Frames Per Second: \n";
@@ -88,7 +89,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         const eCollisionType eCollidingWith = CheckCollisions(rTuple, bIsPaused);
         if ( eCollidingWith != eCollisionType::NoCollision )
         {
-            HandleCollisions(rTuple, bIsPaused, eCollidingWith, m_lDetermFrame);
+            HandleCollisions(rTuple, bIsPaused, eCollidingWith, iSimFrame);
         }
 
         //included here because i want to check for none type also
@@ -109,9 +110,9 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         }
         
         UpdateUIText( GetisWinConditionMet(), bIsPaused, rTuple );
-        UpdateScoreText(rTuple, m_lDetermFrame, bIsPaused);
-        rTuple.pBat1->UpdateHitVFX(rTuple.pRenderWindow, m_lDetermFrame );
-        rTuple.pBat2->UpdateHitVFX(rTuple.pRenderWindow, m_lDetermFrame );
+        UpdateScoreText(rTuple, iSimFrame, bIsPaused);
+        rTuple.pBat1->UpdateHitVFX(rTuple.pRenderWindow, iSimFrame );
+        rTuple.pBat2->UpdateHitVFX(rTuple.pRenderWindow, iSimFrame );
 
 
         sf::Event event;
@@ -163,9 +164,9 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         rTuple.pRenderWindow->display();
         if(!bIsPaused)
         {
-            m_lDetermFrame ++;
-            rTuple.pBall->UpdateBallTrail( m_lDetermFrame);
+            rTuple.pBall->UpdateBallTrail( iSimFrame );
             DimMiddleLine(rTuple,true);
+            rTuple.pWorldState->IncrimentSimFrame();
         }
     }
 
@@ -248,11 +249,11 @@ void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, eCol
 
             if(eBallGoingDir != LEFT)
             {
-                rTuple.pBat1->SetLastHitFrame(m_lDetermFrame);
+                rTuple.pBat1->SetLastHitFrame(iSimFrame);
             }
             else
             {
-                rTuple.pBat2->SetLastHitFrame(m_lDetermFrame);
+                rTuple.pBat2->SetLastHitFrame(iSimFrame);
             }
             
             sf::Sound* pPlayThisSound = eBallGoingDir != LEFT ? rTuple.pPlayer1SoundEffect :rTuple.pPlayer2SoundEffect;
@@ -342,7 +343,7 @@ void GameScreen::UpdateScoreText(DataStruct& rTuple, const int iSimFrame, bool b
     }
     std::string scoreString = GameScreen::SetScoreText(m_aScore[0],m_aScore[1]);
     rTuple.pScoreText->setString(sf::String(scoreString));
-    if ( m_lLastGoalScoredFrame+30 >= m_lDetermFrame )
+    if ( m_lLastGoalScoredFrame+30 >= rTuple.pWorldState->GetCurrentSimFrame() )
     {
         rTuple.pScoreText->scale(sf::Vector2f(1.0025,1.0025));
         rTuple.pScoreText->setFillColor(sf::Color(255,255,255,255));
@@ -428,6 +429,7 @@ static float CreateRandomAngle(int minRange, int maxRange)
 
 void GameScreen::ShakeScreen(DataStruct &rTuple, const float fMagnitude, eCollisionType eJustHit, const bool isPaused )
 {
+    const int iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
     sf::Vector2f vSlamForce;
     static const int iTotalSlamFrames = 20;
     static const sf::Vector2 vForceScalingRatio(2,1);
@@ -441,20 +443,20 @@ void GameScreen::ShakeScreen(DataStruct &rTuple, const float fMagnitude, eCollis
 
     if (eJustHit == CollisionWithWall)
     {
-        m_lLastShakeFrame = m_lDetermFrame;
+        m_lLastShakeFrame = iSimFrame;
         vSlamForce = sf::Vector2f(0.0f,fMagnitude*rTuple.pBall->GetYSpeed()/vScaledForces.y);
     }
     else if ( eJustHit == CollisionWithPlayer1 || eJustHit == CollisionWithPlayer2 )
     {
-        m_lLastShakeFrame = m_lDetermFrame;
+        m_lLastShakeFrame = iSimFrame;
         vSlamForce = sf::Vector2f(fMagnitude*rTuple.pBall->GetXSpeed()/vScaledForces.x,0.0f);
     }
 
-    if( m_lLastShakeFrame + (iTotalSlamFrames/2) > m_lDetermFrame )
+    if( m_lLastShakeFrame + (iTotalSlamFrames/2) > iSimFrame )
     {
         rTuple.pView->move(sf::Vector2f(vSlamForce.x*-1.0,vSlamForce.y*1.0));
     }
-    else if (m_lLastShakeFrame + iTotalSlamFrames <= m_lDetermFrame)
+    else if (m_lLastShakeFrame + iTotalSlamFrames <= iSimFrame)
     {
         rTuple.pView->setCenter(sf::Vector2f(rTuple.fScreenWidth/2,rTuple.fScreenHeight/2));
     }

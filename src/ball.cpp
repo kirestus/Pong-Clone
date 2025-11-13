@@ -44,6 +44,7 @@ void Ball::StateMachine(const float fScreenWidth)
     {
         if( m_eDesiredBallState == RIGHT) 
         {
+            
             m_v2CurrentBallSpeed.x = abs(m_v2InitialSpeed.x)*-1;
             eNewBallState = m_eDesiredBallState;
         }

@@ -61,7 +61,6 @@ private:
     sf::Vector2f m_vScreenCenter;
     sf::Clock m_hClock;
     int m_aScore[2] = {0};
-    long m_lDetermFrame = 0;
     long m_lLastShakeFrame = 0;
     long m_lLastGoalScoredFrame = -500;
     static const short m_iNumberOfLines = 6;

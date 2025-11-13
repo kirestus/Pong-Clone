@@ -27,10 +27,15 @@ public:
     bool GetShouldPlaySFX()const{ return m_bShouldPlaySFX; }
     void SetShouldPlaySFX(bool bShouldPlay) { m_bShouldPlaySFX = bShouldPlay; }
 
+    int GetCurrentSimFrame()const {return m_iDetermFrame; }
+    void IncrimentSimFrame(){m_iDetermFrame ++;}
+
 private:
 
     eGameState m_eCurrentGameState;
     eGameState m_eDesiredGameState = eGameState::Boot;
+
+    int m_iDetermFrame = 0;
 
     bool m_bLastGoalScoredOnP1 = false;
     bool m_bShouldPlaySFX = true;

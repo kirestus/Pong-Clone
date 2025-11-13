@@ -198,7 +198,8 @@ public:
        rTuple.pBall->StateMachine(rTuple.fScreenWidth);
        if (rTuple.pWorldState->GetShouldPlaySFX())
        {
-        rTuple.pSpitBallSoundEffect->play();
+          rTuple.pBat1->SetLastHitFrame(rTuple.pWorldState->GetCurrentSimFrame());
+          rTuple.pSpitBallSoundEffect->play();
        }
     }
   }
