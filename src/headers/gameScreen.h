@@ -21,7 +21,8 @@ public:
     eCollisionType GetLastCollisionType() const { return m_eLastCollisionType; }
 
     void ResetGame(DataStruct&);
-    void AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball> pBall);
+    void AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball> pBall, const float);
+    bool ShouldAttachBallToBat(DataStruct&);
 
     bool GetShouldUpdateScore()const{ return m_bShouldUpdateScore; }
     void SetShouldUpdateScore(bool bShouldIt){ m_bShouldUpdateScore = bShouldIt; }
@@ -41,7 +42,7 @@ public:
 
     void UpdateScoreText(DataStruct& rTuple , int, bool);
     void UpdateHudText(DataStruct& rTuple, std::string);
-    void UpdateUIText(bool, bool, DataStruct& );
+    bool UpdateUIText(bool, bool, DataStruct& );
 
     sf::Clock GetGameClock() const { return m_hClock; }
     sf::Clock GetTextFadeTimer() const { return m_TextFadeOutTimer ;}
@@ -51,6 +52,8 @@ public:
 
     void CreateMiddleLine(DataStruct& rTuple);
     void DimMiddleLine(DataStruct& rTuple, bool bShouldDimLine);
+
+    void SetBoundryEdgeShapes(DataStruct& rTuple);
 
 private:
     bool m_bShouldUpdateScore = true;
@@ -65,5 +68,8 @@ private:
     long m_lLastGoalScoredFrame = -500;
     static const short m_iNumberOfLines = 6;
     sf::RectangleShape m_DashedLineRect[m_iNumberOfLines+1];
+
+    sf::RectangleShape m_sTopEdge;
+    sf::RectangleShape m_sBottomEdge;
 };
 

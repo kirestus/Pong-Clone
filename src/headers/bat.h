@@ -64,7 +64,7 @@ public:
     int GetBatVFXArrayLength()const{ return m_iHitFXArrayLength; }
     sf::RectangleShape* GetBatVFXShapeArray(){ return m_FXShape ;}
 
-    void UpdateHitVFX(std::shared_ptr<sf::RenderWindow> pRenderWindow, int);
+    void UpdateHitVFX(std::shared_ptr<sf::RenderWindow> pRenderWindow, int, float);
     void SetLastHitFrame (int hitFrame ){ m_iLastFrameBallWasHit = hitFrame; }
 
 

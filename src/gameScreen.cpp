@@ -38,7 +38,7 @@ void GameScreen::CreateGameScreen(DataStruct& rTuple)
     rTuple.pScoreText->setOrigin(rTuple.pScoreText->getLocalBounds().getSize().x/2,rTuple.pScoreText->getLocalBounds().getSize().y/2);
     rTuple.pScoreText->setPosition(sf::Vector2f(rTuple.fScreenWidth/2, 50.0f) ); // should set this in the middle of the screen will do later
     rTuple.pRenderWindow->setView(*rTuple.pView);
-    
+
     CreateMiddleLine(rTuple);
     SetScoreText(m_aScore[0],m_aScore[1]);
 }
@@ -60,6 +60,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 {
     rTuple.pGameMusic->pause();
     rTuple.pGameMusic->setLoop(true);
+    SetBoundryEdgeShapes(rTuple);
     srand(time(0));
     rTuple.pBall->SetYSpeed(CreateRandomAngle(-2000.0f,2000.0f));
 
@@ -94,26 +95,28 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 
         //included here because i want to check for none type also
         SetLastCollisionType(eCollidingWith);
+
         ShakeScreen(rTuple,0.5f, eCollidingWith, bIsPaused);
 
-        if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 )
+        if (ShouldAttachBallToBat(rTuple))
         {
-            AttachBallToBat(rTuple.pBat1, rTuple.pBall);
-            rTuple.pBall->StateMachine(rTuple.fScreenWidth);
-            rTuple.pBall->SetYSpeed(rTuple.pBat1->GetVelocity()*-1.9f);
+            if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 )
+            {
+                AttachBallToBat(rTuple.pBat1, rTuple.pBall, rTuple.fScreenWidth);
+            }
+            else
+            {
+                AttachBallToBat(rTuple.pBat2, rTuple.pBall, rTuple.fScreenWidth);
+            }
         }
-        else if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2 )
-        {
-            AttachBallToBat(rTuple.pBat2, rTuple.pBall);
-            rTuple.pBall->StateMachine(rTuple.fScreenWidth);
-            rTuple.pBall->SetYSpeed(rTuple.pBat2->GetVelocity()*-1.9f );
-        }
-        
-        UpdateUIText( GetisWinConditionMet(), bIsPaused, rTuple );
-        UpdateScoreText(rTuple, iSimFrame, bIsPaused);
-        rTuple.pBat1->UpdateHitVFX(rTuple.pRenderWindow, iSimFrame );
-        rTuple.pBat2->UpdateHitVFX(rTuple.pRenderWindow, iSimFrame );
 
+        const bool bUpdatedUiText = UpdateUIText( GetisWinConditionMet(), bIsPaused, rTuple );
+
+        DimMiddleLine(rTuple, bUpdatedUiText);
+        UpdateScoreText(rTuple, iSimFrame, bIsPaused);
+
+        rTuple.pBat1->UpdateHitVFX(rTuple.pRenderWindow, iSimFrame, rTuple.pBall->GetShape().getPosition().y);
+        rTuple.pBat2->UpdateHitVFX(rTuple.pRenderWindow, iSimFrame, rTuple.pBall->GetShape().getPosition().y);
 
         sf::Event event;
         while (rTuple.pRenderWindow->pollEvent(event))
@@ -137,6 +140,9 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         {
             rTuple.pRenderWindow->draw( m_DashedLineRect[i] );
         }
+
+        rTuple.pRenderWindow->draw(m_sBottomEdge);
+        rTuple.pRenderWindow->draw(m_sTopEdge);
 
         rTuple.pRenderWindow->draw( *rTuple.pMessageText );
         rTuple.pRenderWindow->draw( *rTuple.pScoreText );
@@ -165,7 +171,6 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         if(!bIsPaused)
         {
             rTuple.pBall->UpdateBallTrail( iSimFrame );
-            DimMiddleLine(rTuple,true);
             rTuple.pWorldState->IncrimentSimFrame();
         }
     }
@@ -369,8 +374,11 @@ void GameScreen::UpdateHudText(DataStruct& rTuple, std::string sDesiredText)
 
 //------------------------------------------------------------
 
-void GameScreen::AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball> pBall)
+void GameScreen::AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball> pBall, const float fScreenWidth)
 {
+    pBall->StateMachine(fScreenWidth);
+    pBall->SetYSpeed(pBat->GetVelocity()*-1.9f);
+
     const sf::Vector2f vBatPosition = pBat->GetShape().getPosition();
     const float fOffset = pBat->GetPlayerNumber() == ePlayerNumber::PLAYER1  ? 20.0f : -20.0f;
     pBall->SetBallVector(sf::Vector3f( vBatPosition.x + fOffset, vBatPosition.y, 0.0f));
@@ -378,9 +386,10 @@ void GameScreen::AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball
 
 //------------------------------------------------------------
 
-void GameScreen::UpdateUIText(bool bIsGameOver, bool bIsPaused, DataStruct& rTuple )
+bool GameScreen::UpdateUIText(bool bIsGameOver, bool bIsPaused, DataStruct& rTuple )
 {
     sf::Color fadeInColor(255,255,255,GetTextFadeTimer().getElapsedTime().asSeconds()*100);
+
     if (GetTextFadeTimer().getElapsedTime().asSeconds()*100 < 225 ) 
     {
         rTuple.pMessageText->setFillColor(sf::Color(255,255,255,m_TextFadeOutTimer.getElapsedTime().asSeconds()*100));
@@ -412,10 +421,12 @@ void GameScreen::UpdateUIText(bool bIsGameOver, bool bIsPaused, DataStruct& rTup
     }
     else
     {
-        //Running this here because it will reset every update unless in the other states
+        //Running t
         m_TextFadeOutTimer.restart();
         rTuple.pMessageText->setFillColor(sf::Color(255,255,255,0));
+        return false;
     }
+    return true;
 }
 
 //------------------------------------------------------------
@@ -433,7 +444,7 @@ void GameScreen::ShakeScreen(DataStruct &rTuple, const float fMagnitude, eCollis
     sf::Vector2f vSlamForce;
     static const int iTotalSlamFrames = 20;
     static const sf::Vector2 vForceScalingRatio(2,1);
-    static const float fForceScale = 400;
+    static const float fForceScale = 550;
     static const sf::Vector2f vScaledForces(vForceScalingRatio.x*fForceScale,vForceScalingRatio.y*fForceScale);
 
     if (isPaused)
@@ -445,6 +456,7 @@ void GameScreen::ShakeScreen(DataStruct &rTuple, const float fMagnitude, eCollis
     {
         m_lLastShakeFrame = iSimFrame;
         vSlamForce = sf::Vector2f(0.0f,fMagnitude*rTuple.pBall->GetYSpeed()/vScaledForces.y);
+        SetBoundryEdgeShapes(rTuple);
     }
     else if ( eJustHit == CollisionWithPlayer1 || eJustHit == CollisionWithPlayer2 )
     {
@@ -507,4 +519,36 @@ void GameScreen::DimMiddleLine(DataStruct& rTuple, bool bShouldDimLine)
 
         }
     }
+}
+
+//------------------------------------------------------------
+
+void GameScreen::SetBoundryEdgeShapes(DataStruct& rTuple)
+{
+    sf::Color EdgeColor(120,120,255,200);
+    m_sTopEdge.setSize(sf::Vector2f (50.0f, 30.0f));
+    m_sTopEdge.setOrigin(m_sTopEdge.getSize().x/2,m_sTopEdge.getSize().y);
+    m_sTopEdge.setPosition(sf::Vector2f(rTuple.pBall->GetShape().getPosition().x, 0.0f));
+    m_sTopEdge.setFillColor(EdgeColor);
+
+    m_sBottomEdge.setSize(sf::Vector2f (50.0f, 30.0f));
+    m_sBottomEdge.setOrigin(m_sBottomEdge.getSize().x/2, 0.0f);
+    m_sBottomEdge.setPosition(sf::Vector2f(rTuple.pBall->GetShape().getPosition().x, rTuple.fScreenHeight));
+    m_sBottomEdge.setFillColor(EdgeColor);
+    
+}
+
+//------------------------------------------------------------
+
+bool GameScreen::ShouldAttachBallToBat(DataStruct& rTuple)
+{
+    if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 )
+    {
+        return true;
+    }
+    else if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2 )
+    {
+        return true;
+    }
+    return false;
 }
