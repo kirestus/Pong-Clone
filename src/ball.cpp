@@ -109,6 +109,10 @@ void Ball::UpdateBallPosition(const float fDeltaT,  const bool isPaused)
 
 void Ball::OnBatCollision(const float fScreenWidth)
 {
+    if (m_eCurrentBallState == HitBall)
+    {
+        return;
+    }
     SetDesiredBallState(eBallState::HitBall);
     StateMachine(fScreenWidth);
 }
@@ -145,7 +149,6 @@ void Ball::UpdateBallTrail(int iSimFrame)
 {
     if (iSimFrame % 2 == 0)
     {
-        //todo: make the length a const set in the class header so that i can tweak it
         for (int i = GetTrailShapeArrayLength(); i >= 0; i --)
         {
             m_sShapeTrail[0] = m_sShape;

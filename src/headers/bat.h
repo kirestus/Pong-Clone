@@ -66,6 +66,7 @@ public:
 
     void UpdateHitVFX(std::shared_ptr<sf::RenderWindow> pRenderWindow, int, float);
     void SetLastHitFrame (int hitFrame ){ m_iLastFrameBallWasHit = hitFrame; }
+    int GetLastHitFrame()const{return m_iLastFrameBallWasHit ;}
 
 
 private:
