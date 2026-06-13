@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-enum eGameState
+enum class eGameState : uint8_t
 {
     Boot,
     Paused,

@@ -35,17 +35,17 @@ void Ball::StateMachine(const float fScreenWidth)
             eNewBallState = eBallState::LEFT;
         }
     }
-    else if (eCurrentBallState == GoalOnPlayer1 )
+    else if (eCurrentBallState == eBallState::GoalOnPlayer1 )
     {
         eNewBallState = eBallState::AtPlayer1;
     }
-        else if (eCurrentBallState == GoalOnPlayer2 )
+        else if (eCurrentBallState == eBallState::GoalOnPlayer2 )
     {
         eNewBallState = eBallState::AtPlayer2;
     }
     else if (eCurrentBallState == eBallState::AtPlayer1 )
     {
-        if( eDesiredBallState == RIGHT) 
+        if( eDesiredBallState == eBallState::RIGHT) 
         {
             
             m_v2CurrentBallSpeed.x = abs(m_v2InitialSpeed.x)*-1;
@@ -54,22 +54,22 @@ void Ball::StateMachine(const float fScreenWidth)
     }
     else if (eCurrentBallState == eBallState::AtPlayer2)
     {
-        if (eDesiredBallState == LEFT)
+        if (eDesiredBallState == eBallState::LEFT)
         {
             m_v2CurrentBallSpeed.x = abs(m_v2InitialSpeed.x);
             eNewBallState = eDesiredBallState;
         }
     }
-    else if(eCurrentBallState == LEFT || eCurrentBallState == RIGHT )
+    else if(eCurrentBallState == eBallState::LEFT || eCurrentBallState == eBallState::RIGHT )
     {
         //check if our collision valid
-        const bool bIsCollisionValid = eCurrentBallState == LEFT && fScreenWidth/2 > GetTranslationPosition().x ||
-        eCurrentBallState == RIGHT && fScreenWidth/2 <  m_vBallVector.x ;
+        const bool bIsCollisionValid = eCurrentBallState == eBallState::LEFT && fScreenWidth/2 > GetTranslationPosition().x ||
+        eCurrentBallState == eBallState::RIGHT && fScreenWidth/2 <  m_vBallVector.x ;
 
         if ( eDesiredBallState == eBallState::HitBall && bIsCollisionValid )
         {
             //inverse the desired move state
-            eNewBallState = eCurrentBallState == LEFT ? RIGHT : LEFT;
+            eNewBallState = eCurrentBallState == eBallState::LEFT ? eBallState::RIGHT : eBallState::LEFT;
             m_v2CurrentBallSpeed.x *= -1;
             if (abs(m_v2CurrentBallSpeed.x) < m_fTopSpeed )
             {
@@ -112,7 +112,7 @@ void Ball::UpdateBallPosition(const float fDeltaT,  const bool isPaused)
 
 void Ball::OnBatCollision(const float fScreenWidth)
 {
-    if (GetCurrentBallState() == HitBall)
+    if (GetCurrentBallState() == eBallState::HitBall)
     {
         return;
     }

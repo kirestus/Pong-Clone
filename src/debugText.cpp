@@ -28,40 +28,42 @@ sf::String DebugText::DebugTextGameState( eGameState eGameState )
 }
 //----------------------------------------------------------
 
-sf::String DebugText::DebugTextBallState( eBallState eBallState )
+sf::String DebugText::DebugTextBallState( eBallState eDebugBallState )
 {
-    if (eBallState == eBallState::LEFT)
+    switch(eDebugBallState)
     {
-        return sf::String("LEFT:");
-    }
-    else if (eBallState == eBallState::RIGHT)
-    {
-        return sf::String("RIGHT:");
-    }
-    else if (eBallState == eBallState::HitBall)
-    {
-        return sf::String("HitBall:");
-    }
-    else if (eBallState == eBallState::HitWall)
-    {
-        return sf::String("HitWall:");
-    }
-    else if (eBallState == eBallState::ResetGamePosition)
-    {
-        return sf::String("RESET:");
-    }
-    else if (eBallState == eBallState::AtPlayer1)
-    {
-        return sf::String("AT P1:");
-    }
-    else if (eBallState == eBallState::AtPlayer2)
-    {
-        return sf::String("AT P2:");
-    }
-    else
-    {
-        std::string sEnumValue = std::to_string(eBallState);
-        return sf::String(sEnumValue);
+        case  eBallState::LEFT:
+            return sf::String("LEFT:");
+            break;
+
+        case eBallState::RIGHT:
+            return sf::String("RIGHT:");
+            break;
+
+        case eBallState::HitBall:
+            return sf::String("HitBall:");
+            break; 
+        
+        case eBallState::HitWall:
+            return sf::String("HitWall:");
+            break;
+
+        case eBallState::ResetGamePosition:
+            return sf::String("RESET:");
+            break;
+
+        case eBallState::AtPlayer1:
+            return sf::String("AT P1:");
+            break;
+
+        case eBallState::AtPlayer2:
+            return sf::String("AT P2:");
+            break;
+
+        default:
+            return sf::String("Undefined BallState");
+            break;
+
     }
 }
 

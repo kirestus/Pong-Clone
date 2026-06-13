@@ -1,5 +1,5 @@
 #pragma once
-enum eBallState{
+enum class eBallState : uint8_t{
     None,
     LEFT,
     RIGHT,

@@ -80,7 +80,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 
         rTuple.pWorldState->DetermineGameState();
 
-        if (rTuple.pWorldState->GetCurrentGameState() == Boot )
+        if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Boot )
         {
             ResetGame(rTuple);
         }
@@ -148,8 +148,8 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         rTuple.pRenderWindow->draw( *rTuple.pMessageText );
         rTuple.pRenderWindow->draw( *rTuple.pScoreText );
 
-        if (rTuple.pBall->GetCurrentBallState() != AtPlayer1 && 
-        rTuple.pBall->GetCurrentBallState() != AtPlayer2 )
+        if (rTuple.pBall->GetCurrentBallState() != eBallState::AtPlayer1 && 
+        rTuple.pBall->GetCurrentBallState() != eBallState::AtPlayer2 )
         {
             for (int i = rTuple.pBall->GetTrailShapeArrayLength(); i >= 0; i --)
             {
@@ -260,7 +260,7 @@ void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused
         const bool bIsBallOnLeft = (rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2);
         if ( bIsCollidingWithP1 && bIsBallOnLeft || !bIsCollidingWithP1 && !bIsBallOnLeft )
         {
-            const eBallState eBallGoingDir = bIsCollidingWithP1 ? RIGHT : LEFT;
+            const eBallState eBallGoingDir = bIsCollidingWithP1 ? eBallState::RIGHT : eBallState::LEFT;
             sf::Vector3f const ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
             
             rTuple.pBall->OnBatCollision(rTuple.fScreenHeight);
@@ -270,7 +270,7 @@ void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused
                 rTuple.pBall->SetDesiredBallState(eBallGoingDir);
                 rTuple.pBall->StateMachine(rTuple.fScreenWidth);
 
-                if(eBallGoingDir != LEFT)
+                if(eBallGoingDir != eBallState::LEFT)
                 {
                     rTuple.pBat1->SetLastHitFrame(iSimFrame);
                 }
@@ -280,7 +280,7 @@ void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused
                 }
             }
             
-            sf::Sound* pPlayThisSound = eBallGoingDir != LEFT ? rTuple.pPlayer1SoundEffect :rTuple.pPlayer2SoundEffect;
+            sf::Sound* pPlayThisSound = eBallGoingDir != eBallState::LEFT ? rTuple.pPlayer1SoundEffect :rTuple.pPlayer2SoundEffect;
             pPlayThisSound->setPosition(ballPosition);
             if (rTuple.pWorldState->GetShouldPlaySFX())
             {
@@ -426,11 +426,11 @@ bool GameScreen::UpdateUIText(const bool bIsGameOver, const bool bIsPaused, cons
     {
         UpdateHudText(rTuple,std::string("SPACE TO UNPAUSE:"));
     }
-    else if (rTuple.pBall->GetCurrentBallState() == AtPlayer1)
+    else if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1)
     {
         UpdateHudText(rTuple,"PRESS F TO SERVE:");
     }
-    else if (rTuple.pBall->GetCurrentBallState() == AtPlayer2 )
+    else if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2 )
     {
         UpdateHudText(rTuple,"PRESS / TO SERVE:");
     }
@@ -471,13 +471,14 @@ void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, c
         return;
     }
 
-    if (eJustHit == CollisionWithWall)
+    if (eJustHit == eCollisionType::CollisionWithWall)
     {
         m_lLastShakeFrame = iSimFrame;
         vSlamForce = sf::Vector2f(0.0f,fMagnitude*rTuple.pBall->GetYSpeed()/vScaledForces.y);
         SetBoundryEdgeShapes(rTuple);
     }
-    else if ( eJustHit == CollisionWithPlayer1 || eJustHit == CollisionWithPlayer2 )
+    else if ( eJustHit == eCollisionType::CollisionWithPlayer1 
+            || eJustHit == eCollisionType::CollisionWithPlayer2 )
     {
         m_lLastShakeFrame = iSimFrame;
         vSlamForce = sf::Vector2f(fMagnitude*rTuple.pBall->GetXSpeed()/vScaledForces.x,0.0f);

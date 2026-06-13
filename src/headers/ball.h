@@ -50,7 +50,7 @@ class Ball
 
 
     private:
-        static const  int m_iShapeTrailLen = 6;
+        static constexpr  int m_iShapeTrailLen = 6;
         eBallState m_eCurrentBallState = eBallState::ResetGamePosition;
         eBallState m_eDesiredBallState = eBallState::None;
         sf::Vector3f m_vBallVector;
@@ -59,9 +59,9 @@ class Ball
         sf::RectangleShape m_sShapeTrail[m_iShapeTrailLen+1];
         //+1 is so i can use the single length value for both creating the array and accesing the elements
 
-        const float m_fTopSpeed = 15500.00f;
+        static constexpr float m_fTopSpeed = 15500.00f;
         const sf::Vector2f m_v2InitialSpeed = sf::Vector2f(4000.0f,00.0f);
         sf::Vector2f m_v2CurrentBallSpeed = m_v2InitialSpeed;
-        const float m_fSpeedUpIncriment = 450.0f;
+        static constexpr float m_fSpeedUpIncriment = 450.0f;
 
 };

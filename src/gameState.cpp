@@ -9,47 +9,47 @@ void GameState::DetermineGameState()
 
     if ( eDesiredGameState == eGameState::Quit)
     {
-        eNewGameState = Quit;
+        eNewGameState = eGameState::Quit;
     }
     
     if(eCurrentGameState == eGameState::Boot)
     {
         if( eDesiredGameState == eGameState::Running )
         {
-            eNewGameState = Running;
+            eNewGameState = eGameState::Running;
         }
         else
         {
-            eNewGameState = Paused;
+            eNewGameState = eGameState::Paused;
         }
     }
     else if ( eCurrentGameState == eGameState::GameOver )
     {
         if( eDesiredGameState == eGameState::Boot )
         {
-            eNewGameState = Boot;
+            eNewGameState = eGameState::Boot;
         }
         else
         {
-            eNewGameState = Paused;
+            eNewGameState = eGameState::Paused;
         }
     }
     else if ( eCurrentGameState == eGameState::Paused )
     {
         if( eDesiredGameState == eGameState::Running )
         {
-            eNewGameState = Running;
+            eNewGameState = eGameState::Running;
         }
     }
     else if ( eCurrentGameState == eGameState::Running )
     {
         if( eDesiredGameState == eGameState::GameOver )
         {
-            eNewGameState = GameOver;
+            eNewGameState = eGameState::GameOver;
         }
         else if( eDesiredGameState == eGameState::Paused )
         {
-            eNewGameState = Paused;
+            eNewGameState = eGameState::Paused;
         }
     }
     if ( eNewGameState != eCurrentGameState )
