@@ -39,7 +39,6 @@ void GameScreen::CreateGameScreen(const DataStruct& rTuple)
     rTuple.pScoreText->setOrigin(rTuple.pScoreText->getLocalBounds().getSize().x/2,rTuple.pScoreText->getLocalBounds().getSize().y/2);
     rTuple.pScoreText->setPosition(sf::Vector2f(rTuple.fScreenWidth/2, 50.0f) ); // should set this in the middle of the screen will do later
     rTuple.pRenderWindow->setView(*rTuple.pView);
-
     CreateMiddleLine(rTuple);
     SetScoreText(m_aScore[0],m_aScore[1]);
 
@@ -409,42 +408,60 @@ bool GameScreen::UpdateUIText(const bool bIsGameOver, const bool bIsPaused, cons
 {
     sf::Color fadeInColor(255,255,255,GetTextFadeTimer().getElapsedTime().asSeconds()*100);
 
-    if (GetTextFadeTimer().getElapsedTime().asSeconds()*100 < 225 ) 
-    {
-        rTuple.pMessageText->setFillColor(sf::Color(255,255,255,m_TextFadeOutTimer.getElapsedTime().asSeconds()*100));
-    }
+    const bool bIsDebugging = rTuple.pDebugText->GetIsDebuggingGameState() || rTuple.pDebugText->GetIsDebuggingBallState();
 
-    if (bIsGameOver && rTuple.pWorldState->GetLastGoalScoredOnP1())
+    if(bIsDebugging)
     {
-        UpdateHudText(rTuple,std::string("PLAYER 2 WINS!:"));
-    }
-    else if (bIsGameOver && !rTuple.pWorldState->GetLastGoalScoredOnP1())
-    {
-        UpdateHudText(rTuple,std::string("PLAYER 1 WINS!:"));
-    }
-    else if (bIsPaused)
-    {
-        UpdateHudText(rTuple,std::string("SPACE TO UNPAUSE:"));
-    }
-    else if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1)
-    {
-        UpdateHudText(rTuple,"PRESS F TO SERVE:");
-    }
-    else if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2 )
-    {
-        UpdateHudText(rTuple,"PRESS / TO SERVE:");
-    }
-    else if (!rTuple.pWorldState->GetShouldPlaySFX())
-    {
-        UpdateHudText(rTuple,"SOUND MUTED:");
+        if(rTuple.pDebugText->GetIsDebuggingGameState())
+        {
+            UpdateHudText(rTuple,std::string(rTuple.pDebugText->DebugTextGameState(rTuple.pWorldState->GetCurrentGameState())));
+
+        }
+        else
+        {
+            UpdateHudText(rTuple,std::string(rTuple.pDebugText->DebugTextBallState(rTuple.pBall->GetCurrentBallState())));
+        }
     }
     else
     {
+        if (GetTextFadeTimer().getElapsedTime().asSeconds()*100 < 225 ) 
+        {
+            rTuple.pMessageText->setFillColor(sf::Color(255,255,255,m_TextFadeOutTimer.getElapsedTime().asSeconds()*100));
+        }
 
-        m_TextFadeOutTimer.restart();
-        rTuple.pMessageText->setFillColor(sf::Color(255,255,255,0));
-        return false;
+        if (bIsGameOver && rTuple.pWorldState->GetLastGoalScoredOnP1())
+        {
+            UpdateHudText(rTuple,std::string("PLAYER 2 WINS!:"));
+        }
+        else if (bIsGameOver && !rTuple.pWorldState->GetLastGoalScoredOnP1())
+        {
+            UpdateHudText(rTuple,std::string("PLAYER 1 WINS!:"));
+        }
+        else if (bIsPaused)
+        {
+            UpdateHudText(rTuple,std::string("SPACE TO UNPAUSE:"));
+        }
+        else if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1)
+        {
+            UpdateHudText(rTuple,"PRESS F TO SERVE:");
+        }
+        else if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2 )
+        {
+            UpdateHudText(rTuple,"PRESS / TO SERVE:");
+        }
+        else if (!rTuple.pWorldState->GetShouldPlaySFX())
+        {
+            UpdateHudText(rTuple,"SOUND MUTED:");
+        }
+        else
+        {
+
+            m_TextFadeOutTimer.restart();
+            rTuple.pMessageText->setFillColor(sf::Color(255,255,255,0));
+            return false;
+        }
     }
+    
     return true;
 }
 

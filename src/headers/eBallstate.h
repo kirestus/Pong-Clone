@@ -1,4 +1,5 @@
 #pragma once
+
 enum class eBallState : uint8_t{
     None,
     LEFT,

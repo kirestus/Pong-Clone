@@ -24,7 +24,7 @@ private:
     
     Command* m_pPressKeyNum1 = new ToggleSFXCommand;
     Command* m_pPressKeyNum2 = new DebugTextBallStateCommand ;
-    Command* m_pPressKeyNum3 = new PauseMusicCommand ;
+    Command* m_pPressKeyNum3 = new DebugTextGameStateCommand;
     Command* m_pPressKeyNum4 = new PauseMusicCommand ;
     Command* m_pPressKeyNum5 = new PauseMusicCommand ;
     Command* m_pPressKeyNum0 = new ResetGameCommand ;

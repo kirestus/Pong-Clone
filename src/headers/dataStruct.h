@@ -5,6 +5,7 @@
 #include<headers/bat.h>
 #include<headers/ball.h>
 #include<headers/gameState.h>
+#include<headers/debugText.h>
 #include<memory>
 #include<iostream>
 
@@ -22,6 +23,7 @@ struct DataStruct{
 
     //---Text----
     std::unique_ptr<GameState> pWorldState = std::make_unique<GameState>();
+    std::unique_ptr<DebugText> pDebugText = std::make_unique<DebugText>();
     std::unique_ptr<sf::Text> pMessageText = std::make_unique<sf::Text>();
     std::unique_ptr<sf::Text> pScoreText = std::make_unique<sf::Text>();
     std::unique_ptr<sf::Font> pVectorFont = std::make_unique<sf::Font>();
@@ -41,6 +43,8 @@ struct DataStruct{
     sf::Sound* pSpitBallSoundEffect = new sf::Sound(*pSpitBallSoundBuffer);
     sf::Sound* pYouWinSoundEffect = new sf::Sound(*pYouWinSoundBuffer);
     sf::Music* pGameMusic = new sf::Music;
+
+    bool* bDebugEnabled = new bool();
 
 
     //---GlobalConsts---

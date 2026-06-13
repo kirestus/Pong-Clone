@@ -81,7 +81,9 @@ class DebugTextGameStateCommand : public Command
 public:
   virtual void execute(const DataStruct& rTuple)
   {
-    rTuple.pMessageText->setString(DebugText::DebugTextGameState(rTuple.pWorldState->GetCurrentGameState()));
+
+      rTuple.pDebugText->SetDebuggingGamelState(!rTuple.pDebugText->GetIsDebuggingGameState());
+      rTuple.pDebugText->SetDebuggingBallState(false);
   }
 };
 
@@ -92,7 +94,8 @@ class DebugTextBallStateCommand : public Command
 public:
   virtual void execute(const DataStruct& rTuple)
   {
-    rTuple.pMessageText->setString(DebugText::DebugTextBallState(rTuple.pBall->GetCurrentBallState()));
+    rTuple.pDebugText->SetDebuggingBallState(!rTuple.pDebugText->GetIsDebuggingBallState());
+    rTuple.pDebugText->SetDebuggingGamelState(false);
   }
 };
 
@@ -132,7 +135,7 @@ class ToggleSFXCommand : public Command
 public:
   virtual void execute(const DataStruct& rTuple)
   {
-    bool toggleSFX = !rTuple.pWorldState->GetShouldPlaySFX();
+    const bool toggleSFX = !rTuple.pWorldState->GetShouldPlaySFX();
     rTuple.pWorldState->SetShouldPlaySFX(toggleSFX);
   }
 };

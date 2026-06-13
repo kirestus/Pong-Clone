@@ -13,17 +13,6 @@ Bat::Bat(const sf::Vector2f vPosition , const ePlayerNumber ePlayer)
 
 //-----------------------------------------------------------------
 
-Bat::Bat()
-{
-    m_vPosition = sf::Vector2f(70,300);
-    m_hRectShape.setSize(sf::Vector2f(15.0f,80.0f));
-    m_hRectShape.setFillColor(sf::Color::White);
-    m_hRectShape.setOrigin( sf::Vector2f(m_hRectShape.getSize().x/2, m_hRectShape.getSize().y/2));
-    m_ePlayerNumber = ePlayerNumber::PLAYER1; // if undefined assume player 1
-}
-
-//-----------------------------------------------------------------
-
 eBatMoveDirection Bat::DetermCurrentMoveDirection(const std::shared_ptr<sf::RenderWindow> pRenderWindow)
 {
     const eBatMoveDirection eCurrentMoveDirection = GetCurrentMoveDirection();
@@ -136,16 +125,16 @@ void Bat::NudgeBat(const std::shared_ptr<sf::RenderWindow> pRenderWindow)
 void Bat::UpdateHitVFX(const std::shared_ptr<sf::RenderWindow> pRenderWindow, int iSimFrame, float fLastHitYPosition)
 {
 
-    static const int iFXFrameTime = 20;
+    static const u_int8_t iFXFrameTime = 20;
 
     //todo change color to more of a red the closer to the edge of the paddle that the ball is hit
     //i will later tie this into ball controll so hits near the edge have more spread and the middle is the sweet spot
 
-    for(int i = m_iHitFXArrayLength; i >= 0 ; i--)
+    for(int8_t i = m_iHitFXArrayLength; i >= 0 ; i--)
     {
         if ( m_iLastFrameBallWasHit + iFXFrameTime > iSimFrame)
         {
-            if(GetPlayerNumber() == PLAYER2)
+            if(GetPlayerNumber() == ePlayerNumber::PLAYER2)
             {
                 m_FXShape[i].setScale(sf::Vector2f(-1.0f,1.0f));
             }
@@ -158,7 +147,7 @@ void Bat::UpdateHitVFX(const std::shared_ptr<sf::RenderWindow> pRenderWindow, in
             m_FXShape[i].setPosition( m_hRectShape.getPosition().x ,m_hRectShape.getPosition().y );
             m_FXShape[i].setSize( sf::Vector2f( m_hRectShape.getSize().x*i*0.8 +10 , m_hRectShape.getSize().y-(i*8)));
             
-            if(GetPlayerNumber() == PLAYER2)
+            if(GetPlayerNumber() == ePlayerNumber::PLAYER2)
             {
                 m_FXShape[i].scale(sf::Vector2f(m_FXShape->getScale().x * -1, 1.0));
             }

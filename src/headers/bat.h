@@ -8,7 +8,7 @@ enum class eBatMoveDirection
     DOWN,
 };
 
-enum ePlayerNumber{
+enum class ePlayerNumber{
     PLAYER1,
     PLAYER2
 };

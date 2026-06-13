@@ -3,28 +3,28 @@
 
 sf::String DebugText::DebugTextGameState( eGameState eGameState )
 {
-    if (eGameState == eGameState::Paused)
+    switch(eGameState)
     {
-        return sf::String("Paused:");
-    }
-    else if (eGameState == eGameState::Boot)
-    {
-        return sf::String("Boot:");
-    }
-    else if (eGameState == eGameState::Running)
-    {
-        return sf::String("Running:");
-    }
-    else if (eGameState == eGameState::GameOver)
-    {
-        return sf::String("GameOver:");
-    }
-    else
-    {
-        return sf::String("");
+        case eGameState::Paused:
+            return sf::String("Paused:");
+            break;
+        
+        case eGameState::Boot:
+            return sf::String("Boot:");
+            break;
+        
+        case eGameState::Running:
+            return sf::String("Running:");
+            break;
+        
+        case eGameState::GameOver:
+            return sf::String("GameOver:");
+            break;
+
+        default:
+            return sf::String("");
     }
 
-    return sf::String("");
 }
 //----------------------------------------------------------
 
