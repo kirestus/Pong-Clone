@@ -13,23 +13,23 @@ class GameScreen
 {
 public:
 
-    GameScreen( DataStruct& );
+    GameScreen( const DataStruct& );
 
-    eCollisionType CheckCollisions(DataStruct &rTuple, bool);
-    void HandleCollisions(DataStruct &rTuple, const bool, const eCollisionType, const int);
+    eCollisionType CheckCollisions(const DataStruct &rTuple,const bool);
+    void HandleCollisions(const DataStruct &rTuple, const bool, const eCollisionType, const int);
     void SetLastCollisionType(eCollisionType eJustHit){m_eLastCollisionType = eJustHit ;}
     eCollisionType GetLastCollisionType() const { return m_eLastCollisionType; }
 
-    void ResetGame(DataStruct&);
+    void ResetGame(const DataStruct&);
     void AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball> pBall, const float);
-    bool ShouldAttachBallToBat(DataStruct&);
+    bool ShouldAttachBallToBat(const DataStruct&);
 
     bool GetShouldUpdateScore()const{ return m_bShouldUpdateScore; }
     void SetShouldUpdateScore(bool bShouldIt){ m_bShouldUpdateScore = bShouldIt; }
 
     bool isBallCollidingWithTarget(const sf::FloatRect box1, const sf::FloatRect box2);
     bool isBallHittingWall(const sf::FloatRect box1, const std::shared_ptr<sf::RenderWindow> pRenderWindow);
-    bool isBallHittingGoal( const sf::FloatRect box1, DataStruct &rTuple, bool );
+    bool isBallHittingGoal( const sf::FloatRect box1, const DataStruct &rTuple, const bool );
 
     std::string SetScoreText(const int &iPlayer1Score, const int &iPlayer2Score);
 
@@ -37,23 +37,23 @@ public:
     sf::Vector2f GetScreenCenter() const {return m_vScreenCenter;}
     void SetScreenCenter(sf::Vector2f fScreenCenter){m_vScreenCenter = fScreenCenter;} 
 
-    void CreateGameScreen(DataStruct& rTuple); 
-    int UpdateGamescreen(DataStruct& rTuple, sf::Clock &rTimer);
+    void CreateGameScreen(const DataStruct& rTuple); 
+    int UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rTimer);
 
-    void UpdateScoreText(DataStruct& rTuple , int, bool);
-    void UpdateHudText(DataStruct& rTuple, std::string);
-    bool UpdateUIText(bool, bool, DataStruct& );
+    void UpdateScoreText(const DataStruct& rTuple , int, bool);
+    void UpdateHudText(const DataStruct& rTuple, std::string);
+    bool UpdateUIText(const bool, const bool, const DataStruct& );
 
     sf::Clock GetGameClock() const { return m_hClock; }
     sf::Clock GetTextFadeTimer() const { return m_TextFadeOutTimer ;}
 
-    void ShakeScreen( DataStruct &rTuple, const float fMagnitude, eCollisionType eJustHit, bool );
+    void ShakeScreen(const DataStruct &rTuple, const float fMagnitude, const eCollisionType eJustHit, const bool );
     bool GetisWinConditionMet() {return (m_aScore[0] == m_iScoreLimit || m_aScore[1] == m_iScoreLimit); }
 
-    void CreateMiddleLine(DataStruct& rTuple);
-    void DimMiddleLine(DataStruct& rTuple, bool bShouldDimLine);
+    void CreateMiddleLine(const DataStruct& rTuple);
+    void DimMiddleLine(const DataStruct& rTuple,const bool bShouldDimLine);
 
-    void SetBoundryEdgeShapes(DataStruct& rTuple);
+    void SetBoundryEdgeShapes(const DataStruct& rTuple);
 
 private:
     bool m_bShouldUpdateScore = true;

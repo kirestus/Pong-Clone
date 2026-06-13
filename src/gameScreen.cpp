@@ -5,11 +5,11 @@
 #include <ctime>
 
 //forward declaring
-static float CreateRandomAngle(int minRange, int maxRange);
+static float CreateRandomAngle(const int minRange, const int maxRange);
 
 //-----------------------------------------------------------------
 
-GameScreen::GameScreen(DataStruct &rTuple)
+GameScreen::GameScreen(const DataStruct &rTuple)
 {
     CreateGameScreen(rTuple);
     UpdateGamescreen(rTuple,m_hClock);
@@ -17,7 +17,7 @@ GameScreen::GameScreen(DataStruct &rTuple)
 
 //-----------------------------------------------------------------
 
-void GameScreen::CreateGameScreen(DataStruct& rTuple)
+void GameScreen::CreateGameScreen(const DataStruct& rTuple)
 {
     //Set values that dont need to be updated each cycle.
     SetScreenCenter(CalculateScreenCenter(rTuple.pRenderWindow));
@@ -60,7 +60,7 @@ sf::Vector2f GameScreen::CalculateScreenCenter(const std::shared_ptr<sf::RenderW
 
 //-----------------------------------------------------------------
 
-int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
+int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock)
 {
     rTuple.pGameMusic->pause();
     rTuple.pGameMusic->setLoop(true);
@@ -76,7 +76,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
         const float fFps = 1.0 / fFrameTime;
         //std::cout << fFps << " Frames Per Second: \n";
 
-        bool bIsPaused = rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused;
+        const bool bIsPaused = rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused;
 
         rTuple.pWorldState->DetermineGameState();
 
@@ -181,7 +181,7 @@ int GameScreen::UpdateGamescreen(DataStruct& rTuple, sf::Clock &rGameClock)
 
 //----------------------------------------------------------
 
-void GameScreen::ResetGame(DataStruct &rTuple)
+void GameScreen::ResetGame(const DataStruct &rTuple)
 {
     rTuple.pBat1->SetPosition(sf::Vector2f(50.0f, rTuple.fScreenHeight/2));
     rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
@@ -197,9 +197,9 @@ void GameScreen::ResetGame(DataStruct &rTuple)
 
 //----------------------------------------------------------
 
-eCollisionType GameScreen::CheckCollisions(DataStruct &rTuple, bool isPaused)
+eCollisionType GameScreen::CheckCollisions(const DataStruct &rTuple,const bool isPaused)
 {  
-    sf::FloatRect pBallHitbox = rTuple.pBall->GetShape().getGlobalBounds();
+    const sf::FloatRect pBallHitbox = rTuple.pBall->GetShape().getGlobalBounds();
     
     const bool bIsCollidingWithP1 = isBallCollidingWithTarget(pBallHitbox, rTuple.pBat1->GetShape().getGlobalBounds());
     const bool bIsCollidingWithP2 = isBallCollidingWithTarget(pBallHitbox, rTuple.pBat2->GetShape().getGlobalBounds());
@@ -216,7 +216,7 @@ eCollisionType GameScreen::CheckCollisions(DataStruct &rTuple, bool isPaused)
 
 //----------------------------------------------------------
 
-void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, eCollisionType eCollidingwith, int iSimFrame )
+void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused, eCollisionType eCollidingwith, int iSimFrame )
 {
     if (eCollidingwith == CollisionWithGoalZone)
     {
@@ -242,7 +242,7 @@ void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, eCol
     else if (eCollidingwith == CollisionWithPlayer1 || eCollidingwith == CollisionWithPlayer2)
     {
         const bool bIsCollidingWithP1 = eCollidingwith == CollisionWithPlayer1 ? true : false; 
-        std::shared_ptr<Bat> pBat = bIsCollidingWithP1 ? rTuple.pBat1 : rTuple.pBat2 ;
+        const std::shared_ptr<Bat> pBat = bIsCollidingWithP1 ? rTuple.pBat1 : rTuple.pBat2 ;
         const bool bIsBallOnLeft = (rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2);
         if ( bIsCollidingWithP1 && bIsBallOnLeft || !bIsCollidingWithP1 && !bIsBallOnLeft )
         {
@@ -280,7 +280,7 @@ void GameScreen::HandleCollisions(DataStruct &rTuple, const bool bIsPaused, eCol
         rTuple.pBall->OnWallCollision(true, rTuple.fScreenWidth);
         if (rTuple.pWorldState->GetShouldPlaySFX())
         {
-            float fPitchShift = 0.8 + (abs(rTuple.pBall->GetYSpeed()/30000));
+            const float fPitchShift = 0.8 + (abs(rTuple.pBall->GetYSpeed()/30000));
             rTuple.pHitWallSoundEffect->setVolume(abs(rTuple.pBall->GetYSpeed()/100));
             rTuple.pHitWallSoundEffect->setPitch(fPitchShift);
             rTuple.pHitWallSoundEffect->play();
@@ -315,7 +315,7 @@ bool GameScreen::isBallHittingWall(const sf::FloatRect box1, const std::shared_p
 
 //----------------------------------------------------------
 
-bool GameScreen::isBallHittingGoal(const sf::FloatRect box1, DataStruct &rTuple, bool isPaused )
+bool GameScreen::isBallHittingGoal(const sf::FloatRect box1,const DataStruct &rTuple,const bool isPaused )
 {
     const float fLeftGoalPosition = 0.0f;
     const float fRightGoalPosition = rTuple.fScreenWidth;
@@ -345,13 +345,13 @@ std::string GameScreen::SetScoreText(const int &iPlayer1Score, const int &iPlaye
 
 //----------------------------------------------------------
 
-void GameScreen::UpdateScoreText(DataStruct& rTuple, const int iSimFrame, bool bIsPaused)
+void GameScreen::UpdateScoreText(const DataStruct& rTuple, const int iSimFrame, const bool bIsPaused)
 {
     if (bIsPaused)
     {
         return;
     }
-    std::string scoreString = GameScreen::SetScoreText(m_aScore[0],m_aScore[1]);
+    const std::string scoreString = GameScreen::SetScoreText(m_aScore[0],m_aScore[1]);
     rTuple.pScoreText->setString(sf::String(scoreString));
     if ( m_lLastGoalScoredFrame+30 >= rTuple.pWorldState->GetCurrentSimFrame() )
     {
@@ -370,7 +370,7 @@ void GameScreen::UpdateScoreText(DataStruct& rTuple, const int iSimFrame, bool b
 
 //------------------------------------------------------------
 
-void GameScreen::UpdateHudText(DataStruct& rTuple, std::string sDesiredText)
+void GameScreen::UpdateHudText(const DataStruct& rTuple, std::string sDesiredText)
 {
     rTuple.pMessageText->setString(sf::String(sDesiredText));
     rTuple.pMessageText->setOrigin(rTuple.pMessageText->getLocalBounds().getSize().x/2,rTuple.pMessageText->getLocalBounds().getSize().y/2);
@@ -391,7 +391,7 @@ void GameScreen::AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball
 
 //------------------------------------------------------------
 
-bool GameScreen::UpdateUIText(bool bIsGameOver, bool bIsPaused, DataStruct& rTuple )
+bool GameScreen::UpdateUIText(const bool bIsGameOver, const bool bIsPaused, const DataStruct& rTuple )
 {
     sf::Color fadeInColor(255,255,255,GetTextFadeTimer().getElapsedTime().asSeconds()*100);
 
@@ -436,14 +436,14 @@ bool GameScreen::UpdateUIText(bool bIsGameOver, bool bIsPaused, DataStruct& rTup
 
 //------------------------------------------------------------
 
-static float CreateRandomAngle(int minRange, int maxRange)
+static float CreateRandomAngle(const int minRange, const int maxRange)
 {
     return rand() % (maxRange - minRange + 1 ) + minRange;
 }
 
 //------------------------------------------------------------
 
-void GameScreen::ShakeScreen(DataStruct &rTuple, const float fMagnitude, eCollisionType eJustHit, const bool isPaused )
+void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, eCollisionType eJustHit, const bool isPaused )
 {
     const int iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
     sf::Vector2f vSlamForce;
@@ -483,7 +483,7 @@ void GameScreen::ShakeScreen(DataStruct &rTuple, const float fMagnitude, eCollis
 
 //------------------------------------------------------------
 
-void GameScreen::CreateMiddleLine(DataStruct& rTuple)
+void GameScreen::CreateMiddleLine(const DataStruct& rTuple)
 {
     static const float lineHeight = (rTuple.fScreenHeight/m_iNumberOfLines)/2;
     static const float lineThickness = 7.5f;
@@ -500,7 +500,7 @@ void GameScreen::CreateMiddleLine(DataStruct& rTuple)
 
 //------------------------------------------------------------
 
-void GameScreen::DimMiddleLine(DataStruct& rTuple, bool bShouldDimLine)
+void GameScreen::DimMiddleLine(const DataStruct& rTuple, bool bShouldDimLine)
 {
     static const int iDimValue = 45;
     static const int iFullOpacityValue = 100;
@@ -529,7 +529,7 @@ void GameScreen::DimMiddleLine(DataStruct& rTuple, bool bShouldDimLine)
 
 //------------------------------------------------------------
 
-void GameScreen::SetBoundryEdgeShapes(DataStruct& rTuple)
+void GameScreen::SetBoundryEdgeShapes(const DataStruct& rTuple)
 {
     sf::Color EdgeColor(120,120,255,200);
     m_sTopEdge.setSize(sf::Vector2f (50.0f, 30.0f));
@@ -546,7 +546,7 @@ void GameScreen::SetBoundryEdgeShapes(DataStruct& rTuple)
 
 //------------------------------------------------------------
 
-bool GameScreen::ShouldAttachBallToBat(DataStruct& rTuple)
+bool GameScreen::ShouldAttachBallToBat(const DataStruct& rTuple)
 {
     if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 )
     {
