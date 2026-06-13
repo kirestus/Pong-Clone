@@ -1,7 +1,7 @@
 #include <headers/bat.h>
 
 
-Bat::Bat(sf::Vector2f vPosition , ePlayerNumber ePlayer)
+Bat::Bat(const sf::Vector2f vPosition , const ePlayerNumber ePlayer)
 {
     m_hRectShape.setPosition(vPosition);
     m_vPosition = vPosition;
@@ -24,10 +24,10 @@ Bat::Bat()
 
 //-----------------------------------------------------------------
 
-eBatMoveDirection Bat::DetermCurrentMoveDirection(std::shared_ptr<sf::RenderWindow> pRenderWindow)
+eBatMoveDirection Bat::DetermCurrentMoveDirection(const std::shared_ptr<sf::RenderWindow> pRenderWindow)
 {
-    eBatMoveDirection eCurrentMoveDirection = GetCurrentMoveDirection();
-    eBatMoveDirection eDesiredMoveDirection = GetDesiredMoveDirection();
+    const eBatMoveDirection eCurrentMoveDirection = GetCurrentMoveDirection();
+    const eBatMoveDirection eDesiredMoveDirection = GetDesiredMoveDirection();
     eBatMoveDirection eNewMoveDirection;
 
     switch(eCurrentMoveDirection)
@@ -69,7 +69,7 @@ eBatMoveDirection Bat::DetermCurrentMoveDirection(std::shared_ptr<sf::RenderWind
 
 //-----------------------------------------------------------------
 
-bool Bat::IsBouncing(float fSpeed)
+bool Bat::IsBouncing(const float fSpeed)
 {
     return ((GetDesiredMoveDirection() == eBatMoveDirection::UP && fSpeed > 0 )||
     (GetDesiredMoveDirection() == eBatMoveDirection::DOWN && fSpeed < 0));
@@ -77,11 +77,11 @@ bool Bat::IsBouncing(float fSpeed)
 
 //-----------------------------------------------------------------
 
-void Bat::CalculateBatSpeed(std::shared_ptr<sf::RenderWindow> pRenderWindow, float fLapsedTime, bool isGamePaused = false)
+void Bat::CalculateBatSpeed(const std::shared_ptr<sf::RenderWindow> pRenderWindow, const float fLapsedTime, const bool isGamePaused = false)
 {
     eBatMoveDirection newMoveDirection = DetermCurrentMoveDirection(pRenderWindow);
     //UpdateDesiredToShapeTransform();
-    float fSpeed =  GetVelocity()*fLapsedTime;
+    const float fSpeed =  GetVelocity()*fLapsedTime;
     if (!isGamePaused)
     {
         if (( fSpeed < GetTopSpeed() || fSpeed > GetTopSpeed() *-1 ))
@@ -116,7 +116,7 @@ void Bat::CalculateBatSpeed(std::shared_ptr<sf::RenderWindow> pRenderWindow, flo
 //-----------------------------------------------------------------
 
 
-void Bat::NudgeBat(std::shared_ptr<sf::RenderWindow> pRenderWindow)
+void Bat::NudgeBat(const std::shared_ptr<sf::RenderWindow> pRenderWindow)
 {
         //Nudge the bat if its at the top or bottom so it doesnt glitch out
     if( IsHittingTop() )
@@ -133,7 +133,7 @@ void Bat::NudgeBat(std::shared_ptr<sf::RenderWindow> pRenderWindow)
 
 //-----------------------------------------------------------------
 
-void Bat::UpdateHitVFX(std::shared_ptr<sf::RenderWindow> pRenderWindow, int iSimFrame, float fLastHitYPosition)
+void Bat::UpdateHitVFX(const std::shared_ptr<sf::RenderWindow> pRenderWindow, int iSimFrame, float fLastHitYPosition)
 {
 
     static const int iFXFrameTime = 20;

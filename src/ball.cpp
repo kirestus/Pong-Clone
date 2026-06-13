@@ -14,16 +14,19 @@ Ball::Ball(std::shared_ptr<sf::RenderWindow> pRenderWindow)
 
 void Ball::StateMachine(const float fScreenWidth)
 {
-    eBallState eNewBallState = m_eCurrentBallState;
-    if (m_eCurrentBallState == eBallState::ResetGamePosition )
+    const eBallState eCurrentBallState = GetCurrentBallState();
+    const eBallState eDesiredBallState = GetDesiredBallState();
+    eBallState eNewBallState = eCurrentBallState;
+
+    if (eCurrentBallState == eBallState::ResetGamePosition )
     {
         m_sShape.setPosition(m_vBallVector.x ,m_vBallVector.y);
         //game reset state will go to either left or right
-        if (m_eDesiredBallState == eBallState::AtPlayer1)
+        if (eDesiredBallState == eBallState::AtPlayer1)
         {
             eNewBallState = eBallState::AtPlayer1;
         }
-        else if (m_eDesiredBallState == eBallState::AtPlayer2)
+        else if (eDesiredBallState == eBallState::AtPlayer2)
         {
             eNewBallState = eBallState::AtPlayer2;
         }
@@ -32,64 +35,64 @@ void Ball::StateMachine(const float fScreenWidth)
             eNewBallState = eBallState::LEFT;
         }
     }
-    else if (m_eCurrentBallState == GoalOnPlayer1 )
+    else if (eCurrentBallState == GoalOnPlayer1 )
     {
         eNewBallState = eBallState::AtPlayer1;
     }
-        else if (m_eCurrentBallState == GoalOnPlayer2 )
+        else if (eCurrentBallState == GoalOnPlayer2 )
     {
         eNewBallState = eBallState::AtPlayer2;
     }
-    else if (m_eCurrentBallState == eBallState::AtPlayer1 )
+    else if (eCurrentBallState == eBallState::AtPlayer1 )
     {
-        if( m_eDesiredBallState == RIGHT) 
+        if( eDesiredBallState == RIGHT) 
         {
             
             m_v2CurrentBallSpeed.x = abs(m_v2InitialSpeed.x)*-1;
-            eNewBallState = m_eDesiredBallState;
+            eNewBallState = eDesiredBallState;
         }
     }
-    else if (m_eCurrentBallState == eBallState::AtPlayer2)
+    else if (eCurrentBallState == eBallState::AtPlayer2)
     {
-        if (m_eDesiredBallState == LEFT)
+        if (eDesiredBallState == LEFT)
         {
             m_v2CurrentBallSpeed.x = abs(m_v2InitialSpeed.x);
-            eNewBallState = m_eDesiredBallState;
+            eNewBallState = eDesiredBallState;
         }
     }
-    else if(m_eCurrentBallState == LEFT || m_eCurrentBallState == RIGHT )
+    else if(eCurrentBallState == LEFT || eCurrentBallState == RIGHT )
     {
         //check if our collision valid
-        bool bIsCollisionValid = m_eCurrentBallState == LEFT && fScreenWidth/2 > GetTranslationPosition().x ||
-        m_eCurrentBallState == RIGHT && fScreenWidth/2 <  m_vBallVector.x ;
+        const bool bIsCollisionValid = eCurrentBallState == LEFT && fScreenWidth/2 > GetTranslationPosition().x ||
+        eCurrentBallState == RIGHT && fScreenWidth/2 <  m_vBallVector.x ;
 
-        if ( m_eDesiredBallState == eBallState::HitBall && bIsCollisionValid )
+        if ( eDesiredBallState == eBallState::HitBall && bIsCollisionValid )
         {
             //inverse the desired move state
-            eNewBallState = m_eCurrentBallState == LEFT ? RIGHT : LEFT;
+            eNewBallState = eCurrentBallState == LEFT ? RIGHT : LEFT;
             m_v2CurrentBallSpeed.x *= -1;
             if (abs(m_v2CurrentBallSpeed.x) < m_fTopSpeed )
             {
                 m_v2CurrentBallSpeed.x = m_v2CurrentBallSpeed.x > 0 ? m_v2CurrentBallSpeed.x += m_fSpeedUpIncriment : m_v2CurrentBallSpeed.x -= m_fSpeedUpIncriment;
             }
         }
-        else if(m_eDesiredBallState == eBallState::HitWall)
+        else if(eDesiredBallState == eBallState::HitWall)
         {
             SetYSpeed(GetYSpeed()*-1);
             eNewBallState = m_eCurrentBallState;
         }
-        else if( m_eDesiredBallState == eBallState::GoalOnPlayer1)
+        else if( eDesiredBallState == eBallState::GoalOnPlayer1)
         {
             eNewBallState = eBallState::AtPlayer2;
         }
-        else if ( m_eDesiredBallState == eBallState::GoalOnPlayer2 )
+        else if ( eDesiredBallState == eBallState::GoalOnPlayer2 )
         {
             eNewBallState = eBallState::AtPlayer1;
         }
     }
 
     assert(eNewBallState != eBallState::None && "StateMachine is NONE Update When Called to after scoring a goal");
-    m_eCurrentBallState = eNewBallState;
+    SetCurrentBallState(eNewBallState);
 }
 
 //----------------------------------------------------------
@@ -109,7 +112,7 @@ void Ball::UpdateBallPosition(const float fDeltaT,  const bool isPaused)
 
 void Ball::OnBatCollision(const float fScreenWidth)
 {
-    if (m_eCurrentBallState == HitBall)
+    if (GetCurrentBallState() == HitBall)
     {
         return;
     }

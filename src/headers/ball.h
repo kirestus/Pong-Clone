@@ -8,7 +8,6 @@ class Ball
 
         Ball(std::shared_ptr<sf::RenderWindow> pRenderWindow);
 
-        void SetDesiredBallState(eBallState _desiredState){ m_eDesiredBallState = _desiredState ;}
 
         sf::RectangleShape& ReferenceShape(){return m_sShape ;}
 
@@ -34,6 +33,11 @@ class Ball
         void SetBallVector(sf::Vector3f _vector){m_vBallVector = _vector ;}
 
         eBallState GetCurrentBallState() const { return m_eCurrentBallState ;}
+        eBallState GetDesiredBallState() const { return m_eDesiredBallState ;}
+
+        void SetCurrentBallState(eBallState state){ m_eCurrentBallState = state ;}
+        void SetDesiredBallState(eBallState _desiredState){ m_eDesiredBallState = _desiredState ;}
+
 
         void StateMachine(const float);
         void UpdateBallPosition(const float, const bool);
