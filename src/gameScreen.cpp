@@ -207,18 +207,31 @@ eCollisionType GameScreen::CheckCollisions(const DataStruct &rTuple,const bool i
     const bool bDidPLayerScore = isBallHittingGoal(pBallHitbox,rTuple, isPaused );
 
     //order here could matter in the rare edge case of a player hitting a wall and hitting the goal
-    if ( bDidPLayerScore ){ return eCollisionType::CollisionWithGoalZone ;}
-    else if ( bIsCollidingWithP1 ){ return eCollisionType::CollisionWithPlayer1 ;}
-    else if ( bIsCollidingWithP2 ){ return eCollisionType::CollisionWithPlayer2 ;}
-    else if ( bIsCollidingWithWalls ){ return eCollisionType::CollisionWithWall ;}
+    if ( bDidPLayerScore )
+    { 
+        return eCollisionType::CollisionWithGoalZone ;
+    }
+    else if ( bIsCollidingWithP1 )
+    { 
+        return eCollisionType::CollisionWithPlayer1 ;
+    }
+    else if ( bIsCollidingWithP2 )
+    { 
+        return eCollisionType::CollisionWithPlayer2 ;
+    }
+    else if ( bIsCollidingWithWalls )
+    { 
+        return eCollisionType::CollisionWithWall ;
+    }
+
     return eCollisionType::NoCollision ;
 }
 
 //----------------------------------------------------------
 
-void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused, eCollisionType eCollidingwith, int iSimFrame )
+void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused, const eCollisionType eCollidingwith,const int iSimFrame )
 {
-    if (eCollidingwith == CollisionWithGoalZone)
+    if (eCollidingwith == eCollisionType::CollisionWithGoalZone)
     {
         const bool isleft = rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2;
         rTuple.pBall->OnScoreGoal(true, isleft, rTuple.fScreenWidth);
@@ -239,9 +252,10 @@ void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused
 
         ResetGame(rTuple);
     }
-    else if (eCollidingwith == CollisionWithPlayer1 || eCollidingwith == CollisionWithPlayer2)
+    else if (eCollidingwith == eCollisionType::CollisionWithPlayer1 
+            || eCollidingwith == eCollisionType::CollisionWithPlayer2)
     {
-        const bool bIsCollidingWithP1 = eCollidingwith == CollisionWithPlayer1 ? true : false; 
+        const bool bIsCollidingWithP1 = eCollidingwith == eCollisionType::CollisionWithPlayer1 ? true : false; 
         const std::shared_ptr<Bat> pBat = bIsCollidingWithP1 ? rTuple.pBat1 : rTuple.pBat2 ;
         const bool bIsBallOnLeft = (rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2);
         if ( bIsCollidingWithP1 && bIsBallOnLeft || !bIsCollidingWithP1 && !bIsBallOnLeft )
@@ -370,7 +384,7 @@ void GameScreen::UpdateScoreText(const DataStruct& rTuple, const int iSimFrame, 
 
 //------------------------------------------------------------
 
-void GameScreen::UpdateHudText(const DataStruct& rTuple, std::string sDesiredText)
+void GameScreen::UpdateHudText(const DataStruct& rTuple, const std::string sDesiredText)
 {
     rTuple.pMessageText->setString(sf::String(sDesiredText));
     rTuple.pMessageText->setOrigin(rTuple.pMessageText->getLocalBounds().getSize().x/2,rTuple.pMessageText->getLocalBounds().getSize().y/2);
@@ -379,7 +393,7 @@ void GameScreen::UpdateHudText(const DataStruct& rTuple, std::string sDesiredTex
 
 //------------------------------------------------------------
 
-void GameScreen::AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball> pBall, const float fScreenWidth)
+void GameScreen::AttachBallToBat(const std::shared_ptr<Bat> pBat, const std::shared_ptr<Ball> pBall, const float fScreenWidth)
 {
     pBall->StateMachine(fScreenWidth);
     pBall->SetYSpeed(pBat->GetVelocity()*-1.9f);
@@ -443,13 +457,13 @@ static float CreateRandomAngle(const int minRange, const int maxRange)
 
 //------------------------------------------------------------
 
-void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, eCollisionType eJustHit, const bool isPaused )
+void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, const eCollisionType eJustHit, const bool isPaused )
 {
     const int iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
     sf::Vector2f vSlamForce;
-    static const int iTotalSlamFrames = 20;
+    static constexpr int iTotalSlamFrames = 20;
     static const sf::Vector2 vForceScalingRatio(2,1);
-    static const float fForceScale = 550;
+    static constexpr float fForceScale = 550;
     static const sf::Vector2f vScaledForces(vForceScalingRatio.x*fForceScale,vForceScalingRatio.y*fForceScale);
 
     if (isPaused)
@@ -500,7 +514,7 @@ void GameScreen::CreateMiddleLine(const DataStruct& rTuple)
 
 //------------------------------------------------------------
 
-void GameScreen::DimMiddleLine(const DataStruct& rTuple, bool bShouldDimLine)
+void GameScreen::DimMiddleLine(const DataStruct& rTuple, const bool bShouldDimLine)
 {
     static const int iDimValue = 45;
     static const int iFullOpacityValue = 100;
