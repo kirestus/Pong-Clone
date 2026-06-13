@@ -44,9 +44,6 @@ struct DataStruct{
     sf::Sound* pYouWinSoundEffect = new sf::Sound(*pYouWinSoundBuffer);
     sf::Music* pGameMusic = new sf::Music;
 
-    bool* bDebugEnabled = new bool();
-
-
     //---GlobalConsts---
     const float fScreenWidth = pRenderWindow->getSize().x;
     const float fScreenHeight = pRenderWindow->getSize().y;
