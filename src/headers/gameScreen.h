@@ -20,6 +20,9 @@ public:
     void SetLastCollisionType(eCollisionType eJustHit){m_eLastCollisionType = eJustHit ;}
     eCollisionType GetLastCollisionType() const { return m_eLastCollisionType; }
 
+    void SetSimFrameTopLastHit(uint64_t iFrame){m_iSimFrameTopLastHit = iFrame;}
+    uint64_t GetSimFrameTopLastHit()const {return m_iSimFrameTopLastHit;}
+
     void ResetGame(const DataStruct&);
     void AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball> pBall, const float);
     bool ShouldAttachBallToBat(const DataStruct&);
@@ -54,6 +57,8 @@ public:
     void DimMiddleLine(const DataStruct& rTuple,const bool bShouldDimLine);
 
     void SetBoundryEdgeShapes(const DataStruct& rTuple);
+    void UpdateWallBounceVFX(const DataStruct& rTuple);
+
 
 private:
     bool m_bShouldUpdateScore = true;
@@ -64,12 +69,15 @@ private:
     sf::Vector2f m_vScreenCenter;
     sf::Clock m_hClock;
     int m_aScore[2] = {0};
-    long m_lLastShakeFrame = 0;
+    uint64_t m_iLastShakeFrame = 0;
     long m_lLastGoalScoredFrame = -500;
     static const short m_iNumberOfLines = 6;
     sf::RectangleShape m_DashedLineRect[m_iNumberOfLines+1];
 
-    sf::RectangleShape m_sTopEdge;
-    sf::RectangleShape m_sBottomEdge;
+    uint64_t m_iSimFrameTopLastHit = 0;
+    static constexpr int m_iBounceVFXArrayLength = 6;
+    int pBounceWallVFXSpriteArray[m_iBounceVFXArrayLength];
+    sf::RectangleShape m_sTopEdge[m_iBounceVFXArrayLength+1];
+    sf::RectangleShape m_sBottomEdge[m_iBounceVFXArrayLength+1];
 };
 

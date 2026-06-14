@@ -28,6 +28,9 @@ struct DataStruct{
     std::unique_ptr<sf::Text> pScoreText = std::make_unique<sf::Text>();
     std::unique_ptr<sf::Font> pVectorFont = std::make_unique<sf::Font>();
 
+
+    //---VFX----
+
     //---SFX----
     std::unique_ptr<sf::SoundBuffer> pPlayer1SoundBuffer = std::make_unique<sf::SoundBuffer>();
     std::unique_ptr<sf::SoundBuffer> pPlayer2SoundBuffer = std::make_unique<sf::SoundBuffer>();

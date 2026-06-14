@@ -118,6 +118,8 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         rTuple.pBat1->UpdateHitVFX(rTuple.pRenderWindow, iSimFrame, rTuple.pBall->GetShape().getPosition().y);
         rTuple.pBat2->UpdateHitVFX(rTuple.pRenderWindow, iSimFrame, rTuple.pBall->GetShape().getPosition().y);
 
+        //UpdateWallBounceVFX(rTuple); TODO: Get this working later
+
         sf::Event event;
         while (rTuple.pRenderWindow->pollEvent(event))
         {
@@ -141,9 +143,6 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
             rTuple.pRenderWindow->draw( m_DashedLineRect[i] );
         }
 
-        rTuple.pRenderWindow->draw(m_sBottomEdge);
-        rTuple.pRenderWindow->draw(m_sTopEdge);
-
         rTuple.pRenderWindow->draw( *rTuple.pMessageText );
         rTuple.pRenderWindow->draw( *rTuple.pScoreText );
 
@@ -156,6 +155,21 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
             }
         }
         
+        //TODO: Get the vfx for the edge bounce working better
+        /*
+        for(int i = m_iBounceVFXArrayLength; i >= 0; i --)
+        {
+            if(rTuple.pWorldState->GetDidBallLastHitScreenTop())
+            {
+                rTuple.pRenderWindow->draw(m_sTopEdge[i]);
+            }
+            else
+            {
+                rTuple.pRenderWindow->draw(m_sBottomEdge[i]);
+            }
+        }
+        */
+
         for (int i = rTuple.pBat1->GetBatVFXArrayLength(); i >= 0; i --)
         {
             rTuple.pRenderWindow->draw( rTuple.pBat1->GetBatVFXShapeArray()[i]);
@@ -291,6 +305,10 @@ void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused
         GetLastCollisionType()!=eCollisionType::CollisionWithWall)
     {
         rTuple.pBall->OnWallCollision(true, rTuple.fScreenWidth);
+
+        bool bHitTop =  rTuple.pBall->GetDesiredBallState() == eBallState::HitTopWall;
+        rTuple.pWorldState->SetBallLastHitTop(bHitTop);
+
         if (rTuple.pWorldState->GetShouldPlaySFX())
         {
             const float fPitchShift = 0.8 + (abs(rTuple.pBall->GetYSpeed()/30000));
@@ -490,22 +508,23 @@ void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, c
 
     if (eJustHit == eCollisionType::CollisionWithWall)
     {
-        m_lLastShakeFrame = iSimFrame;
+        SetSimFrameTopLastHit(iSimFrame);
+        m_iLastShakeFrame = iSimFrame;
         vSlamForce = sf::Vector2f(0.0f,fMagnitude*rTuple.pBall->GetYSpeed()/vScaledForces.y);
         SetBoundryEdgeShapes(rTuple);
     }
     else if ( eJustHit == eCollisionType::CollisionWithPlayer1 
             || eJustHit == eCollisionType::CollisionWithPlayer2 )
     {
-        m_lLastShakeFrame = iSimFrame;
+        m_iLastShakeFrame = iSimFrame;
         vSlamForce = sf::Vector2f(fMagnitude*rTuple.pBall->GetXSpeed()/vScaledForces.x,0.0f);
     }
 
-    if( m_lLastShakeFrame + (iTotalSlamFrames/2) > iSimFrame )
+    if( m_iLastShakeFrame + (iTotalSlamFrames/2) > iSimFrame )
     {
         rTuple.pView->move(sf::Vector2f(vSlamForce.x*-1.0,vSlamForce.y*1.0));
     }
-    else if (m_lLastShakeFrame + iTotalSlamFrames <= iSimFrame)
+    else if (m_iLastShakeFrame + iTotalSlamFrames <= iSimFrame)
     {
         rTuple.pView->setCenter(sf::Vector2f(rTuple.fScreenWidth/2,rTuple.fScreenHeight/2));
     }
@@ -563,18 +582,73 @@ void GameScreen::DimMiddleLine(const DataStruct& rTuple, const bool bShouldDimLi
 
 void GameScreen::SetBoundryEdgeShapes(const DataStruct& rTuple)
 {
-    sf::Color EdgeColor(120,120,255,200);
-    m_sTopEdge.setSize(sf::Vector2f (50.0f, 30.0f));
-    m_sTopEdge.setOrigin(m_sTopEdge.getSize().x/2,m_sTopEdge.getSize().y);
-    m_sTopEdge.setPosition(sf::Vector2f(rTuple.pBall->GetShape().getPosition().x, 0.0f));
-    m_sTopEdge.setFillColor(EdgeColor);
 
-    m_sBottomEdge.setSize(sf::Vector2f (50.0f, 30.0f));
-    m_sBottomEdge.setOrigin(m_sBottomEdge.getSize().x/2, 0.0f);
-    m_sBottomEdge.setPosition(sf::Vector2f(rTuple.pBall->GetShape().getPosition().x, rTuple.fScreenHeight));
-    m_sBottomEdge.setFillColor(EdgeColor);
+    //TODO: move this and the other vfx out of the GameScreen System
+
+    const bool bLastHitTop = rTuple.pWorldState->GetDidBallLastHitScreenTop();
+
+    sf::RectangleShape* pShape = bLastHitTop ? m_sTopEdge : m_sBottomEdge;
+
+    for(int i = m_iBounceVFXArrayLength; i >= 0; i --)
+    {
+        sf::Color EdgeColor(120,120,255,200);
+        pShape[i].setSize(sf::Vector2f (50.0f, 30.0f));
+        pShape[i].setFillColor(EdgeColor);
+
+        if(bLastHitTop)
+        {
+            pShape[i].setOrigin(pShape[0].getSize().x/2,pShape[0].getSize().y);
+            pShape[i].setPosition(sf::Vector2f(rTuple.pBall->GetShape().getPosition().x, 0.0f));
+            return;
+        }
+        else
+        {
+            pShape[i].setOrigin(pShape[0].getSize().x/2, 0.0f);
+            pShape[i].setPosition(sf::Vector2f(rTuple.pBall->GetShape().getPosition().x, rTuple.fScreenHeight));
+            return;
+        }
+    }
     
 }
+
+//------------------------------------------------------------
+
+void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple)
+{
+
+    static constexpr u_int8_t iFXFrameTime = 20;
+
+    //todo change color to more of a red the closer to the edge of the paddle that the ball is hit
+    //i will later tie this into ball controll so hits near the edge have more spread and the middle is the sweet spot
+
+    const bool bLastHitTop = rTuple.pWorldState->GetDidBallLastHitScreenTop();
+
+    sf::RectangleShape* pFXShape = bLastHitTop ? m_sTopEdge : m_sBottomEdge;
+
+    const float fSpeed = rTuple.pBall->GetYSpeed();
+    for(int8_t i = GameScreen::m_iBounceVFXArrayLength; i >= 0 ; i--)
+    {
+        if (GetSimFrameTopLastHit() > 0 && GetSimFrameTopLastHit() + iFXFrameTime > rTuple.pWorldState->GetCurrentSimFrame())
+        {
+            if(GetSimFrameTopLastHit() == rTuple.pWorldState->GetCurrentSimFrame())
+            {
+                pFXShape[i].setSize(sf::Vector2f (abs(fSpeed)/10, 20.0f));
+            }
+            pFXShape[i].setSize(sf::Vector2f (abs(fSpeed)/(10 - i), 20.0f));
+            pFXShape[i].setOrigin(pFXShape->getGlobalBounds().width/2, pFXShape->getGlobalBounds().height/2);
+        }
+    else
+    {
+        const sf::Color pLastColor = pFXShape[0].getFillColor();
+        const sf::Color fillColor = sf::Color(pLastColor.r,pLastColor.g,pLastColor.b,pLastColor.a-i);
+        pFXShape[i].setSize(sf::Vector2f (pFXShape->getSize().x /2 ,pFXShape->getSize().y /i));
+        pFXShape[i].setOrigin(pFXShape->getGlobalBounds().width/2, pFXShape->getGlobalBounds().height/2);
+        pFXShape[i].setFillColor(fillColor);
+    }   
+
+    }
+}
+
 
 //------------------------------------------------------------
 

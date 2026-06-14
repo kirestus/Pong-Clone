@@ -44,7 +44,8 @@ sf::String DebugText::DebugTextBallState( eBallState eDebugBallState )
             return sf::String("HitBall:");
             break; 
         
-        case eBallState::HitWall:
+        case eBallState::HitTopWall:
+        case eBallState::HitBottomWall:
             return sf::String("HitWall:");
             break;
 

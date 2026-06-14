@@ -30,6 +30,9 @@ public:
     int GetCurrentSimFrame()const {return m_iDetermFrame; }
     void IncrimentSimFrame(){m_iDetermFrame ++;}
 
+    bool GetDidBallLastHitScreenTop()const {return m_bBallLastHitScreenTop ;}
+    void SetBallLastHitTop(bool hitTop){m_bBallLastHitScreenTop = hitTop ;}
+
 private:
 
     eGameState m_eCurrentGameState;
@@ -37,6 +40,7 @@ private:
 
     int m_iDetermFrame = 0;
 
+    bool m_bBallLastHitScreenTop = false;
     bool m_bLastGoalScoredOnP1 = false;
     bool m_bShouldPlaySFX = true;
 };

@@ -76,7 +76,7 @@ void Ball::StateMachine(const float fScreenWidth)
                 m_v2CurrentBallSpeed.x = m_v2CurrentBallSpeed.x > 0 ? m_v2CurrentBallSpeed.x += m_fSpeedUpIncriment : m_v2CurrentBallSpeed.x -= m_fSpeedUpIncriment;
             }
         }
-        else if(eDesiredBallState == eBallState::HitWall)
+        else if(eDesiredBallState == eBallState::HitBottomWall || eDesiredBallState == eBallState::HitTopWall )
         {
             SetYSpeed(GetYSpeed()*-1);
             eNewBallState = m_eCurrentBallState;
@@ -126,7 +126,14 @@ void Ball::OnWallCollision(const bool isColliding, const float fScreenWidth)
 {
     if (isColliding)
     {
-        SetDesiredBallState(eBallState::HitWall);
+        if( m_vBallVector.y < 50) // using 50 to check for a value near the top, kinda a shitty way to do this
+        {
+            SetDesiredBallState(eBallState::HitTopWall);
+        }
+        else
+        {
+            SetDesiredBallState(eBallState::HitBottomWall);
+        }
         StateMachine(fScreenWidth);
     }
 }
@@ -148,7 +155,7 @@ void Ball::OnScoreGoal(const bool isColliding, const bool isLeft, const float fS
 
 //----------------------------------------------------------
 
-void Ball::UpdateBallTrail(int iSimFrame)
+void Ball::UpdateBallTrail(const int iSimFrame)
 {
     if (iSimFrame % 2 == 0)
     {
