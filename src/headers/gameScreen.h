@@ -7,6 +7,7 @@
 #include <headers/inputHandler.h>
 #include <headers/gameState.h>
 #include <headers/collision.h>
+#include <cstdint>
 
 
 class GameScreen 
