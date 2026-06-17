@@ -59,6 +59,9 @@ public:
     void SetBoundryEdgeShapes(const DataStruct& rTuple);
     void UpdateWallBounceVFX(const DataStruct& rTuple);
 
+    float CreateRandomAngle(const int minRange, const int maxRange);
+
+
 
 private:
     bool m_bShouldUpdateScore = true;
@@ -68,10 +71,10 @@ private:
     InputHandler m_hInputHandler;         
     sf::Vector2f m_vScreenCenter;
     sf::Clock m_hClock;
-    int m_aScore[2] = {0};
+    uint8_t m_aScore[2] = {0};
     uint64_t m_iLastShakeFrame = 0;
-    long m_lLastGoalScoredFrame = -500;
-    static const short m_iNumberOfLines = 6;
+    int32_t m_lLastGoalScoredFrame = -500;
+    static const uint8_t m_iNumberOfLines = 6;
     sf::RectangleShape m_DashedLineRect[m_iNumberOfLines+1];
 
     uint64_t m_iSimFrameTopLastHit = 0;
