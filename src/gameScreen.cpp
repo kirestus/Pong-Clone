@@ -621,7 +621,7 @@ void GameScreen::SetBoundryEdgeShapes(const DataStruct& rTuple)
 void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple)
 {
 
-    static constexpr u_int8_t iFXFrameTime = 20;
+    constexpr u_int8_t iFXFrameTime = 20;
     const int iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
     //todo change color to more of a red the closer to the edge of the paddle that the ball is hit
     //i will later tie this into ball controll so hits near the edge have more spread and the middle is the sweet spot
