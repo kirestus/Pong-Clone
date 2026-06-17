@@ -110,7 +110,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 
         const bool bUpdatedUiText = UpdateUIText( GetisWinConditionMet(), bIsPaused, rTuple );
 
-        DimMiddleLine(rTuple, bUpdatedUiText);
+        DimMiddleLine(rTuple, bUpdatedUiText || rTuple.pWorldState->IsScreenShaking());
         UpdateScoreText(rTuple, iSimFrame, bIsPaused);
 
         rTuple.pBat1->UpdateHitVFX(rTuple.pRenderWindow, iSimFrame, rTuple.pBall->GetShape().getPosition().y);
@@ -503,18 +503,13 @@ void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, c
     const int iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
     static constexpr int iTotalSlamFrames = 15;
     static const sf::Vector2 vForceScalingRatio(10,5);
-    static constexpr float fForceScale = 550;
+    static constexpr float fForceScale = 500;
     static const sf::Vector2f vScaledForces(vForceScalingRatio.x*fForceScale,vForceScalingRatio.y*fForceScale);
 
     if (isPaused)
     {
         return;
     }
-
-    const bool bWasLastHitPlayer = eJustHit == eCollisionType::CollisionWithPlayer1 
-    || eJustHit == eCollisionType::CollisionWithPlayer2 ? true : false;
-
-    const bool bWasWallLastHit = eJustHit == eCollisionType::CollisionWithWall;
 
     const sf::Vector2f vSlamForce = sf::Vector2f(fMagnitude*rTuple.pBall->GetXSpeed()/vScaledForces.x,fMagnitude*rTuple.pBall->GetYSpeed()/vScaledForces.y);
 
@@ -523,7 +518,7 @@ void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, c
         SetSimFrameTopLastHit(iSimFrame);
         m_iLastShakeFrame = iSimFrame;
     }
-    else if ( bWasLastHitPlayer )
+    else if ( eJustHit == eCollisionType::CollisionWithPlayer1 || eJustHit == eCollisionType::CollisionWithPlayer2 )
     {
         m_iLastShakeFrame = iSimFrame;
     }
@@ -531,10 +526,12 @@ void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, c
     if( m_iLastShakeFrame + (iTotalSlamFrames) > iSimFrame && m_iLastShakeFrame > 0)
     {
         rTuple.pView->move(sf::Vector2f(vSlamForce.x*-1.0,vSlamForce.y*1.0));
+        rTuple.pWorldState->SetIsScreenShaking(true);
     }
     else if (m_iLastShakeFrame + iTotalSlamFrames <= iSimFrame)
     {
         rTuple.pView->setCenter(sf::Vector2f(rTuple.fScreenWidth/2,rTuple.fScreenHeight/2));
+        rTuple.pWorldState->SetIsScreenShaking(false);
     }
 
     rTuple.pRenderWindow->setView(*rTuple.pView);
@@ -600,13 +597,13 @@ void GameScreen::SetBoundryEdgeShapes(const DataStruct& rTuple)
     for(int i = m_iBounceVFXArrayLength; i >= 0; i --)
     {
         sf::Color EdgeColor(120,120,255,50+(i*5));
-        pShape[i].setSize(sf::Vector2f (45.0f, 30.0f+i));
+        pShape[i].setSize(sf::Vector2f (40.0f*i, 30.0f));
         pShape[i].setFillColor(EdgeColor);
 
         if(bLastHitTop)
         {
             pShape[i].setOrigin(pShape[0].getSize().x/2,pShape[0].getSize().y);
-            pShape[i].setPosition(sf::Vector2f(rTuple.pBall->GetShape().getPosition().x, -10.0f));
+            pShape[i].setPosition(sf::Vector2f(rTuple.pBall->GetShape().getPosition().x, -30.0f));
             return;
         }
         else
@@ -661,11 +658,8 @@ void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple)
 
 bool GameScreen::ShouldAttachBallToBat(const DataStruct& rTuple)
 {
-    if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 )
-    {
-        return true;
-    }
-    else if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2 )
+    if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 
+    || rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2)
     {
         return true;
     }

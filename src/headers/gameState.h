@@ -33,6 +33,9 @@ public:
     bool GetDidBallLastHitScreenTop()const {return m_bBallLastHitScreenTop ;}
     void SetBallLastHitTop(bool hitTop){m_bBallLastHitScreenTop = hitTop ;}
 
+    bool IsScreenShaking()const {return m_bIsScreenShaking ;}
+    void SetIsScreenShaking(bool isShaking){m_bIsScreenShaking = isShaking;}
+
 private:
 
     eGameState m_eCurrentGameState;
@@ -40,6 +43,7 @@ private:
 
     int m_iDetermFrame = 0;
 
+    bool m_bIsScreenShaking = false;
     bool m_bBallLastHitScreenTop = false;
     bool m_bLastGoalScoredOnP1 = false;
     bool m_bShouldPlaySFX = true;
