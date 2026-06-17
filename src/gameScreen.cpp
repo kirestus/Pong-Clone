@@ -4,8 +4,6 @@
 #include <cstdlib>
 #include <ctime>
 
-//forward declaring
-static float CreateRandomAngle(const int minRange, const int maxRange);
 
 //-----------------------------------------------------------------
 
@@ -485,7 +483,7 @@ bool GameScreen::UpdateUIText(const bool bIsGameOver, const bool bIsPaused, cons
 
 //------------------------------------------------------------
 
-static float CreateRandomAngle(const int minRange, const int maxRange)
+float GameScreen::CreateRandomAngle(const int minRange, const int maxRange)
 {
     return rand() % (maxRange - minRange + 1 ) + minRange;
 }
@@ -495,7 +493,6 @@ static float CreateRandomAngle(const int minRange, const int maxRange)
 void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, const eCollisionType eJustHit, const bool isPaused )
 {
     const int iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
-    sf::Vector2f vSlamForce;
     static constexpr int iTotalSlamFrames = 20;
     static const sf::Vector2 vForceScalingRatio(2,1);
     static constexpr float fForceScale = 550;
@@ -506,21 +503,24 @@ void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, c
         return;
     }
 
+    const bool bWasLastHitPlayer = eJustHit == eCollisionType::CollisionWithPlayer1 
+    || eJustHit == eCollisionType::CollisionWithPlayer2 ? true : false;
+
+    const sf::Vector2f vSlamForce = bWasLastHitPlayer ? sf::Vector2f(fMagnitude*rTuple.pBall->GetXSpeed()/vScaledForces.x,0.0f) :
+    sf::Vector2f(0.0f,fMagnitude*rTuple.pBall->GetYSpeed()/vScaledForces.y);
+
     if (eJustHit == eCollisionType::CollisionWithWall)
     {
         SetSimFrameTopLastHit(iSimFrame);
         m_iLastShakeFrame = iSimFrame;
-        vSlamForce = sf::Vector2f(0.0f,fMagnitude*rTuple.pBall->GetYSpeed()/vScaledForces.y);
         SetBoundryEdgeShapes(rTuple);
     }
-    else if ( eJustHit == eCollisionType::CollisionWithPlayer1 
-            || eJustHit == eCollisionType::CollisionWithPlayer2 )
+    else if ( bWasLastHitPlayer )
     {
         m_iLastShakeFrame = iSimFrame;
-        vSlamForce = sf::Vector2f(fMagnitude*rTuple.pBall->GetXSpeed()/vScaledForces.x,0.0f);
     }
 
-    if( m_iLastShakeFrame + (iTotalSlamFrames/2) > iSimFrame )
+    if( m_iLastShakeFrame + (iTotalSlamFrames/2) > iSimFrame && m_iLastShakeFrame > 0)
     {
         rTuple.pView->move(sf::Vector2f(vSlamForce.x*-1.0,vSlamForce.y*1.0));
     }
@@ -637,15 +637,14 @@ void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple)
             pFXShape[i].setSize(sf::Vector2f (abs(fSpeed)/(10 - i), 20.0f));
             pFXShape[i].setOrigin(pFXShape->getGlobalBounds().width/2, pFXShape->getGlobalBounds().height/2);
         }
-    else
-    {
-        const sf::Color pLastColor = pFXShape[0].getFillColor();
-        const sf::Color fillColor = sf::Color(pLastColor.r,pLastColor.g,pLastColor.b,pLastColor.a-i);
-        pFXShape[i].setSize(sf::Vector2f (pFXShape->getSize().x /2 ,pFXShape->getSize().y /i));
-        pFXShape[i].setOrigin(pFXShape->getGlobalBounds().width/2, pFXShape->getGlobalBounds().height/2);
-        pFXShape[i].setFillColor(fillColor);
-    }   
-
+        else
+        {
+            const sf::Color pLastColor = pFXShape[0].getFillColor();
+            const sf::Color fillColor = sf::Color(pLastColor.r,pLastColor.g,pLastColor.b,pLastColor.a-i);
+            pFXShape[i].setSize(sf::Vector2f (pFXShape->getSize().x /2 ,pFXShape->getSize().y /i));
+            pFXShape[i].setOrigin(pFXShape->getGlobalBounds().width/2, pFXShape->getGlobalBounds().height/2);
+            pFXShape[i].setFillColor(fillColor);
+        }   
     }
 }
 
