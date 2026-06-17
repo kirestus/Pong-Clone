@@ -68,7 +68,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 
     while (rTuple.pRenderWindow->isOpen())
     {
-        const int iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
+        const unsigned long iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
         const float fFrameTime = rGameClock.restart().asSeconds();
         const float fFps = 1.0 / fFrameTime;
         //std::cout << fFps << " Frames Per Second: \n";
@@ -136,7 +136,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 
         rTuple.pRenderWindow->clear();
 
-        for(int i = m_iNumberOfLines; i>=0 ; i--)
+        for(short i = m_iNumberOfLines; i>=0 ; i--)
         {
             rTuple.pRenderWindow->draw( m_DashedLineRect[i] );
         }
@@ -147,7 +147,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         if (rTuple.pBall->GetCurrentBallState() != eBallState::AtPlayer1 && 
         rTuple.pBall->GetCurrentBallState() != eBallState::AtPlayer2 )
         {
-            for (int i = rTuple.pBall->GetTrailShapeArrayLength(); i >= 0; i --)
+            for (short i = rTuple.pBall->GetTrailShapeArrayLength(); i >= 0; i --)
             {
                 rTuple.pRenderWindow->draw( rTuple.pBall->GetTrailShapeArray()[i] );
             }
@@ -155,7 +155,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         
         //TODO: Get the vfx for the edge bounce working better
         
-        for(int i = m_iBounceVFXArrayLength; i >= 0; i --)
+        for(short i = m_iBounceVFXArrayLength; i >= 0; i --)
         {
             if (rTuple.pBall->GetDesiredBallState() == eBallState::HitBottomWall || rTuple.pBall->GetDesiredBallState() == eBallState::HitTopWall) 
             {
@@ -176,7 +176,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 
         }
 
-        for (int i = rTuple.pBat1->GetBatVFXArrayLength(); i >= 0; i --)
+        for (short i = rTuple.pBat1->GetBatVFXArrayLength(); i >= 0; i --)
         {
             rTuple.pRenderWindow->draw( rTuple.pBat1->GetBatVFXShapeArray()[i]);
             rTuple.pRenderWindow->draw( rTuple.pBat2->GetBatVFXShapeArray()[i]);
@@ -375,14 +375,14 @@ bool GameScreen::isBallHittingGoal(const sf::FloatRect box1,const DataStruct &rT
 
 //----------------------------------------------------------
 
-std::string GameScreen::SetScoreText(const int &iPlayer1Score, const int &iPlayer2Score)
+std::string GameScreen::SetScoreText(const unsigned short &iPlayer1Score, const unsigned short &iPlayer2Score)
 {
    return std::to_string(iPlayer1Score)+"-"+ std::to_string(iPlayer2Score);
 }
 
 //----------------------------------------------------------
 
-void GameScreen::UpdateScoreText(const DataStruct& rTuple, const int iSimFrame, const bool bIsPaused)
+void GameScreen::UpdateScoreText(const DataStruct& rTuple, const unsigned long iSimFrame, const bool bIsPaused)
 {
     if (bIsPaused)
     {
@@ -544,7 +544,7 @@ void GameScreen::CreateMiddleLine(const DataStruct& rTuple)
     static const float lineHeight = (rTuple.fScreenHeight/m_iNumberOfLines)/2;
     static const float lineThickness = 7.5f;
 
-    for (int i = m_iNumberOfLines; i >= 0; i--)
+    for (short i = m_iNumberOfLines; i >= 0; i--)
     {
         m_DashedLineRect[i].setSize(sf::Vector2f(lineThickness,lineHeight));
         m_DashedLineRect[i].setOrigin(sf::Vector2f(m_DashedLineRect[i].getSize().x/2,0.0f));
@@ -558,9 +558,9 @@ void GameScreen::CreateMiddleLine(const DataStruct& rTuple)
 
 void GameScreen::DimMiddleLine(const DataStruct& rTuple, const bool bShouldDimLine)
 {
-    static const int iDimValue = 45;
-    static const int iFullOpacityValue = 100;
-    for (int i = m_iNumberOfLines; i >= 0; i--)
+    static const unsigned short iDimValue = 45;
+    static const unsigned int iFullOpacityValue = 100;
+    for (short i = m_iNumberOfLines; i >= 0; i--)
     {
         //todo make this gradual so that its not so jarring
         if (bShouldDimLine)
@@ -594,7 +594,7 @@ void GameScreen::SetBoundryEdgeShapes(const DataStruct& rTuple)
 
     sf::RectangleShape* pShape = bLastHitTop ? m_sTopEdge : m_sBottomEdge;
 
-    for(int i = m_iBounceVFXArrayLength; i >= 0; i --)
+    for(short i = m_iBounceVFXArrayLength; i >= 0; i --)
     {
         sf::Color EdgeColor(120,120,255,50+(i*5));
         pShape[i].setSize(sf::Vector2f (40.0f*i, 30.0f));
@@ -621,8 +621,8 @@ void GameScreen::SetBoundryEdgeShapes(const DataStruct& rTuple)
 void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple)
 {
 
-    constexpr u_int8_t iFXFrameTime = 20;
-    const int iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
+    constexpr unsigned short iFXFrameTime = 20;
+    const unsigned long iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
     //todo change color to more of a red the closer to the edge of the paddle that the ball is hit
     //i will later tie this into ball controll so hits near the edge have more spread and the middle is the sweet spot
 
@@ -631,7 +631,7 @@ void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple)
     sf::RectangleShape* pFXShape = bLastHitTop ? m_sTopEdge : m_sBottomEdge;
 
     const float fSpeed = rTuple.pBall->GetYSpeed();
-    for(int i = GameScreen::m_iBounceVFXArrayLength; i >= 0 ; i--)
+    for(short i = GameScreen::m_iBounceVFXArrayLength; i >= 0 ; i--)
     {
         if (GetSimFrameTopLastHit() > 0 && GetSimFrameTopLastHit() + iFXFrameTime > rTuple.pWorldState->GetCurrentSimFrame())
         {

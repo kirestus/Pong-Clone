@@ -121,15 +121,15 @@ void Bat::NudgeBat(const std::shared_ptr<sf::RenderWindow> pRenderWindow)
 
 //-----------------------------------------------------------------
 
-void Bat::UpdateHitVFX(const std::shared_ptr<sf::RenderWindow> pRenderWindow, int iSimFrame, float fLastHitYPosition)
+void Bat::UpdateHitVFX(const std::shared_ptr<sf::RenderWindow> pRenderWindow, long iSimFrame, float fLastHitYPosition)
 {
 
-    constexpr u_int8_t iFXFrameTime = 20;
+    constexpr unsigned short iFXFrameTime = 20;
 
     //todo change color to more of a red the closer to the edge of the paddle that the ball is hit
     //i will later tie this into ball controll so hits near the edge have more spread and the middle is the sweet spot
 
-    for(int8_t i = m_iHitFXArrayLength; i >= 0 ; i--)
+    for(short i = m_iHitFXArrayLength; i >= 0 ; i--)
     {
         if ( m_iLastFrameBallWasHit + iFXFrameTime > iSimFrame)
         {

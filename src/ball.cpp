@@ -1,6 +1,5 @@
 #include <headers/ball.h>
 #include <assert.h>
-#include <cstdint>
 
 Ball::Ball(std::shared_ptr<sf::RenderWindow> pRenderWindow)
 {
