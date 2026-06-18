@@ -155,11 +155,11 @@ void Ball::OnScoreGoal(const bool isColliding, const bool isLeft, const float fS
 
 //----------------------------------------------------------
 
-void Ball::UpdateBallTrail(const int iSimFrame)
+void Ball::UpdateBallTrail(const int64 iSimFrame)
 {
     if (iSimFrame % 2 == 0)
     {
-        for (int i = GetTrailShapeArrayLength(); i >= 0; i --)
+        for (int8 i = GetTrailShapeArrayLength(); i >= 0; i --)
         {
             m_sShapeTrail[0] = m_sShape;
             m_sShapeTrail[i] = m_sShapeTrail[i-1];

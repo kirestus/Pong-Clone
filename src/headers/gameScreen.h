@@ -7,6 +7,7 @@
 #include <headers/inputHandler.h>
 #include <headers/gameState.h>
 #include <headers/collision.h>
+#include <headers/alias.h>
 
 
 class GameScreen 
@@ -20,8 +21,8 @@ public:
     void SetLastCollisionType(eCollisionType eJustHit){m_eLastCollisionType = eJustHit ;}
     eCollisionType GetLastCollisionType() const { return m_eLastCollisionType; }
 
-    void SetSimFrameTopLastHit(uint64_t iFrame){m_iSimFrameTopLastHit = iFrame;}
-    uint64_t GetSimFrameTopLastHit()const {return m_iSimFrameTopLastHit;}
+    void SetSimFrameTopLastHit(uint64 iFrame){m_iSimFrameTopLastHit = iFrame;}
+    uint64 GetSimFrameTopLastHit()const {return m_iSimFrameTopLastHit;}
 
     void ResetGame(const DataStruct&);
     void AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball> pBall, const float);
@@ -59,27 +60,27 @@ public:
     void SetBoundryEdgeShapes(const DataStruct& rTuple);
     void UpdateWallBounceVFX(const DataStruct& rTuple);
 
-    float CreateRandomAngle(const int minRange, const int maxRange);
+    float CreateRandomAngle(const int16 minRange, const int16 maxRange);
 
 
 
 private:
     bool m_bShouldUpdateScore = true;
-    static const unsigned short m_iScoreLimit = 10;
+    static const uint8 m_iScoreLimit = 10;
     sf::Clock m_TextFadeOutTimer;
     eCollisionType m_eLastCollisionType;
     InputHandler m_hInputHandler;         
     sf::Vector2f m_vScreenCenter;
     sf::Clock m_hClock;
-    unsigned short m_aScore[2] = {0};
-    unsigned int m_iLastShakeFrame = 0;
-    long m_lLastGoalScoredFrame = -500;
-    static const uint8_t m_iNumberOfLines = 6;
+    uint8 m_aScore[2] = {0};
+    uint64 m_iLastShakeFrame = 0;
+    int64 m_lLastGoalScoredFrame = -500;
+    static const uint8 m_iNumberOfLines = 6;
     sf::RectangleShape m_DashedLineRect[m_iNumberOfLines+1];
 
-    unsigned long m_iSimFrameTopLastHit = 0;
-    static constexpr unsigned short m_iBounceVFXArrayLength = 5;
-    unsigned short pBounceWallVFXSpriteArray[m_iBounceVFXArrayLength];
+    uint64 m_iSimFrameTopLastHit = 0;
+    static constexpr uint8 m_iBounceVFXArrayLength = 5;
+    uint8 pBounceWallVFXSpriteArray[m_iBounceVFXArrayLength];
     sf::RectangleShape m_sTopEdge[m_iBounceVFXArrayLength+1];
     sf::RectangleShape m_sBottomEdge[m_iBounceVFXArrayLength+1];
 };

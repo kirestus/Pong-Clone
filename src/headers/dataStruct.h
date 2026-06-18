@@ -9,7 +9,7 @@
 #include<memory>
 #include<iostream>
 
-//should make this a singleton so that i dont have multiples kicking around
+
 
 struct DataStruct{
     //--GameEntities---

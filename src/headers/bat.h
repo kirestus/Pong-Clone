@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <headers/alias.h>
 
 enum class eBatMoveDirection
 {
@@ -20,7 +21,6 @@ class Bat
 public:
 
     Bat(sf::Vector2f, ePlayerNumber);
-    Bat();
 
     void CalculateBatSpeed(std::shared_ptr<sf::RenderWindow> pRenderWindow, float fLapsedTime, bool isGamePaused);
     void NudgeBat(std::shared_ptr<sf::RenderWindow> pRenderWindow);
@@ -61,12 +61,12 @@ public:
     eBatMoveDirection GetCurrentMoveDirection() const { return m_eCurrentMoveDirection; }
     void SetCurrentMoveDirection( eBatMoveDirection _direction ){ m_eCurrentMoveDirection = _direction ;}
 
-    unsigned short GetBatVFXArrayLength()const{ return m_iHitFXArrayLength; }
+    uint8 GetBatVFXArrayLength()const{ return m_iHitFXArrayLength; }
     sf::RectangleShape* GetBatVFXShapeArray(){ return m_FXShape ;}
 
     void UpdateHitVFX(std::shared_ptr<sf::RenderWindow> pRenderWindow, long, float);
     void SetLastHitFrame (int hitFrame ){ m_iLastFrameBallWasHit = hitFrame; }
-    long GetLastHitFrame()const{return m_iLastFrameBallWasHit ;}
+    int64 GetLastHitFrame()const{return m_iLastFrameBallWasHit ;}
 
 
 private:
@@ -74,8 +74,8 @@ private:
     sf::Vector2f m_vPosition;
     sf::RectangleShape m_hRectShape;
 
-    static const unsigned short m_iHitFXArrayLength = 8;
-    long m_iLastFrameBallWasHit = -500;
+    static const uint8 m_iHitFXArrayLength = 8;
+    int64 m_iLastFrameBallWasHit = -500;
     sf::RectangleShape m_FXShape[m_iHitFXArrayLength+1];
     ePlayerNumber m_ePlayerNumber;
 

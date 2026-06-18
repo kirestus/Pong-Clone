@@ -1,6 +1,8 @@
 #pragma once
+#include <headers/alias.h>
 
-enum class eBallState : uint8_t{
+enum class eBallState : uint8
+{
     None,
     LEFT,
     RIGHT,

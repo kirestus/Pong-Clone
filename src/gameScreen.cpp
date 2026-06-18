@@ -491,7 +491,7 @@ bool GameScreen::UpdateUIText(const bool bIsGameOver, const bool bIsPaused, cons
 
 //------------------------------------------------------------
 
-float GameScreen::CreateRandomAngle(const int minRange, const int maxRange)
+float GameScreen::CreateRandomAngle(const int16 minRange, const int16 maxRange)
 {
     return rand() % (maxRange - minRange + 1 ) + minRange;
 }

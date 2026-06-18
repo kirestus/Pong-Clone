@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-enum class eGameState : uint8_t
+#include <headers/alias.h>
+
+enum class eGameState : uint8
 {
     Boot,
     Paused,
@@ -27,7 +29,7 @@ public:
     bool GetShouldPlaySFX()const{ return m_bShouldPlaySFX; }
     void SetShouldPlaySFX(bool bShouldPlay) { m_bShouldPlaySFX = bShouldPlay; }
 
-    int GetCurrentSimFrame()const {return m_iDetermFrame; }
+    int64 GetCurrentSimFrame()const {return m_iDetermFrame; }
     void IncrimentSimFrame(){m_iDetermFrame ++;}
 
     bool GetDidBallLastHitScreenTop()const {return m_bBallLastHitScreenTop ;}
@@ -41,7 +43,7 @@ private:
     eGameState m_eCurrentGameState;
     eGameState m_eDesiredGameState = eGameState::Boot;
 
-    int m_iDetermFrame = 0;
+    int64 m_iDetermFrame = 0;
 
     bool m_bIsScreenShaking = false;
     bool m_bBallLastHitScreenTop = false;

@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <headers/eBallstate.h>
+#include <headers/alias.h>
 
 class Ball
 {
@@ -15,7 +16,7 @@ class Ball
         void SetShape( sf::RectangleShape _shape ) { m_sShape = _shape ;}
 
         sf::RectangleShape* GetTrailShapeArray(){ return m_sShapeTrail ;}
-        int GetTrailShapeArrayLength()const{ return m_iShapeTrailLen; }
+        uint8 GetTrailShapeArrayLength()const{ return m_iShapeTrailLen; }
 
         float GetXSpeed() const { return m_v2CurrentBallSpeed.x ;}
         void SetXSpeed( float _speed) { m_v2CurrentBallSpeed.x = _speed ;}
@@ -46,11 +47,11 @@ class Ball
         void OnWallCollision( const bool, const float );
         void OnScoreGoal(const bool, const bool isLeft, const float);
 
-        void UpdateBallTrail(int);
+        void UpdateBallTrail(int64);
 
 
     private:
-        static constexpr  int m_iShapeTrailLen = 6;
+        static constexpr uint8 m_iShapeTrailLen = 6;
         eBallState m_eCurrentBallState = eBallState::ResetGamePosition;
         eBallState m_eDesiredBallState = eBallState::None;
         sf::Vector3f m_vBallVector;

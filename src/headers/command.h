@@ -1,5 +1,6 @@
 #include <headers/dataStruct.h>
 #include <headers/debugText.h>
+#include <headers/alias.h>
 
 class Command
 {  

@@ -3,6 +3,7 @@
 #include <string>
 #include <headers/gameState.h>
 #include <headers/eBallstate.h>
+#include <headers/alias.h>
 
 
 class DebugText

@@ -1,7 +1,8 @@
 #include <headers/dataStruct.h>
 #include <SFML/Graphics.hpp>
+#include <headers/alias.h>
 
-enum class eCollisionType : std::uint8_t
+enum class eCollisionType : uint8
 {
     CollisionWithPlayer1,
     CollisionWithPlayer2,
