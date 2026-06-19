@@ -76,11 +76,6 @@ void Ball::StateMachine(const float fScreenWidth)
                 m_v2CurrentBallSpeed.x = m_v2CurrentBallSpeed.x > 0 ? m_v2CurrentBallSpeed.x += m_fSpeedUpIncriment : m_v2CurrentBallSpeed.x -= m_fSpeedUpIncriment;
             }
         }
-        else if(eDesiredBallState == eBallState::HitBottomWall || eDesiredBallState == eBallState::HitTopWall )
-        {
-            SetYSpeed(GetYSpeed()*-1);
-            eNewBallState = m_eCurrentBallState;
-        }
         else if( eDesiredBallState == eBallState::GoalOnPlayer1)
         {
             eNewBallState = eBallState::AtPlayer2;
@@ -88,6 +83,11 @@ void Ball::StateMachine(const float fScreenWidth)
         else if ( eDesiredBallState == eBallState::GoalOnPlayer2 )
         {
             eNewBallState = eBallState::AtPlayer1;
+        }
+        else if(eDesiredBallState == eBallState::HitBottomWall || eDesiredBallState == eBallState::HitTopWall )
+        {
+            SetYSpeed(GetYSpeed()*-1.05);
+            eNewBallState = m_eCurrentBallState;
         }
     }
 
@@ -157,15 +157,20 @@ void Ball::OnScoreGoal(const bool isColliding, const bool isLeft, const float fS
 
 void Ball::UpdateBallTrail(const int64 iSimFrame)
 {
-    if (iSimFrame % 2 == 0)
+    if (iSimFrame % 3 == 0)
     {
         for (int8 i = GetTrailShapeArrayLength(); i >= 0; i --)
         {
             m_sShapeTrail[0] = m_sShape;
             m_sShapeTrail[i] = m_sShapeTrail[i-1];
             const float fScaleModifier = GetTrailShapeArrayLength() - 0.08;
+            
+            const bool bIsGoingLeft = GetCurrentBallState() == eBallState::LEFT;
+            const bool bIsGoingRight = GetCurrentBallState() == eBallState::RIGHT;
 
-            m_sShapeTrail[i].setFillColor(sf::Color(255,255,255,230/i ));
+            const sf::Color TrailColor = bIsGoingRight ? sf::Color(255,100,100,230/i) : sf::Color(100,100,255,240/i*2);
+
+            m_sShapeTrail[i].setFillColor(TrailColor);
             m_sShapeTrail[i].setScale(sf::Vector2f(fScaleModifier/GetTrailShapeArrayLength(),fScaleModifier/GetTrailShapeArrayLength()));
 
         }
