@@ -2,14 +2,15 @@
 #include <SFML/Graphics.hpp>
 #include <headers/alias.h>
 
-enum class eBatMoveDirection
+enum class eBatMoveDirection : uint8
 {
     NONE,
     UP,
     DOWN,
 };
 
-enum class ePlayerNumber{
+enum class ePlayerNumber : uint8
+{
     PLAYER1,
     PLAYER2
 };
