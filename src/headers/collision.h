@@ -1,6 +1,4 @@
-#include <headers/dataStruct.h>
-#include <SFML/Graphics.hpp>
-#include <headers/alias.h>
+#pragma once
 
 enum class eCollisionType : uint8
 {

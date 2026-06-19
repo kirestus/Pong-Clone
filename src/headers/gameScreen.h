@@ -78,7 +78,7 @@ private:
     static const uint8 m_iNumberOfLines = 6;
     sf::RectangleShape m_DashedLineRect[m_iNumberOfLines+1];
 
-    uint64 m_iSimFrameTopLastHit = 0;
+    uint16 m_iSimFrameTopLastHit = 0;
     static constexpr uint8 m_iBounceVFXArrayLength = 5;
     uint8 pBounceWallVFXSpriteArray[m_iBounceVFXArrayLength];
     sf::RectangleShape m_sTopEdge[m_iBounceVFXArrayLength+1];

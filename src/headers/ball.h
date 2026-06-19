@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <headers/eBallstate.h>
+#include <headers/collision.h>
 #include <headers/alias.h>
 
 class Ball
@@ -8,7 +9,6 @@ class Ball
     public:
 
         Ball(std::shared_ptr<sf::RenderWindow> pRenderWindow);
-
 
         sf::RectangleShape& ReferenceShape(){return m_sShape ;}
 
@@ -36,6 +36,9 @@ class Ball
         eBallState GetCurrentBallState() const { return m_eCurrentBallState ;}
         eBallState GetDesiredBallState() const { return m_eDesiredBallState ;}
 
+        eCollisionType GetLastCollisionType() const { return m_eLastCollisionType ;}
+        void SetLastCollisiontype(eCollisionType type){m_eLastCollisionType = type;}
+
         void SetCurrentBallState(eBallState state){ m_eCurrentBallState = state ;}
         void SetDesiredBallState(eBallState _desiredState){ m_eDesiredBallState = _desiredState ;}
 
@@ -54,6 +57,8 @@ class Ball
         static constexpr uint8 m_iShapeTrailLen = 6;
         eBallState m_eCurrentBallState = eBallState::ResetGamePosition;
         eBallState m_eDesiredBallState = eBallState::None;
+        eCollisionType m_eLastCollisionType = eCollisionType::NoCollision;
+
         sf::Vector3f m_vBallVector;
 
         sf::RectangleShape m_sShape;

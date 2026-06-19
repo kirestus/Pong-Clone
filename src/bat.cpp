@@ -26,32 +26,18 @@ eBatMoveDirection Bat::DetermCurrentMoveDirection(const std::shared_ptr<sf::Rend
             break;
         case eBatMoveDirection::DOWN :
         {
-            if (IsHittingBottom(pRenderWindow->getSize()))
-            {
-                eNewMoveDirection = eBatMoveDirection::UP;
-            }
-            else
-            {
-                eNewMoveDirection = eDesiredMoveDirection;
-            }
+            eNewMoveDirection = IsHittingBottom(pRenderWindow->getSize() ) ? eBatMoveDirection::UP : eNewMoveDirection = eDesiredMoveDirection;
             break;
         }
         case eBatMoveDirection::UP :
         {
-            if ( IsHittingTop() )
-            {
-                eNewMoveDirection = eBatMoveDirection::NONE;
-            }
-            else
-            {
-                eNewMoveDirection = eDesiredMoveDirection;
-            }
+            eNewMoveDirection = IsHittingTop() ? eBatMoveDirection::NONE : eNewMoveDirection = eDesiredMoveDirection;
             break;
         }
         default:
             break;   
     }
-    SetCurrentMoveDirection(eNewMoveDirection);
+    SetCurrentMoveDirection(eNewMoveDirection); // should i be setting this here if its returning the value?
     return eNewMoveDirection;
 }
 
@@ -72,7 +58,7 @@ void Bat::CalculateBatSpeed(const std::shared_ptr<sf::RenderWindow> pRenderWindo
     const float fSpeed =  GetVelocity()*fLapsedTime;
     if (!isGamePaused)
     {
-        if (( fSpeed < GetTopSpeed() || fSpeed > GetTopSpeed() *-1 ))
+        if ( abs(fSpeed) < GetTopSpeed())
         {
             SetPosition(sf::Vector2f(GetPosition().x, GetPosition().y + fSpeed ));
         }
@@ -83,7 +69,7 @@ void Bat::CalculateBatSpeed(const std::shared_ptr<sf::RenderWindow> pRenderWindo
         }
         else if (newMoveDirection == eBatMoveDirection::DOWN && abs(fSpeed) < GetTopSpeed())
         { 
-            ModifyVelocity(  ( GetAccel()*fLapsedTime ));
+            ModifyVelocity(( GetAccel()*fLapsedTime ));
         }
         else
         {
@@ -124,12 +110,12 @@ void Bat::NudgeBat(const std::shared_ptr<sf::RenderWindow> pRenderWindow)
 void Bat::UpdateHitVFX(const std::shared_ptr<sf::RenderWindow> pRenderWindow, long iSimFrame, float fLastHitYPosition)
 {
 
-    constexpr unsigned short iFXFrameTime = 20;
+    constexpr uint8 iFXFrameTime = 20;
 
     //todo change color to more of a red the closer to the edge of the paddle that the ball is hit
     //i will later tie this into ball controll so hits near the edge have more spread and the middle is the sweet spot
 
-    for(short i = m_iHitFXArrayLength; i >= 0 ; i--)
+    for(int8 i = m_iHitFXArrayLength; i >= 0 ; i--)
     {
         if ( m_iLastFrameBallWasHit + iFXFrameTime > iSimFrame)
         {

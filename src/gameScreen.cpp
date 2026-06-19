@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <cassert>
 
 
 //-----------------------------------------------------------------
@@ -250,7 +251,10 @@ eCollisionType GameScreen::CheckCollisions(const DataStruct &rTuple,const bool i
 
 void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused, const eCollisionType eCollidingwith,const int iSimFrame )
 {
-    if (eCollidingwith == eCollisionType::CollisionWithGoalZone)
+
+    switch (eCollidingwith)
+    {
+    case eCollisionType::CollisionWithGoalZone:
     {
         const bool isleft = rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2;
         rTuple.pBall->OnScoreGoal(true, isleft, rTuple.fScreenWidth);
@@ -270,45 +274,40 @@ void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused
         }
 
         ResetGame(rTuple);
+
+        return;
     }
-    else if (eCollidingwith == eCollisionType::CollisionWithPlayer1 
-            || eCollidingwith == eCollisionType::CollisionWithPlayer2)
+    case eCollisionType::CollisionWithPlayer1:
+    case eCollisionType::CollisionWithPlayer2:
     {
+        if(rTuple.pBall->GetLastCollisionType() == eCollidingwith)
+        {
+            //ignore multiple collisions with a single paddle
+            return;
+        }
         const bool bIsCollidingWithP1 = eCollidingwith == eCollisionType::CollisionWithPlayer1 ? true : false; 
         const std::shared_ptr<Bat> pBat = bIsCollidingWithP1 ? rTuple.pBat1 : rTuple.pBat2 ;
         const bool bIsBallOnLeft = (rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2);
-        if ( bIsCollidingWithP1 && bIsBallOnLeft || !bIsCollidingWithP1 && !bIsBallOnLeft )
-        {
-            const eBallState eBallGoingDir = bIsCollidingWithP1 ? eBallState::RIGHT : eBallState::LEFT;
-            sf::Vector3f const ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
-            
-            rTuple.pBall->OnBatCollision(rTuple.fScreenHeight);
-            if(pBat->GetLastHitFrame() +10 < iSimFrame ) // checking against edge cases where you clip the ball
-            {
-                rTuple.pBall->SetYSpeed(pBat->GetVelocity() + rTuple.pBall->GetYSpeed()+CreateRandomAngle(-500.0f,500.0f)); 
-                rTuple.pBall->SetDesiredBallState(eBallGoingDir);
-                rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+        const eBallState eBallGoingDir = bIsCollidingWithP1 ? eBallState::RIGHT : eBallState::LEFT;
+        sf::Vector3f const ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
+        
+        rTuple.pBall->OnBatCollision(rTuple.fScreenHeight);
 
-                if(eBallGoingDir != eBallState::LEFT)
-                {
-                    rTuple.pBat1->SetLastHitFrame(iSimFrame);
-                }
-                else
-                {
-                    rTuple.pBat2->SetLastHitFrame(iSimFrame);
-                }
-            }
-            
-            sf::Sound* pPlayThisSound = eBallGoingDir != eBallState::LEFT ? rTuple.pPlayer1SoundEffect :rTuple.pPlayer2SoundEffect;
-            pPlayThisSound->setPosition(ballPosition);
-            if (rTuple.pWorldState->GetShouldPlaySFX())
-            {
-                pPlayThisSound->play();
-            }
+        constexpr int16 iRandomSpread(500); // add a bit of randomness to each hit
+        rTuple.pBall->SetYSpeed(pBat->GetVelocity() + rTuple.pBall->GetYSpeed()+CreateRandomAngle(-iRandomSpread,iRandomSpread)); 
+        rTuple.pBall->SetDesiredBallState(eBallGoingDir);
+        rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+        pBat->SetLastHitFrame(iSimFrame);
+        
+        sf::Sound* pPlayThisSound = eBallGoingDir != eBallState::LEFT ? rTuple.pPlayer1SoundEffect :rTuple.pPlayer2SoundEffect;
+        pPlayThisSound->setPosition(ballPosition);
+        if (rTuple.pWorldState->GetShouldPlaySFX())
+        {
+            pPlayThisSound->play();
         }
+        return;
     }
-    else if(eCollidingwith == eCollisionType::CollisionWithWall && 
-        GetLastCollisionType()!=eCollisionType::CollisionWithWall)
+    case eCollisionType::CollisionWithWall:
     {
         rTuple.pBall->OnWallCollision(true, rTuple.fScreenWidth);
 
@@ -322,8 +321,11 @@ void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused
             rTuple.pHitWallSoundEffect->setPitch(fPitchShift);
             rTuple.pHitWallSoundEffect->play();
         }
-    }  
-
+        return;
+    }
+    default:
+    assert("Undefined Collision");
+}
 }
 
 //----------------------------------------------------------
@@ -493,7 +495,7 @@ bool GameScreen::UpdateUIText(const bool bIsGameOver, const bool bIsPaused, cons
 
 float GameScreen::CreateRandomAngle(const int16 minRange, const int16 maxRange)
 {
-    return rand() % (maxRange - minRange + 1 ) + minRange;
+    return rand() % (maxRange);
 }
 
 //------------------------------------------------------------
