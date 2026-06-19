@@ -23,9 +23,7 @@ public:
 
     Bat(sf::Vector2f, ePlayerNumber);
 
-    void CalculateBatSpeed(std::shared_ptr<sf::RenderWindow> pRenderWindow, float fLapsedTime, bool isGamePaused);
-    void NudgeBat(std::shared_ptr<sf::RenderWindow> pRenderWindow);
-
+    void UpdateHitVFX(const float fDeltaT);
     sf::Vector2f GetPosition() const { return m_vPosition ;}
     void SetPosition(sf::Vector2f _position) { m_vPosition = _position ; }
 
@@ -65,7 +63,6 @@ public:
     uint8 GetBatVFXArrayLength()const{ return m_iHitFXArrayLength; }
     sf::RectangleShape* GetBatVFXShapeArray(){ return m_FXShape ;}
 
-    void UpdateHitVFX(std::shared_ptr<sf::RenderWindow> pRenderWindow, long, float);
     void SetLastHitFrame (int hitFrame ){ m_iLastFrameBallWasHit = hitFrame; }
     int64 GetLastHitFrame()const{return m_iLastFrameBallWasHit ;}
 

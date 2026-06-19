@@ -1,4 +1,5 @@
 #include <headers/gameScreen.h>
+#include <headers/batSystem.h>
 #include <string>
 #include <iostream>
 #include <cstdlib>
@@ -12,6 +13,7 @@ GameScreen::GameScreen(const DataStruct &rTuple)
 {
     CreateGameScreen(rTuple);
     UpdateGamescreen(rTuple,m_hClock);
+    //create a batsystem
 }
 
 //-----------------------------------------------------------------
@@ -69,7 +71,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 
     while (rTuple.pRenderWindow->isOpen())
     {
-        const unsigned long iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
+        const uint32 iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
         const float fFrameTime = rGameClock.restart().asSeconds();
         const float fFps = 1.0 / fFrameTime;
         //std::cout << fFps << " Frames Per Second: \n";
@@ -83,8 +85,12 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
             ResetGame(rTuple);
         }
         
-        rTuple.pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
-        rTuple.pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
+        std::unique_ptr<BatSystem> pBatSystem = std::make_unique<BatSystem>();
+
+        pBatSystem->CalculateBatSpeed(rTuple,rTuple.pBat1, fFrameTime);
+        pBatSystem->CalculateBatSpeed(rTuple,rTuple.pBat2, fFrameTime);
+        //rTuple.pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
+        //rTuple.pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
         rTuple.pBall->UpdateBallPosition(fFrameTime/10, bIsPaused);
         
         const eCollisionType eCollidingWith = CheckCollisions(rTuple, bIsPaused);
@@ -114,10 +120,8 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         DimMiddleLine(rTuple, bUpdatedUiText || rTuple.pWorldState->IsScreenShaking());
         UpdateScoreText(rTuple, iSimFrame, bIsPaused);
 
-        rTuple.pBat1->UpdateHitVFX(rTuple.pRenderWindow, iSimFrame, rTuple.pBall->GetShape().getPosition().y);
-        rTuple.pBat2->UpdateHitVFX(rTuple.pRenderWindow, iSimFrame, rTuple.pBall->GetShape().getPosition().y);
-
-        //UpdateWallBounceVFX(rTuple);// TODO: Get this working later
+        rTuple.pBat1->UpdateHitVFX(iSimFrame);
+        rTuple.pBat2->UpdateHitVFX(iSimFrame);
 
         sf::Event event;
         while (rTuple.pRenderWindow->pollEvent(event))

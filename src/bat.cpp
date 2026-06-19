@@ -1,5 +1,5 @@
 #include <headers/bat.h>
-
+//#include <headers/dataStruct.h>
 
 Bat::Bat(const sf::Vector2f vPosition , const ePlayerNumber ePlayer)
 {
@@ -51,65 +51,10 @@ bool Bat::IsBouncing(const float fSpeed)
 
 //-----------------------------------------------------------------
 
-void Bat::CalculateBatSpeed(const std::shared_ptr<sf::RenderWindow> pRenderWindow, const float fLapsedTime, const bool isGamePaused = false)
+void Bat::UpdateHitVFX(const float fDeltaT)
+    //const std::shared_ptr<sf::RenderWindow> pRenderWindow, long iSimFrame, float fLastHitYPosition)
 {
-    eBatMoveDirection newMoveDirection = DetermCurrentMoveDirection(pRenderWindow);
-    //UpdateDesiredToShapeTransform();
-    const float fSpeed =  GetVelocity()*fLapsedTime;
-    if (!isGamePaused)
-    {
-        if ( abs(fSpeed) < GetTopSpeed())
-        {
-            SetPosition(sf::Vector2f(GetPosition().x, GetPosition().y + fSpeed ));
-        }
-
-        if (newMoveDirection == eBatMoveDirection::UP && abs(fSpeed) < GetTopSpeed())
-        {
-            ModifyVelocity( - ( GetAccel()*fLapsedTime ));
-        }
-        else if (newMoveDirection == eBatMoveDirection::DOWN && abs(fSpeed) < GetTopSpeed())
-        { 
-            ModifyVelocity(( GetAccel()*fLapsedTime ));
-        }
-        else
-        {
-            SetVelocity(fSpeed*0.96/fLapsedTime);
-        }
-
-        if( ( IsHittingBottom(pRenderWindow->getSize()) || IsHittingTop() ))
-        {
-            NudgeBat(pRenderWindow);
-            SetVelocity(0.0f);
-        }
-        
-        UpdateShapeToDesiredTransform();
-    }
-
-}
-
-//-----------------------------------------------------------------
-
-
-void Bat::NudgeBat(const std::shared_ptr<sf::RenderWindow> pRenderWindow)
-{
-        //Nudge the bat if its at the top or bottom so it doesnt glitch out
-    if( IsHittingTop() )
-    {
-        sf::Vector2f nudgeDown = sf::Vector2f(GetPosition().x,GetPosition().y+0.1);
-        SetPosition(nudgeDown);
-    }
-    else if( IsHittingBottom( pRenderWindow->getSize() ) )
-    {
-        sf::Vector2f nudgeUp = sf::Vector2f(GetPosition().x,GetPosition().y-0.1);
-        SetPosition(nudgeUp);
-    }
-}
-
-//-----------------------------------------------------------------
-
-void Bat::UpdateHitVFX(const std::shared_ptr<sf::RenderWindow> pRenderWindow, long iSimFrame, float fLastHitYPosition)
-{
-
+    //pass tuple to this instead of all this other shit
     constexpr uint8 iFXFrameTime = 20;
 
     //todo change color to more of a red the closer to the edge of the paddle that the ball is hit
@@ -117,7 +62,7 @@ void Bat::UpdateHitVFX(const std::shared_ptr<sf::RenderWindow> pRenderWindow, lo
 
     for(int8 i = m_iHitFXArrayLength; i >= 0 ; i--)
     {
-        if ( m_iLastFrameBallWasHit + iFXFrameTime > iSimFrame)
+        if ( m_iLastFrameBallWasHit + iFXFrameTime > fDeltaT)
         {
             if(GetPlayerNumber() == ePlayerNumber::PLAYER2)
             {
@@ -128,6 +73,8 @@ void Bat::UpdateHitVFX(const std::shared_ptr<sf::RenderWindow> pRenderWindow, lo
                 m_FXShape[i].setScale(sf::Vector2f(1.0f,1.0f));
             }
             
+            // TODO: pass the data tuple instead and get the sweetspot hit
+            //const bool bHitSweetSpot = 
             m_FXShape[i].setFillColor( sf::Color( 150,150,255,10 ) );
             m_FXShape[i].setPosition( m_hRectShape.getPosition().x ,m_hRectShape.getPosition().y );
             m_FXShape[i].setSize( sf::Vector2f( m_hRectShape.getSize().x*i*0.8 +10 , m_hRectShape.getSize().y-(i*8)));
@@ -149,4 +96,3 @@ void Bat::UpdateHitVFX(const std::shared_ptr<sf::RenderWindow> pRenderWindow, lo
 }
 
 //-----------------------------------------------------------------
-
