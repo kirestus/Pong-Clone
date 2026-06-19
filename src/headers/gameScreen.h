@@ -60,7 +60,7 @@ public:
     void SetBoundryEdgeShapes(const DataStruct& rTuple);
     void UpdateWallBounceVFX(const DataStruct& rTuple);
 
-    float CreateRandomAngle(const int16 minRange, const int16 maxRange);
+    float CreateRandomAngle(const int16);
 
 
 

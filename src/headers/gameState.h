@@ -32,7 +32,7 @@ public:
     int64 GetCurrentSimFrame()const {return m_iDetermFrame; }
     void IncrimentSimFrame(){m_iDetermFrame ++;}
 
-    bool GetDidBallLastHitScreenTop()const {return m_bBallLastHitScreenTop ;}
+    bool GetDidBallLastHitScreenTop()const {return m_bBallLastHitScreenTop ;}//TODO: move this into the ball class
     void SetBallLastHitTop(bool hitTop){m_bBallLastHitScreenTop = hitTop ;}
 
     bool IsScreenShaking()const {return m_bIsScreenShaking ;}

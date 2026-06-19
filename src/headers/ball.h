@@ -50,6 +50,9 @@ class Ball
         void OnWallCollision( const bool, const float );
         void OnScoreGoal(const bool, const bool isLeft, const float);
 
+        bool IsLastHitOnSweetSpot() const { return m_bIsLastHitOnSweetSpot ;}
+        void SetLastHitOnSweetSpot(bool isSweet){m_bIsLastHitOnSweetSpot = isSweet;}
+
         void UpdateBallTrail(int64);
 
 
@@ -68,6 +71,8 @@ class Ball
         static constexpr float m_fTopSpeed = 15500.00f;
         const sf::Vector2f m_v2InitialSpeed = sf::Vector2f(4000.0f,00.0f);
         sf::Vector2f m_v2CurrentBallSpeed = m_v2InitialSpeed;
-        static constexpr float m_fSpeedUpIncriment = 450.0f;
+        static constexpr float m_fSpeedUpIncriment = 600.0f;
+
+        bool m_bIsLastHitOnSweetSpot = false;
 
 };

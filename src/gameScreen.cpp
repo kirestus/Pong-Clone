@@ -62,7 +62,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 {
     rTuple.pGameMusic->pause();
     rTuple.pGameMusic->setLoop(true);
-    rTuple.pBall->SetYSpeed(CreateRandomAngle(-2000.0f,2000.0f));
+    rTuple.pBall->SetYSpeed(CreateRandomAngle(2000.0f));
 
     rTuple.pRenderWindow->setFramerateLimit(244.0);
     rTuple.pRenderWindow->setMouseCursorVisible(false);
@@ -287,14 +287,19 @@ void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused
         }
         const bool bIsCollidingWithP1 = eCollidingwith == eCollisionType::CollisionWithPlayer1 ? true : false; 
         const std::shared_ptr<Bat> pBat = bIsCollidingWithP1 ? rTuple.pBat1 : rTuple.pBat2 ;
-        const bool bIsBallOnLeft = (rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2);
         const eBallState eBallGoingDir = bIsCollidingWithP1 ? eBallState::RIGHT : eBallState::LEFT;
-        sf::Vector3f const ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
+        const sf::Vector3f ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
         
         rTuple.pBall->OnBatCollision(rTuple.fScreenHeight);
 
+        const float fCollisionDelta = abs(rTuple.pBall->GetShape().getPosition().y - pBat->GetShape().getPosition().y) ;
+        const bool bIsHittingSweetSpot = fCollisionDelta < abs(10.0f);
+        rTuple.pBall->SetLastHitOnSweetSpot(bIsHittingSweetSpot);
+
         constexpr int16 iRandomSpread(500); // add a bit of randomness to each hit
-        rTuple.pBall->SetYSpeed(pBat->GetVelocity() + rTuple.pBall->GetYSpeed()+CreateRandomAngle(-iRandomSpread,iRandomSpread)); 
+        
+        const float fNewYSpeed = bIsHittingSweetSpot ? pBat->GetVelocity()*1.25f + rTuple.pBall->GetYSpeed() : pBat->GetVelocity() + rTuple.pBall->GetYSpeed()+CreateRandomAngle(iRandomSpread) ; 
+        rTuple.pBall->SetYSpeed(fNewYSpeed); 
         rTuple.pBall->SetDesiredBallState(eBallGoingDir);
         rTuple.pBall->StateMachine(rTuple.fScreenWidth);
         pBat->SetLastHitFrame(iSimFrame);
@@ -332,11 +337,7 @@ void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused
 
 bool GameScreen::isBallCollidingWithTarget(const sf::FloatRect box1, const sf::FloatRect box2)
 {
-    if( box1.intersects(box2) )
-    {
-        return true;
-    }
-    return false;
+    return box1.intersects(box2);
 }
 
 //----------------------------------------------------------
@@ -345,11 +346,7 @@ bool GameScreen::isBallHittingWall(const sf::FloatRect box1, const std::shared_p
 {
     const float rectTop = 0.0f;
     const float rectBottom = pRenderWindow->getSize().y - 15.0f;
-    if (box1.top >= rectBottom || box1.top <= rectTop)
-    {
-        return true;
-    }
-    return false;
+    return box1.top >= rectBottom || box1.top <= rectTop;
 }
 
 //----------------------------------------------------------
@@ -493,7 +490,7 @@ bool GameScreen::UpdateUIText(const bool bIsGameOver, const bool bIsPaused, cons
 
 //------------------------------------------------------------
 
-float GameScreen::CreateRandomAngle(const int16 minRange, const int16 maxRange)
+float GameScreen::CreateRandomAngle(const int16 maxRange)
 {
     return rand() % (maxRange);
 }
@@ -505,7 +502,7 @@ void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, c
     const int iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
     static constexpr int iTotalSlamFrames = 15;
     static const sf::Vector2 vForceScalingRatio(10,5);
-    static constexpr float fForceScale = 500;
+    static constexpr float fForceScale = 600;
     static const sf::Vector2f vScaledForces(vForceScalingRatio.x*fForceScale,vForceScalingRatio.y*fForceScale);
 
     if (isPaused)
@@ -625,8 +622,6 @@ void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple)
 
     constexpr unsigned short iFXFrameTime = 20;
     const unsigned long iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
-    //todo change color to more of a red the closer to the edge of the paddle that the ball is hit
-    //i will later tie this into ball controll so hits near the edge have more spread and the middle is the sweet spot
 
     const bool bLastHitTop = rTuple.pWorldState->GetDidBallLastHitScreenTop();
 

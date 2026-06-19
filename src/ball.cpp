@@ -73,7 +73,8 @@ void Ball::StateMachine(const float fScreenWidth)
             m_v2CurrentBallSpeed.x *= -1;
             if (abs(m_v2CurrentBallSpeed.x) < m_fTopSpeed )
             {
-                m_v2CurrentBallSpeed.x = m_v2CurrentBallSpeed.x > 0 ? m_v2CurrentBallSpeed.x += m_fSpeedUpIncriment : m_v2CurrentBallSpeed.x -= m_fSpeedUpIncriment;
+                float fSpeedUpBoost = IsLastHitOnSweetSpot() ? m_fSpeedUpIncriment : m_fSpeedUpIncriment /2 ;
+                m_v2CurrentBallSpeed.x = m_v2CurrentBallSpeed.x > 0 ? m_v2CurrentBallSpeed.x += fSpeedUpBoost : m_v2CurrentBallSpeed.x -= fSpeedUpBoost;
             }
         }
         else if( eDesiredBallState == eBallState::GoalOnPlayer1)
@@ -84,9 +85,9 @@ void Ball::StateMachine(const float fScreenWidth)
         {
             eNewBallState = eBallState::AtPlayer1;
         }
-        else if(eDesiredBallState == eBallState::HitBottomWall || eDesiredBallState == eBallState::HitTopWall )
+            else if(eDesiredBallState == eBallState::HitBottomWall || eDesiredBallState == eBallState::HitTopWall )
         {
-            SetYSpeed(GetYSpeed()*-1.05);
+            SetYSpeed(GetYSpeed()*-1.1);
             eNewBallState = m_eCurrentBallState;
         }
     }
