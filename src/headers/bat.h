@@ -90,9 +90,9 @@ private:
 
     bool m_bIsDrivenByAnalog = true;
 
-    float m_fYaccel = m_bIsDrivenByAnalog ? 12000.0f : 3800.0f;
-    const float m_fYtopSpeed = 250.00f;
-    float m_fYdecayRate = m_bIsDrivenByAnalog ? 0.95f : 0.97f;
+    float m_fYaccel = m_bIsDrivenByAnalog ? 10050.0f : 3800.0f;
+    const float m_fYtopSpeed = 50.00f;
+    float m_fYdecayRate = m_bIsDrivenByAnalog ? 0.960f : 0.97f;
 
     float m_fVelocity = 0.0f;
     float m_fSpeed = 0.0f;

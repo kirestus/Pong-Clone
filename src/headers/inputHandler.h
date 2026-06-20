@@ -22,6 +22,9 @@ private:
     Command* m_pJoystickMovement = new JoystickMovementCommand;
     Command* m_pReleaseJoyStick_ = new ReleaseJoystickCommand ;
 
+    Command* m_pP2JoystickMovement = new Player2JoystickMovementCommand;
+    Command* m_pP2ReleaseJoyStick_ = new P2ReleaseJoystickCommand;
+
     Command* m_pPlayer1ButtonShoot = new Player1ButtonShootCommand;
     Command* m_pPlayer2ButtonShoot = new Player2ButtonShootCommand;
     

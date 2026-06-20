@@ -53,7 +53,6 @@ void BatSystem::CalculateBatSpeed(const DataStruct& rTuple,std::shared_ptr<Bat> 
         {
             std::cout<<"UPSpeed"<<abs(fUpSpeed)<<"\n";
             pBat->ModifyVelocity( fUpSpeed * abs(pBat->GetAnalogSpeedModifier()/100.0f));
-            //pBat->ModifyVelocity( - ( pBat->GetAccel()*fDeltaT )* abs(pBat->GetAnalogSpeedModifier()/100.0f));
         }
         else if (newMoveDirection == eBatMoveDirection::DOWN && abs(fDownSpeed) < pBat->GetTopSpeed())
         { 

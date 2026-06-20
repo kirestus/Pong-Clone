@@ -119,14 +119,10 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
     }  
 
 
-    //Handle joystick inputs 
+    //Handle joystick inputs TODO: lots of duplicated code here, i need to rewrite this later
 
-    if (pEvent->type == pEvent->JoystickMoved && pEvent->joystickMove.axis == sf::Joystick::Axis::Y)
+    if (pEvent->type == pEvent->JoystickMoved && pEvent->joystickMove.axis == sf::Joystick::Axis::Y )
     {
-        const bool bIsLeftStick = pEvent->joystickMove.axis == sf::Joystick::Axis::Y;
-
-        if(!bIsLeftStick)
-        return m_pReleaseJoyStick_;
 
         m_pJoystickMovement->SetAnalogStrength(pEvent->joystickMove.position);
         if (pEvent->joystickMove.position < -g_iStickDeadZone)
@@ -138,6 +134,20 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
         else
         return m_pReleaseJoyStick_;
     }
+        
+    if (pEvent->type == pEvent->JoystickMoved && pEvent->joystickMove.axis == sf::Joystick::Axis::V )
+    {
+
+        m_pP2JoystickMovement->SetAnalogStrength(pEvent->joystickMove.position);
+        if (pEvent->joystickMove.position < -g_iStickDeadZone)
+        return m_pP2JoystickMovement;
+
+        else if (pEvent->joystickMove.position > g_iStickDeadZone)
+        return m_pP2JoystickMovement;
+
+        else
+        return m_pP2ReleaseJoyStick_;
+    }
 
     if (pEvent->type == pEvent->JoystickButtonPressed)
     {
@@ -146,7 +156,7 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
         return m_pPressActionButton;
         
         if(pEvent->joystickButton.button == 1)
-        return m_pPressActionButton;
+        return m_pPlayer2ButtonShoot;
             
         else if(pEvent->joystickButton.button == 2)
         return m_pPressActionButton;
@@ -171,14 +181,6 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
 
     }
 
-    if (pEvent->type == pEvent->JoystickButtonReleased)
-    {
-        if(pEvent->joystickButton.button == 12)
-            return m_pReleasePlayer1ButtonUp_;
-        
-        else if(pEvent->joystickButton.button == 13)
-        return m_pReleasePlayer1ButtonDown_;
-    }
 
     
     return NULL;

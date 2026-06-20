@@ -88,7 +88,7 @@ public:
 };
 //----------------------------------------------------------
 
-class JoystickMovementCommand : public Command
+class JoystickMovementCommand : public Command_Joystick
 {
   public:
     virtual void execute(const DataStruct& rTuple)
@@ -106,6 +106,30 @@ class JoystickMovementCommand : public Command
       else
       {
         rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
+      }
+    }
+};
+
+//----------------------------------------------------------
+
+class Player2JoystickMovementCommand : public Command_Joystick
+{
+  public:
+    virtual void execute(const DataStruct& rTuple)
+    {
+      rTuple.pBat2->SetAnalogSpeedModifier(m_iAnalogStrength);
+
+      if (m_iAnalogStrength > 0)
+      {
+        rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
+      }
+      else if (m_iAnalogStrength < 0 )
+      {
+        rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::UP);
+      }
+      else
+      {
+        rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
       }
     }
 };
@@ -232,6 +256,17 @@ public:
     virtual void execute( const DataStruct& rTuple )
     {
       rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
+    }
+};
+
+//----------------------------------------------------------
+
+class P2ReleaseJoystickCommand : public Command
+{
+public:
+    virtual void execute( const DataStruct& rTuple )
+    {
+      rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
     }
 };
 
