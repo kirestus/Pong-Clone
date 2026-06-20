@@ -40,8 +40,7 @@ eBatMoveDirection BatSystem::DetermCurrentMoveDirection(const DataStruct& rTuple
 void BatSystem::CalculateBatSpeed(const DataStruct& rTuple,std::shared_ptr<Bat> pBat, const float fDeltaT)
 {
     eBatMoveDirection newMoveDirection = DetermCurrentMoveDirection(rTuple,pBat);
-    //UpdateDesiredToShapeTransform();
-    const float fSpeed =  pBat->GetVelocity()*fDeltaT;
+    const float fSpeed =  (pBat->GetVelocity()*fDeltaT);
     if (rTuple.pWorldState->GetCurrentGameState() != eGameState::Paused)
     {
         if ( abs(fSpeed) < pBat->GetTopSpeed())
@@ -51,11 +50,11 @@ void BatSystem::CalculateBatSpeed(const DataStruct& rTuple,std::shared_ptr<Bat> 
 
         if (newMoveDirection == eBatMoveDirection::UP && abs(fSpeed) < pBat->GetTopSpeed())
         {
-            pBat->ModifyVelocity( - ( pBat->GetAccel()*fDeltaT ));
+            pBat->ModifyVelocity( - ( pBat->GetAccel()*fDeltaT )* abs(pBat->GetAnalogSpeedModifier()/100.0f));
         }
         else if (newMoveDirection == eBatMoveDirection::DOWN && abs(fSpeed) < pBat->GetTopSpeed())
         { 
-            pBat->ModifyVelocity(( pBat->GetAccel()*fDeltaT ));
+            pBat->ModifyVelocity(( pBat->GetAccel()*fDeltaT )* pBat->GetAnalogSpeedModifier()/100.0f);
         }
         else
         {

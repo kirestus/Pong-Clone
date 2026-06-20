@@ -1,11 +1,15 @@
 #include <headers/gameScreen.h>
 #include <headers/batSystem.h>
+#include <headers/gamePadUtils.h>
 #include <string>
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <cassert>
 
+
+//static global variables 
+static constexpr float g_fSWEET_SPOT_SIZE = 20.0f;
 
 //-----------------------------------------------------------------
 
@@ -60,48 +64,66 @@ sf::Vector2f GameScreen::CalculateScreenCenter(const std::shared_ptr<sf::RenderW
 
 //-----------------------------------------------------------------
 
+static uint16 CalculateFrameRate(const DataStruct& rTuple)
+{
+    if(!rTuple.pRenderWindow->hasFocus())
+    {
+        return 10;
+    }
+    else if ( rTuple.pWorldState->GetCurrentGameState() != eGameState::Running )
+    {
+        return 60;
+    }
+    else
+    {
+        return 240;
+    }
+}
+
+//-----------------------------------------------------------------
+
 int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock)
 {
     rTuple.pGameMusic->pause();
     rTuple.pGameMusic->setLoop(true);
-    rTuple.pBall->SetYSpeed(CreateRandomAngle(2000.0f));
+    rTuple.pBall->SetYSpeed(CreateRandomAngle(2000));
 
-    rTuple.pRenderWindow->setFramerateLimit(244.0);
+
     rTuple.pRenderWindow->setMouseCursorVisible(false);
 
     while (rTuple.pRenderWindow->isOpen())
     {
-        const uint32 iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
-        const float fFrameTime = rGameClock.restart().asSeconds();
-        const float fFps = 1.0 / fFrameTime;
+
+        const int64 iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
+        const float fDeltaT = rGameClock.restart().asSeconds();
+        const float fFps = 1.0 / fDeltaT;
         //std::cout << fFps << " Frames Per Second: \n";
-
-        const bool bIsPaused = rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused;
-
+        
         rTuple.pWorldState->DetermineGameState();
+        rTuple.pRenderWindow->setFramerateLimit(CalculateFrameRate(rTuple));
 
+        const bool bIsRunning = rTuple.pWorldState->GetCurrentGameState() == eGameState::Running;
         if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Boot )
         {
             ResetGame(rTuple);
         }
         
         std::unique_ptr<BatSystem> pBatSystem = std::make_unique<BatSystem>();
+        std::unique_ptr<PadUtils> pPadUtils = std::make_unique<PadUtils>();
 
-        pBatSystem->CalculateBatSpeed(rTuple,rTuple.pBat1, fFrameTime);
-        pBatSystem->CalculateBatSpeed(rTuple,rTuple.pBat2, fFrameTime);
-        //rTuple.pBat1->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
-        //rTuple.pBat2->CalculateBatSpeed(rTuple.pRenderWindow, fFrameTime, bIsPaused);
-        rTuple.pBall->UpdateBallPosition(fFrameTime/10, bIsPaused);
+        pBatSystem->CalculateBatSpeed(rTuple,rTuple.pBat1, fDeltaT);
+        pBatSystem->CalculateBatSpeed(rTuple,rTuple.pBat2, fDeltaT);
+        rTuple.pBall->UpdateBallPosition(fDeltaT/10, !bIsRunning); //TODO: make this feel good in the actual values with dividing by 10
         
-        const eCollisionType eCollidingWith = CheckCollisions(rTuple, bIsPaused);
+        const eCollisionType eCollidingWith = CheckCollisions(rTuple);
         if ( eCollidingWith != eCollisionType::NoCollision )
         {
-            HandleCollisions(rTuple, bIsPaused, eCollidingWith, iSimFrame);
+            HandleCollisions(rTuple, eCollidingWith, iSimFrame);
         }
 
         SetLastCollisionType(eCollidingWith);
 
-        ShakeScreen(rTuple,0.5f, eCollidingWith, bIsPaused);
+        ShakeScreen(rTuple,0.5f, eCollidingWith);
 
         if (ShouldAttachBallToBat(rTuple))
         {
@@ -115,13 +137,20 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
             }
         }
 
-        const bool bUpdatedUiText = UpdateUIText( GetisWinConditionMet(), bIsPaused, rTuple );
+        const bool bUpdatedUiText = UpdateUIText( GetisWinConditionMet(), !bIsRunning, rTuple );
 
         DimMiddleLine(rTuple, bUpdatedUiText || rTuple.pWorldState->IsScreenShaking());
-        UpdateScoreText(rTuple, iSimFrame, bIsPaused);
+        UpdateScoreText(rTuple, iSimFrame, !bIsRunning);
 
-        rTuple.pBat1->UpdateHitVFX(iSimFrame);
-        rTuple.pBat2->UpdateHitVFX(iSimFrame);
+        if(rTuple.pBat1->GetLastHitFrame() > rTuple.pBat2->GetLastHitFrame())
+        {
+            rTuple.pBat1->UpdateHitVFX(iSimFrame,rTuple.pBall->IsLastHitOnSweetSpot());
+        }
+        else
+        {
+            rTuple.pBat2->UpdateHitVFX(iSimFrame,rTuple.pBall->IsLastHitOnSweetSpot());  
+        }
+
 
         sf::Event event;
         while (rTuple.pRenderWindow->pollEvent(event))
@@ -137,7 +166,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
             }
         }
 
-        // This Section handles all the rendering for the game
+        // This Section handles all the rendering for the game TODO: make this its own function
 
         rTuple.pRenderWindow->clear();
 
@@ -181,7 +210,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 
         }
 
-        for (short i = rTuple.pBat1->GetBatVFXArrayLength(); i >= 0; i --)
+        for (int8 i = rTuple.pBat1->GetBatVFXArrayLength(); i >= 0; i --)
         {
             rTuple.pRenderWindow->draw( rTuple.pBat1->GetBatVFXShapeArray()[i]);
             rTuple.pRenderWindow->draw( rTuple.pBat2->GetBatVFXShapeArray()[i]);
@@ -193,7 +222,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         rTuple.pRenderWindow->draw( rTuple.pBall->ReferenceShape() );
         
         rTuple.pRenderWindow->display();
-        if(!bIsPaused)
+        if(bIsRunning)
         {
             rTuple.pBall->UpdateBallTrail( iSimFrame );
             rTuple.pWorldState->IncrimentSimFrame();
@@ -221,14 +250,15 @@ void GameScreen::ResetGame(const DataStruct &rTuple)
 
 //----------------------------------------------------------
 
-eCollisionType GameScreen::CheckCollisions(const DataStruct &rTuple,const bool isPaused)
+eCollisionType GameScreen::CheckCollisions(const DataStruct &rTuple)
 {  
     const sf::FloatRect pBallHitbox = rTuple.pBall->GetShape().getGlobalBounds();
     
+    //TODO: see if i cant write this to be faster, seems slow to do all the bool checks and then check the if statements but it's easy to read
     const bool bIsCollidingWithP1 = isBallCollidingWithTarget(pBallHitbox, rTuple.pBat1->GetShape().getGlobalBounds());
     const bool bIsCollidingWithP2 = isBallCollidingWithTarget(pBallHitbox, rTuple.pBat2->GetShape().getGlobalBounds());
     const bool bIsCollidingWithWalls = isBallHittingWall(pBallHitbox, rTuple.pRenderWindow );
-    const bool bDidPLayerScore = isBallHittingGoal(pBallHitbox,rTuple, isPaused );
+    const bool bDidPLayerScore = isBallHittingGoal(pBallHitbox,rTuple );
 
     //order here could matter in the rare edge case of a player hitting a wall and hitting the goal
     if ( bDidPLayerScore )
@@ -253,15 +283,15 @@ eCollisionType GameScreen::CheckCollisions(const DataStruct &rTuple,const bool i
 
 //----------------------------------------------------------
 
-void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused, const eCollisionType eCollidingwith,const int iSimFrame )
+void GameScreen::HandleCollisions(const DataStruct &rTuple, const eCollisionType eCollidingwith,const int64 iSimFrame )
 {
 
     switch (eCollidingwith)
     {
     case eCollisionType::CollisionWithGoalZone:
     {
-        const bool isleft = rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2;
-        rTuple.pBall->OnScoreGoal(true, isleft, rTuple.fScreenWidth);
+        const bool bIsleft = rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2;
+        rTuple.pBall->OnScoreGoal(bIsleft, rTuple.fScreenWidth);
         m_lLastGoalScoredFrame = iSimFrame;
         if ( GetisWinConditionMet() )
         {
@@ -297,7 +327,7 @@ void GameScreen::HandleCollisions(const DataStruct &rTuple, const bool bIsPaused
         rTuple.pBall->OnBatCollision(rTuple.fScreenHeight);
 
         const float fCollisionDelta = abs(rTuple.pBall->GetShape().getPosition().y - pBat->GetShape().getPosition().y) ;
-        const bool bIsHittingSweetSpot = fCollisionDelta < abs(10.0f);
+        const bool bIsHittingSweetSpot = fCollisionDelta < g_fSWEET_SPOT_SIZE; //TODO: make this a global variable somewhere
         rTuple.pBall->SetLastHitOnSweetSpot(bIsHittingSweetSpot);
 
         constexpr int16 iRandomSpread(500); // add a bit of randomness to each hit
@@ -355,7 +385,7 @@ bool GameScreen::isBallHittingWall(const sf::FloatRect box1, const std::shared_p
 
 //----------------------------------------------------------
 
-bool GameScreen::isBallHittingGoal(const sf::FloatRect box1,const DataStruct &rTuple,const bool isPaused )
+bool GameScreen::isBallHittingGoal(const sf::FloatRect box1,const DataStruct &rTuple/*,const bool isPaused*/ )
 {
     const float fLeftGoalPosition = 0.0f;
     const float fRightGoalPosition = rTuple.fScreenWidth;
@@ -501,7 +531,7 @@ float GameScreen::CreateRandomAngle(const int16 maxRange)
 
 //------------------------------------------------------------
 
-void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, const eCollisionType eJustHit, const bool isPaused )
+void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, const eCollisionType eJustHit )
 {
     const int iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
     static constexpr int iTotalSlamFrames = 15;
@@ -509,7 +539,7 @@ void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, c
     static constexpr float fForceScale = 600;
     static const sf::Vector2f vScaledForces(vForceScalingRatio.x*fForceScale,vForceScalingRatio.y*fForceScale);
 
-    if (isPaused)
+    if (rTuple.pWorldState->GetCurrentGameState() != eGameState::Running)
     {
         return;
     }
@@ -625,7 +655,7 @@ void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple)
 {
 
     constexpr unsigned short iFXFrameTime = 20;
-    const unsigned long iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
+    const int64 iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
 
     const bool bLastHitTop = rTuple.pWorldState->GetDidBallLastHitScreenTop();
 

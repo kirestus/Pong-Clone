@@ -73,8 +73,8 @@ void Ball::StateMachine(const float fScreenWidth)
             m_v2CurrentBallSpeed.x *= -1;
             if (abs(m_v2CurrentBallSpeed.x) < m_fTopSpeed )
             {
-                float fSpeedUpBoost = IsLastHitOnSweetSpot() ? m_fSpeedUpIncriment : m_fSpeedUpIncriment /2 ;
-                m_v2CurrentBallSpeed.x = m_v2CurrentBallSpeed.x > 0 ? m_v2CurrentBallSpeed.x += fSpeedUpBoost : m_v2CurrentBallSpeed.x -= fSpeedUpBoost;
+                float fSpeedUpBoost = IsLastHitOnSweetSpot() ? m_fSpeedUpIncriment : m_fSpeedUpIncriment / 2.0f ;
+                m_v2CurrentBallSpeed.x = m_v2CurrentBallSpeed.x > 0.0f ? m_v2CurrentBallSpeed.x += fSpeedUpBoost : m_v2CurrentBallSpeed.x -= fSpeedUpBoost;
             }
         }
         else if( eDesiredBallState == eBallState::GoalOnPlayer1)
@@ -87,7 +87,14 @@ void Ball::StateMachine(const float fScreenWidth)
         }
             else if(eDesiredBallState == eBallState::HitBottomWall || eDesiredBallState == eBallState::HitTopWall )
         {
-            SetYSpeed(GetYSpeed()*-1.1);
+            if (m_v2CurrentBallSpeed.y <= m_fTopSpeed)
+            {
+                SetYSpeed(GetYSpeed()*-1.1);
+            }
+            else
+            {
+                SetYSpeed(GetYSpeed()*-1);
+            }
             eNewBallState = m_eCurrentBallState;
         }
     }
@@ -127,7 +134,7 @@ void Ball::OnWallCollision(const bool isColliding, const float fScreenWidth)
 {
     if (isColliding)
     {
-        if( m_vBallVector.y < 50) // using 50 to check for a value near the top, kinda a shitty way to do this
+        if( m_vBallVector.y < 50.0f) // using 50 to check for a value near the top, kinda a shitty way to do this
         {
             SetDesiredBallState(eBallState::HitTopWall);
         }
@@ -141,7 +148,7 @@ void Ball::OnWallCollision(const bool isColliding, const float fScreenWidth)
 
 //----------------------------------------------------------
 
-void Ball::OnScoreGoal(const bool isColliding, const bool isLeft, const float fScreenWidth)
+void Ball::OnScoreGoal(const bool isLeft, const float fScreenWidth)
 {
         if (isLeft)
         {
@@ -164,7 +171,7 @@ void Ball::UpdateBallTrail(const int64 iSimFrame)
         {
             m_sShapeTrail[0] = m_sShape;
             m_sShapeTrail[i] = m_sShapeTrail[i-1];
-            const float fScaleModifier = GetTrailShapeArrayLength() - 0.08;
+            const float fScaleModifier = GetTrailShapeArrayLength() - 0.08f;
             
             const bool bIsGoingLeft = GetCurrentBallState() == eBallState::LEFT;
             const bool bIsGoingRight = GetCurrentBallState() == eBallState::RIGHT;

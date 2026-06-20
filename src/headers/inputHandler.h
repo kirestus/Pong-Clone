@@ -18,6 +18,9 @@ private:
     Command* m_pReleasePlayer2ButtonUp_ = new StopPlayer2UpCommand; 
     Command* m_pReleasePlayer1ButtonDown_ = new StopPlayer1DownCommand; 
     Command* m_pReleasePlayer2ButtonDown_ = new StopPlayer2DownCommand ;
+    
+    Command* m_pJoystickMovement = new JoystickMovementCommand;
+    Command* m_pReleaseJoyStick_ = new ReleaseJoystickCommand ;
 
     Command* m_pPlayer1ButtonShoot = new Player1ButtonShootCommand;
     Command* m_pPlayer2ButtonShoot = new Player2ButtonShootCommand;
@@ -32,5 +35,8 @@ private:
     Command* m_pPressSpace = new StartCommand ;
     Command* m_pQuitGame_ = new QuitCommand ;
 
-    Command* m_aCommandArray[17];
+    Command* m_pPressActionButton = new Player1ButtonShootCommand ;
+    Command* m_pPressPauseButton = new StartCommand ;
+
+    Command* m_aCommandArray[20];
 };

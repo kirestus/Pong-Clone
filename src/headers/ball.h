@@ -48,7 +48,7 @@ class Ball
 
         void OnBatCollision( const float );
         void OnWallCollision( const bool, const float );
-        void OnScoreGoal(const bool, const bool isLeft, const float);
+        void OnScoreGoal( const bool, const float );
 
         bool IsLastHitOnSweetSpot() const { return m_bIsLastHitOnSweetSpot ;}
         void SetLastHitOnSweetSpot(bool isSweet){m_bIsLastHitOnSweetSpot = isSweet;}

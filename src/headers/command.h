@@ -7,6 +7,10 @@ class Command
 public:
     virtual ~Command() {std::cout<<"Destroying Command";}
     virtual void execute(const DataStruct& rTuple) = 0;
+    virtual void SetAnalogStrength(int val){m_iAnalogStrength = val;}
+
+protected:
+  int m_iAnalogStrength = 100;
 };
 //----------------------------------------------------------
 
@@ -17,6 +21,7 @@ public:
   {
     rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
   }
+
 };
 
 //----------------------------------------------------------
@@ -73,6 +78,29 @@ public:
     }
   }
 
+};
+//----------------------------------------------------------
+
+class JoystickMovementCommand : public Command
+{
+  public:
+    virtual void execute(const DataStruct& rTuple)
+    {
+      rTuple.pBat1->SetAnalogSpeedModifier(m_iAnalogStrength);
+      
+      if (m_iAnalogStrength > 0)
+      {
+        rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
+      }
+      else if (m_iAnalogStrength < 0 )
+      {
+        rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::UP);
+      }
+      else
+      {
+        rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
+      }
+    }
 };
 
 //----------------------------------------------------------
@@ -191,6 +219,17 @@ public:
 
 //----------------------------------------------------------
 
+class ReleaseJoystickCommand : public Command
+{
+public:
+    virtual void execute( const DataStruct& rTuple )
+    {
+      rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
+    }
+};
+
+//----------------------------------------------------------
+
 class Player1ButtonShootCommand : public Command
 {
 public:
@@ -216,6 +255,11 @@ class Player2ButtonShootCommand : public Command
 public:
   virtual void execute(const DataStruct& rTuple )
   {
+    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused)
+    {
+      rTuple.pWorldState->SetCurrentGamestate(eGameState::Running);
+    }
+
     if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2)
     {
        rTuple.pBall->SetDesiredBallState(eBallState::LEFT);

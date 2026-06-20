@@ -10,7 +10,6 @@
 #include<iostream>
 
 
-
 struct DataStruct{
     //--GameEntities---
 

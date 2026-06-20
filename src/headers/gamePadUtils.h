@@ -3,6 +3,7 @@
 class PadUtils
 {
     public:
+
     bool IsConnected(uint8);
     bool IsActionButtonPressed();
 

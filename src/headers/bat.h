@@ -23,7 +23,7 @@ public:
 
     Bat(sf::Vector2f, ePlayerNumber);
 
-    void UpdateHitVFX(const float fDeltaT);
+    void UpdateHitVFX(const float fDeltaT, bool bHitSweetSpot);
     sf::Vector2f GetPosition() const { return m_vPosition ;}
     void SetPosition(sf::Vector2f _position) { m_vPosition = _position ; }
 
@@ -66,6 +66,11 @@ public:
     void SetLastHitFrame (int hitFrame ){ m_iLastFrameBallWasHit = hitFrame; }
     int64 GetLastHitFrame()const{return m_iLastFrameBallWasHit ;}
 
+    void IsUsingAnalogControls(bool bIsAnalog){ m_bIsDrivenByAnalog = bIsAnalog ;}
+
+    void SetAnalogSpeedModifier(int iSpeedMod){m_iAnalogSpeedModifier = iSpeedMod ;}
+    int GetAnalogSpeedModifier() const {return m_iAnalogSpeedModifier;}
+
 
 private:
 
@@ -80,9 +85,13 @@ private:
     eBatMoveDirection m_eDesiredMoveDirection = eBatMoveDirection::NONE;
     eBatMoveDirection m_eCurrentMoveDirection = eBatMoveDirection::NONE;
 
-    const float m_fYaccel = 3200.0f;
+    bool m_bIsDrivenByAnalog = true;
+
+    float m_fYaccel = m_bIsDrivenByAnalog ? 4500.0f : 3800.0f;
     const float m_fYtopSpeed = 90000.00f;
-    const float m_fYdecayRate = 0.9985f;
+    float m_fYdecayRate = m_bIsDrivenByAnalog ? 0.724f : 0.86f;
+
     float m_fVelocity = 0.0f;
     float m_fSpeed = 0.0f;
+    int m_iAnalogSpeedModifier = 100;
 };

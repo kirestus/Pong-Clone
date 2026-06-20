@@ -1,5 +1,4 @@
 #include <headers/bat.h>
-//#include <headers/dataStruct.h>
 
 Bat::Bat(const sf::Vector2f vPosition , const ePlayerNumber ePlayer)
 {
@@ -51,8 +50,7 @@ bool Bat::IsBouncing(const float fSpeed)
 
 //-----------------------------------------------------------------
 
-void Bat::UpdateHitVFX(const float fDeltaT)
-    //const std::shared_ptr<sf::RenderWindow> pRenderWindow, long iSimFrame, float fLastHitYPosition)
+void Bat::UpdateHitVFX(const float fDeltaT, bool bHitSweetSpot )
 {
     //pass tuple to this instead of all this other shit
     constexpr uint8 iFXFrameTime = 20;
@@ -74,17 +72,27 @@ void Bat::UpdateHitVFX(const float fDeltaT)
             }
             
             // TODO: pass the data tuple instead and get the sweetspot hit
-            //const bool bHitSweetSpot = 
-            m_FXShape[i].setFillColor( sf::Color( 150,150,255,10 ) );
+            sf::Color FillColor;
+            if(GetPlayerNumber()== ePlayerNumber::PLAYER1)
+            {
+                FillColor = bHitSweetSpot ? sf::Color( 255,100,100,16 ) : sf::Color( 255,255,255,10 );
+            }
+            else
+            {
+                FillColor = bHitSweetSpot ? sf::Color( 100,100,255,16 ) : sf::Color( 255,255,255,10 );
+            }
+            const float fSizeTweak = bHitSweetSpot ? 0.66f : 0.5f;
+
+            m_FXShape[i].setFillColor( FillColor );
             m_FXShape[i].setPosition( m_hRectShape.getPosition().x ,m_hRectShape.getPosition().y );
-            m_FXShape[i].setSize( sf::Vector2f( m_hRectShape.getSize().x*i*0.8 +10 , m_hRectShape.getSize().y-(i*8)));
+            m_FXShape[i].setSize( sf::Vector2f( m_hRectShape.getSize().x*i*fSizeTweak+10.0f , m_hRectShape.getSize().y-(i*fSizeTweak*10.0f)));
             
             if(GetPlayerNumber() == ePlayerNumber::PLAYER2)
             {
-                m_FXShape[i].scale(sf::Vector2f(m_FXShape->getScale().x * -1, 1.0));
+                m_FXShape[i].scale(sf::Vector2f(m_FXShape->getScale().x * -1.0f, 1.0f));
             }
 
-            m_FXShape[i].setOrigin( sf::Vector2f(0, m_FXShape[i].getSize().y/2 ));
+            m_FXShape[i].setOrigin( sf::Vector2f(0, m_FXShape[i].getSize().y/2.0f ));
         }
         else
         {
