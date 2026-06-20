@@ -40,26 +40,29 @@ eBatMoveDirection BatSystem::DetermCurrentMoveDirection(const DataStruct& rTuple
 void BatSystem::CalculateBatSpeed(const DataStruct& rTuple,std::shared_ptr<Bat> pBat, const float fDeltaT)
 {
     eBatMoveDirection newMoveDirection = DetermCurrentMoveDirection(rTuple,pBat);
-    const float fSpeed =  (pBat->GetVelocity()*fDeltaT);
-    if (rTuple.pWorldState->GetCurrentGameState() != eGameState::Paused)
+    const float fDistance =  (pBat->GetVelocity() * fDeltaT);
+    const float fDownSpeed = (pBat->GetAccel()+fDistance) * fDeltaT;
+    const float fUpSpeed = (-pBat->GetAccel()+fDistance) * fDeltaT;
+
+    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Running)
     {
-        if ( abs(fSpeed) < pBat->GetTopSpeed())
+        //const float fBouncingDecayRateModifer = pBat->IsBouncing() ? 0.4 : 1.0;
+        pBat->SetPosition(sf::Vector2f(pBat->GetPosition().x, pBat->GetPosition().y + fDistance ));
+
+        if (newMoveDirection == eBatMoveDirection::UP && abs(fUpSpeed) < pBat->GetTopSpeed())
         {
-            pBat->SetPosition(sf::Vector2f(pBat->GetPosition().x, pBat->GetPosition().y + fSpeed ));
+            std::cout<<"UPSpeed"<<abs(fUpSpeed)<<"\n";
+            pBat->ModifyVelocity( fUpSpeed * abs(pBat->GetAnalogSpeedModifier()/100.0f));
+            //pBat->ModifyVelocity( - ( pBat->GetAccel()*fDeltaT )* abs(pBat->GetAnalogSpeedModifier()/100.0f));
+        }
+        else if (newMoveDirection == eBatMoveDirection::DOWN && abs(fDownSpeed) < pBat->GetTopSpeed())
+        { 
+            std::cout<<"DownSpeed"<<abs(fDownSpeed)<<"\n";
+            pBat->ModifyVelocity( fDownSpeed * abs(pBat->GetAnalogSpeedModifier()/100.0f));
         }
 
-        if (newMoveDirection == eBatMoveDirection::UP && abs(fSpeed) < pBat->GetTopSpeed())
-        {
-            pBat->ModifyVelocity( - ( pBat->GetAccel()*fDeltaT )* abs(pBat->GetAnalogSpeedModifier()/100.0f));
-        }
-        else if (newMoveDirection == eBatMoveDirection::DOWN && abs(fSpeed) < pBat->GetTopSpeed())
-        { 
-            pBat->ModifyVelocity(( pBat->GetAccel()*fDeltaT )* pBat->GetAnalogSpeedModifier()/100.0f);
-        }
-        else
-        {
-            pBat->SetVelocity(fSpeed*0.96/fDeltaT);
-        }
+        pBat->SetVelocity(pBat->GetVelocity() * pBat->GetDecayRate());
+        
 
         if( ( pBat->IsHittingBottom(rTuple.pRenderWindow->getSize()) || pBat->IsHittingTop() ))
         {

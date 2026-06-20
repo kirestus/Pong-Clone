@@ -42,8 +42,9 @@ eBatMoveDirection Bat::DetermCurrentMoveDirection(const std::shared_ptr<sf::Rend
 
 //-----------------------------------------------------------------
 
-bool Bat::IsBouncing(const float fSpeed)
+bool Bat::IsBouncing()
 {
+    const float fSpeed = GetVelocity();
     return ((GetDesiredMoveDirection() == eBatMoveDirection::UP && fSpeed > 0 )||
     (GetDesiredMoveDirection() == eBatMoveDirection::DOWN && fSpeed < 0));
 }

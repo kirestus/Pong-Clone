@@ -37,6 +37,8 @@ public:
     float GetAccel() const {return m_fYaccel ;}
     float GetTopSpeed() const {return m_fYtopSpeed ;}
 
+    float GetDecayRate() const {return m_fYdecayRate ;}
+
     ePlayerNumber GetPlayerNumber() const { return m_ePlayerNumber ;}
 
     void ModifyVelocity( float _speedMod ){ m_fVelocity += _speedMod ;}
@@ -50,7 +52,8 @@ public:
     bool IsHittingBottom(sf::Vector2u vRenderScreenArea) const {return m_vPosition.y + (5.0f + m_hRectShape.getSize().y/2 ) >= vRenderScreenArea.y ;}
     bool IsHittingTop() const {return m_vPosition.y - (5.0f+ m_hRectShape.getSize().y/2 ) <= 0.0f ;}
 
-    bool IsBouncing(const float fSpeed);
+    bool IsBouncing();
+
 
     eBatMoveDirection DetermCurrentMoveDirection(std::shared_ptr<sf::RenderWindow> pRenderWindow );
 
@@ -87,9 +90,9 @@ private:
 
     bool m_bIsDrivenByAnalog = true;
 
-    float m_fYaccel = m_bIsDrivenByAnalog ? 4500.0f : 3800.0f;
-    const float m_fYtopSpeed = 90000.00f;
-    float m_fYdecayRate = m_bIsDrivenByAnalog ? 0.724f : 0.86f;
+    float m_fYaccel = m_bIsDrivenByAnalog ? 12000.0f : 3800.0f;
+    const float m_fYtopSpeed = 250.00f;
+    float m_fYdecayRate = m_bIsDrivenByAnalog ? 0.95f : 0.97f;
 
     float m_fVelocity = 0.0f;
     float m_fSpeed = 0.0f;

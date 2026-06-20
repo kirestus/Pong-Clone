@@ -5,12 +5,19 @@
 class Command
 {  
 public:
-    virtual ~Command() {std::cout<<"Destroying Command";}
+    virtual ~Command() {std::cout<<"Destroying Command"<<this;}
     virtual void execute(const DataStruct& rTuple) = 0;
     virtual void SetAnalogStrength(int val){m_iAnalogStrength = val;}
+    virtual void SetIsUsingPad(bool bIsUsingPad){m_bIsUsingPad = bIsUsingPad ;}
 
 protected:
   int m_iAnalogStrength = 100;
+  bool m_bIsUsingPad = false;
+};
+
+class Command_Joystick : public Command
+{
+  virtual void SetIsUsingPad(bool bIsUsingPad) override { Command::SetIsUsingPad(true); }
 };
 //----------------------------------------------------------
 
@@ -87,7 +94,7 @@ class JoystickMovementCommand : public Command
     virtual void execute(const DataStruct& rTuple)
     {
       rTuple.pBat1->SetAnalogSpeedModifier(m_iAnalogStrength);
-      
+
       if (m_iAnalogStrength > 0)
       {
         rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
@@ -230,11 +237,17 @@ public:
 
 //----------------------------------------------------------
 
-class Player1ButtonShootCommand : public Command
+class Player1ButtonShootCommand : public Command_Joystick
 {
 public:
   virtual void execute(const DataStruct& rTuple )
   {
+    rTuple.pBat1->IsUsingAnalogControls(true);
+    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused)
+    {
+      rTuple.pWorldState->SetCurrentGamestate(eGameState::Running);
+    }
+
     if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1)
     {
        rTuple.pBall->SetDesiredBallState(eBallState::RIGHT);
@@ -264,8 +277,11 @@ public:
     {
        rTuple.pBall->SetDesiredBallState(eBallState::LEFT);
        rTuple.pBall->StateMachine(rTuple.fScreenWidth);
-       rTuple.pSpitBallSoundEffect->play();  
-    }
+       if (rTuple.pWorldState->GetShouldPlaySFX())
+       {
+        rTuple.pSpitBallSoundEffect->play();  
+        
+        }    }
   }
 };
 
