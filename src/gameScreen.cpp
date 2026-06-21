@@ -1,15 +1,14 @@
 #include <headers/gameScreen.h>
 #include <headers/batSystem.h>
+#include <headers/gameStateSystem.h>
 #include <headers/gamePadUtils.h>
+#include <headers/collisionSystem.h>
 #include <string>
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <cassert>
 
-
-//static global variables 
-static constexpr float g_fSWEET_SPOT_SIZE = 20.0f;
 
 //-----------------------------------------------------------------
 
@@ -44,7 +43,7 @@ void GameScreen::CreateGameScreen(const DataStruct& rTuple)
     rTuple.pScoreText->setPosition(sf::Vector2f(rTuple.fScreenWidth/2, 50.0f) ); // should set this in the middle of the screen will do later
     rTuple.pRenderWindow->setView(*rTuple.pView);
     CreateMiddleLine(rTuple);
-    SetScoreText(m_aScore[0],m_aScore[1]);
+    SetScoreText(rTuple.pWorldState->GetScore()[0],rTuple.pWorldState->GetScore()[1]);
 
     //SetBoundryEdgeShapes(rTuple);
     srand(time(0));
@@ -85,7 +84,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 {
     rTuple.pGameMusic->pause();
     rTuple.pGameMusic->setLoop(true);
-    rTuple.pBall->SetYSpeed(CreateRandomAngle(2000));
+    rTuple.pBall->SetYSpeed(200);
 
 
     rTuple.pRenderWindow->setMouseCursorVisible(false);
@@ -100,15 +99,18 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         
         rTuple.pWorldState->DetermineGameState();
         rTuple.pRenderWindow->setFramerateLimit(CalculateFrameRate(rTuple));
+        
+        std::unique_ptr<GameStateSystem>pGameStateSystem = std::make_unique<GameStateSystem>();
 
         const bool bIsRunning = rTuple.pWorldState->GetCurrentGameState() == eGameState::Running;
         if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Boot )
         {
-            ResetGame(rTuple);
+            pGameStateSystem->ResetGame(rTuple);
         }
         
         std::unique_ptr<BatSystem> pBatSystem = std::make_unique<BatSystem>();
         std::unique_ptr<PadUtils> pPadUtils = std::make_unique<PadUtils>();
+        std::unique_ptr<CollisionSystem> pCollisionSystem = std::make_unique<CollisionSystem>();
 
         std::vector<std::shared_ptr<Bat>> pBatArray;
         pBatArray.push_back(rTuple.pBat1);
@@ -123,10 +125,10 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 
         rTuple.pBall->UpdateBallPosition(fDeltaT/10, !bIsRunning); //TODO: make this feel good in the actual values with dividing by 10
         
-        const eCollisionType eCollidingWith = CheckCollisions(rTuple);
+        const eCollisionType eCollidingWith = pCollisionSystem->CheckCollisions(rTuple);
         if ( eCollidingWith != eCollisionType::NoCollision )
         {
-            HandleCollisions(rTuple, eCollidingWith, iSimFrame);
+             pCollisionSystem->HandleCollisions(rTuple, eCollidingWith, iSimFrame);
         }
 
         SetLastCollisionType(eCollidingWith);
@@ -139,7 +141,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
             pBatSystem->AttachBallToBat(rTuple,pBat);
         }
 
-        const bool bUpdatedUiText = UpdateUIText( GetisWinConditionMet(), !bIsRunning, rTuple );
+        const bool bUpdatedUiText = UpdateUIText( rTuple.pWorldState->GetisWinConditionMet(), !bIsRunning, rTuple );
 
         DimMiddleLine(rTuple, bUpdatedUiText || rTuple.pWorldState->IsScreenShaking());
         UpdateScoreText(rTuple, iSimFrame, !bIsRunning);
@@ -168,179 +170,6 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
     return 1;
 }
 
-//----------------------------------------------------------
-
-void GameScreen::ResetGame(const DataStruct &rTuple)
-{
-    rTuple.pBat1->SetPosition(sf::Vector2f(50.0f, rTuple.fScreenHeight/2));
-    rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
-    rTuple.pBat1->UpdateShapeToDesiredTransform();
-
-    rTuple.pBat2->SetPosition(sf::Vector2f(rTuple.fScreenWidth -50.0f, rTuple.fScreenHeight / 2 ));
-    rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
-    rTuple.pBat2->UpdateShapeToDesiredTransform();
-
-    rTuple.pBall->SetBallVector(sf::Vector3f(rTuple.fScreenWidth/2, rTuple.fScreenHeight/2, 0.00f));
-    rTuple.pBall->StateMachine(rTuple.fScreenWidth);
-}
-
-//----------------------------------------------------------
-
-eCollisionType GameScreen::CheckCollisions(const DataStruct &rTuple)
-{  
-    const sf::FloatRect pBallHitbox = rTuple.pBall->GetShape().getGlobalBounds();
-    
-    //TODO: see if i cant write this to be faster, seems slow to do all the bool checks and then check the if statements but it's easy to read
-    const bool bIsCollidingWithP1 = isBallCollidingWithTarget(pBallHitbox, rTuple.pBat1->GetShape().getGlobalBounds());
-    const bool bIsCollidingWithP2 = isBallCollidingWithTarget(pBallHitbox, rTuple.pBat2->GetShape().getGlobalBounds());
-    const bool bIsCollidingWithWalls = isBallHittingWall(pBallHitbox, rTuple.pRenderWindow );
-    const bool bDidPLayerScore = isBallHittingGoal(pBallHitbox,rTuple );
-
-    //order here could matter in the rare edge case of a player hitting a wall and hitting the goal
-    if ( bDidPLayerScore )
-    { 
-        return eCollisionType::CollisionWithGoalZone ;
-    }
-    else if ( bIsCollidingWithP1 )
-    { 
-        return eCollisionType::CollisionWithPlayer1 ;
-    }
-    else if ( bIsCollidingWithP2 )
-    { 
-        return eCollisionType::CollisionWithPlayer2 ;
-    }
-    else if ( bIsCollidingWithWalls )
-    { 
-        return eCollisionType::CollisionWithWall ;
-    }
-
-    return eCollisionType::NoCollision ;
-}
-
-//----------------------------------------------------------
-
-void GameScreen::HandleCollisions(const DataStruct &rTuple, const eCollisionType eCollidingwith,const int64 iSimFrame )
-{
-
-    switch (eCollidingwith)
-    {
-    case eCollisionType::CollisionWithGoalZone:
-    {
-        const bool bIsleft = rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2;
-        rTuple.pBall->OnScoreGoal(bIsleft, rTuple.fScreenWidth);
-        m_lLastGoalScoredFrame = iSimFrame;
-        if ( GetisWinConditionMet() )
-        {
-            if (rTuple.pWorldState->GetShouldPlaySFX())
-            {
-                rTuple.pYouWinSoundEffect->play();  
-            }
-
-            rTuple.pWorldState->SetDesiredGamestate(eGameState::GameOver);
-        }
-        else if (rTuple.pWorldState->GetShouldPlaySFX())
-        {
-            rTuple.pScoreGoalSoundEffect->play();
-        }
-
-        ResetGame(rTuple);
-
-        return;
-    }
-    case eCollisionType::CollisionWithPlayer1:
-    case eCollisionType::CollisionWithPlayer2:
-    {
-        if(rTuple.pBall->GetLastCollisionType() == eCollidingwith)
-        {
-            //ignore multiple collisions with a single paddle
-            return;
-        }
-        const bool bIsCollidingWithP1 = eCollidingwith == eCollisionType::CollisionWithPlayer1 ? true : false; 
-        const std::shared_ptr<Bat> pBat = bIsCollidingWithP1 ? rTuple.pBat1 : rTuple.pBat2 ;
-        const eBallState eBallGoingDir = bIsCollidingWithP1 ? eBallState::RIGHT : eBallState::LEFT;
-        const sf::Vector3f ballPosition(rTuple.pBall->GetTranslationPosition().x,rTuple.pBall->GetTranslationPosition().y,100.0f);
-        
-        rTuple.pBall->OnBatCollision(rTuple.fScreenHeight);
-
-        const float fCollisionDelta = abs(rTuple.pBall->GetShape().getPosition().y - pBat->GetShape().getPosition().y) ;
-        const bool bIsHittingSweetSpot = fCollisionDelta < g_fSWEET_SPOT_SIZE; //TODO: make this a global variable somewhere
-        rTuple.pBall->SetLastHitOnSweetSpot(bIsHittingSweetSpot);
-
-        constexpr int16 iRandomSpread(500); // add a bit of randomness to each hit
-        
-        const float fNewYSpeed = bIsHittingSweetSpot ? pBat->GetVelocity()*1.25f + rTuple.pBall->GetYSpeed() : pBat->GetVelocity() + rTuple.pBall->GetYSpeed()+CreateRandomAngle(iRandomSpread) ; 
-        rTuple.pBall->SetYSpeed(fNewYSpeed); 
-        rTuple.pBall->SetDesiredBallState(eBallGoingDir);
-        rTuple.pBall->StateMachine(rTuple.fScreenWidth);
-        pBat->SetLastHitFrame(iSimFrame);
-        
-        sf::Sound* pPlayThisSound = eBallGoingDir != eBallState::LEFT ? rTuple.pPlayer1SoundEffect :rTuple.pPlayer2SoundEffect;
-        pPlayThisSound->setPosition(ballPosition);
-        if (rTuple.pWorldState->GetShouldPlaySFX())
-        {
-            pPlayThisSound->play();
-        }
-        return;
-    }
-    case eCollisionType::CollisionWithWall:
-    {
-        rTuple.pBall->OnWallCollision(true, rTuple.fScreenWidth);
-
-        bool bHitTop =  rTuple.pBall->GetDesiredBallState() == eBallState::HitTopWall;
-        rTuple.pWorldState->SetBallLastHitTop(bHitTop);
-
-        if (rTuple.pWorldState->GetShouldPlaySFX())
-        {
-            const float fPitchShift = 0.8 + (abs(rTuple.pBall->GetYSpeed()/30000));
-            rTuple.pHitWallSoundEffect->setVolume(abs(rTuple.pBall->GetYSpeed()/100));
-            rTuple.pHitWallSoundEffect->setPitch(fPitchShift);
-            rTuple.pHitWallSoundEffect->play();
-        }
-        return;
-    }
-    default:
-    assert("Undefined Collision");
-}
-}
-
-//----------------------------------------------------------
-
-bool GameScreen::isBallCollidingWithTarget(const sf::FloatRect box1, const sf::FloatRect box2)
-{
-    return box1.intersects(box2);
-}
-
-//----------------------------------------------------------
-
-bool GameScreen::isBallHittingWall(const sf::FloatRect box1, const std::shared_ptr<sf::RenderWindow> pRenderWindow)
-{
-    const float rectTop = 0.0f;
-    const float rectBottom = pRenderWindow->getSize().y - 15.0f;
-    return box1.top >= rectBottom || box1.top <= rectTop;
-}
-
-//----------------------------------------------------------
-
-bool GameScreen::isBallHittingGoal(const sf::FloatRect box1,const DataStruct &rTuple/*,const bool isPaused*/ )
-{
-    const float fLeftGoalPosition = 0.0f;
-    const float fRightGoalPosition = rTuple.fScreenWidth;
-    const float fBoxXpos = box1.left;
-
-    if (fBoxXpos < fLeftGoalPosition )
-    {
-        m_aScore[1] ++;
-
-        return true;
-    }
-    else if (fBoxXpos + 15 > fRightGoalPosition)
-    {   
-        m_aScore[0] ++;
-        
-        return true;
-    }
-    return false;
-}
 
 //----------------------------------------------------------
 
@@ -357,7 +186,7 @@ void GameScreen::UpdateScoreText(const DataStruct& rTuple, const unsigned long i
     {
         return;
     }
-    const std::string scoreString = GameScreen::SetScoreText(m_aScore[0],m_aScore[1]);
+    const std::string scoreString = GameScreen::SetScoreText(rTuple.pWorldState->GetScore()[0],rTuple.pWorldState->GetScore()[1]);
     rTuple.pScoreText->setString(sf::String(scoreString));
     if ( m_lLastGoalScoredFrame+30 >= rTuple.pWorldState->GetCurrentSimFrame() )
     {
@@ -450,12 +279,6 @@ bool GameScreen::UpdateUIText(const bool bIsGameOver, const bool bIsPaused, cons
 
 //------------------------------------------------------------
 
-float GameScreen::CreateRandomAngle(const int16 maxRange)
-{
-    return rand() % (maxRange);
-}
-
-//------------------------------------------------------------
 
 void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, const eCollisionType eJustHit )
 {
@@ -474,7 +297,7 @@ void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, c
 
     if (eJustHit == eCollisionType::CollisionWithWall)
     {
-        SetSimFrameTopLastHit(iSimFrame);
+        rTuple.pWorldState->SetSimFrameTopLastHit(iSimFrame);
         m_iLastShakeFrame = iSimFrame;
     }
     else if ( eJustHit == eCollisionType::CollisionWithPlayer1 || eJustHit == eCollisionType::CollisionWithPlayer2 )
@@ -590,9 +413,9 @@ void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple)
     const float fSpeed = rTuple.pBall->GetYSpeed();
     for(short i = GameScreen::m_iBounceVFXArrayLength; i >= 0 ; i--)
     {
-        if (GetSimFrameTopLastHit() > 0 && GetSimFrameTopLastHit() + iFXFrameTime > rTuple.pWorldState->GetCurrentSimFrame())
+        if (rTuple.pWorldState->GetSimFrameTopLastHit() > 0 && rTuple.pWorldState->GetSimFrameTopLastHit() + iFXFrameTime > rTuple.pWorldState->GetCurrentSimFrame())
         {
-            if(GetSimFrameTopLastHit() == iSimFrame)
+            if(rTuple.pWorldState->GetSimFrameTopLastHit() == iSimFrame)
             {
                 pFXShape[i].setSize(sf::Vector2f (abs(fSpeed)/10, 20.0f));
             }
@@ -621,7 +444,7 @@ void GameScreen::HandleEvents(const DataStruct& rTuple)
         {
             rTuple.pRenderWindow->close();
         }
-        Command* command = m_hInputHandler.HandleInput( &event, GetisWinConditionMet());
+        Command* command = m_hInputHandler.HandleInput( &event, rTuple.pWorldState->GetisWinConditionMet());
         if (command) 
         {  
             command->execute(rTuple);
@@ -661,7 +484,7 @@ rTuple.pRenderWindow->clear();
             SetBoundryEdgeShapes(rTuple);
         }
 
-        if (m_iSimFrameTopLastHit + 30 > rTuple.pWorldState->GetCurrentSimFrame())
+        if (rTuple.pWorldState->GetSimFrameTopLastHit() + 30 > rTuple.pWorldState->GetCurrentSimFrame())
         {
             if(rTuple.pWorldState->GetDidBallLastHitScreenTop())
             {

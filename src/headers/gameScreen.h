@@ -20,25 +20,12 @@ public:
     void HandleEvents(const DataStruct& rTuple);
     void RenderElements(const DataStruct& rTuple);
 
-    eCollisionType CheckCollisions(const DataStruct &rTuple);
-    void HandleCollisions(const DataStruct &rTuple, const eCollisionType, const int64);
     void SetLastCollisionType(eCollisionType eJustHit){m_eLastCollisionType = eJustHit ;}
     void ShakeScreen(const DataStruct &rTuple, const float fMagnitude, const eCollisionType eJustHit);
     eCollisionType GetLastCollisionType() const { return m_eLastCollisionType; }
-
-    void SetSimFrameTopLastHit(uint64 iFrame){m_iSimFrameTopLastHit = iFrame;}
-    uint64 GetSimFrameTopLastHit()const {return m_iSimFrameTopLastHit;}
-
-    void ResetGame(const DataStruct&);
-    void AttachBallToBat(std::shared_ptr<Bat> pBat, std::shared_ptr<Ball> pBall, const float);
-    bool ShouldAttachBallToBat(const DataStruct&);
-
-    bool GetShouldUpdateScore()const{ return m_bShouldUpdateScore; }
-    void SetShouldUpdateScore(bool bShouldIt){ m_bShouldUpdateScore = bShouldIt; }
-
-    bool isBallCollidingWithTarget(const sf::FloatRect box1, const sf::FloatRect box2);
-    bool isBallHittingWall(const sf::FloatRect box1, const std::shared_ptr<sf::RenderWindow> pRenderWindow);
-    bool isBallHittingGoal( const sf::FloatRect box1, const DataStruct &rTuple );
+    
+    //bool GetShouldUpdateScore()const{ return m_bShouldUpdateScore; }
+    //void SetShouldUpdateScore(bool bShouldIt){ m_bShouldUpdateScore = bShouldIt; }
 
     std::string SetScoreText(const unsigned short &iPlayer1Score, const unsigned short &iPlayer2Score);
 
@@ -56,32 +43,25 @@ public:
     sf::Clock GetGameClock() const { return m_hClock; }
     sf::Clock GetTextFadeTimer() const { return m_TextFadeOutTimer ;}
 
-    bool GetisWinConditionMet() {return (m_aScore[0] == m_iScoreLimit || m_aScore[1] == m_iScoreLimit); }
-
     void CreateMiddleLine(const DataStruct& rTuple);
     void DimMiddleLine(const DataStruct& rTuple,const bool bShouldDimLine);
 
     void SetBoundryEdgeShapes(const DataStruct& rTuple);
     void UpdateWallBounceVFX(const DataStruct& rTuple);
 
-    float CreateRandomAngle(const int16);
-
 
 private:
     bool m_bShouldUpdateScore = true;
-    static const uint8 m_iScoreLimit = 10;
     sf::Clock m_TextFadeOutTimer;
     eCollisionType m_eLastCollisionType;
     InputHandler m_hInputHandler;         
     sf::Vector2f m_vScreenCenter;
     sf::Clock m_hClock;
-    uint8 m_aScore[2] = {0};
     uint64 m_iLastShakeFrame = 0;
     int64 m_lLastGoalScoredFrame = -500;
     static const uint8 m_iNumberOfLines = 6;
     sf::RectangleShape m_DashedLineRect[m_iNumberOfLines+1];
 
-    uint16 m_iSimFrameTopLastHit = 0;
     static constexpr uint8 m_iBounceVFXArrayLength = 2;
     uint8 pBounceWallVFXSpriteArray[m_iBounceVFXArrayLength];
     sf::RectangleShape m_sTopEdge[m_iBounceVFXArrayLength+1];

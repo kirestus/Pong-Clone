@@ -38,12 +38,26 @@ public:
     bool IsScreenShaking()const {return m_bIsScreenShaking ;}
     void SetIsScreenShaking(bool isShaking){m_bIsScreenShaking = isShaking;}
 
+    int64 GetSimFrameOfLastScoredGoal() const {return m_iSimFrameOfLastScoredGoal;}
+    void SetSimFrameOfLastScoredGoal(int64 iFrame){m_iSimFrameOfLastScoredGoal = iFrame;}
+    bool GetisWinConditionMet() const {return (m_aScore[0] == m_iScoreLimit || m_aScore[1] == m_iScoreLimit); }
+    const std::array<uint8, 2>& GetScore() const {return m_aScore;}
+
+    void SetSimFrameTopLastHit(uint64 iFrame){m_iSimFrameTopLastHit = iFrame;}
+    uint64 GetSimFrameTopLastHit()const {return m_iSimFrameTopLastHit;}
+
+
 private:
 
     eGameState m_eCurrentGameState;
     eGameState m_eDesiredGameState = eGameState::Boot;
 
     int64 m_iDetermFrame = 0;
+    int64 m_iSimFrameOfLastScoredGoal = 0;
+
+    static const uint8 m_iScoreLimit = 10;
+    std::array<uint8, 2> m_aScore = {0, 0};
+    uint16 m_iSimFrameTopLastHit = 0;
 
     bool m_bIsScreenShaking = false;
     bool m_bBallLastHitScreenTop = false;
