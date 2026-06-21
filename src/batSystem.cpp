@@ -1,11 +1,14 @@
 #include <headers/batSystem.h>
+#include<iostream>
 
 BatSystem::BatSystem()
 {
     //does nothing for now
 }
 
-eBatMoveDirection BatSystem::DetermCurrentMoveDirection(const DataStruct& rTuple, std::shared_ptr<Bat> pBat)
+//-----------------------------------------------------------------
+
+eBatMoveDirection BatSystem::CaclulateCurrentMoveDirection(const DataStruct& rTuple, std::shared_ptr<Bat> pBat)
 {
     const eBatMoveDirection eCurrentMoveDirection = pBat->GetCurrentMoveDirection();
     const eBatMoveDirection eDesiredMoveDirection = pBat->GetDesiredMoveDirection();
@@ -29,32 +32,28 @@ eBatMoveDirection BatSystem::DetermCurrentMoveDirection(const DataStruct& rTuple
         default:
             break;   
     }
-    pBat->SetCurrentMoveDirection(eNewMoveDirection); // should i be setting this here if its returning the value?
     return eNewMoveDirection;
 }
-
-
 
 //-----------------------------------------------------------------
 
 void BatSystem::CalculateBatSpeed(const DataStruct& rTuple,std::shared_ptr<Bat> pBat, const float fDeltaT)
 {
-    eBatMoveDirection newMoveDirection = DetermCurrentMoveDirection(rTuple,pBat);
+    eBatMoveDirection eNewMoveDirection = pBat->GetCurrentMoveDirection();
     const float fDistance =  (pBat->GetVelocity() * fDeltaT);
     const float fDownSpeed = (pBat->GetAccel()+fDistance) * fDeltaT;
     const float fUpSpeed = (-pBat->GetAccel()+fDistance) * fDeltaT;
 
     if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Running)
     {
-        //const float fBouncingDecayRateModifer = pBat->IsBouncing() ? 0.4 : 1.0;
         pBat->SetPosition(sf::Vector2f(pBat->GetPosition().x, pBat->GetPosition().y + fDistance ));
 
-        if (newMoveDirection == eBatMoveDirection::UP && abs(fUpSpeed) < pBat->GetTopSpeed())
+        if (eNewMoveDirection == eBatMoveDirection::UP && abs(fUpSpeed) < pBat->GetTopSpeed())
         {
             std::cout<<"UPSpeed"<<abs(fUpSpeed)<<"\n";
             pBat->ModifyVelocity( fUpSpeed * abs(pBat->GetAnalogSpeedModifier()/100.0f));
         }
-        else if (newMoveDirection == eBatMoveDirection::DOWN && abs(fDownSpeed) < pBat->GetTopSpeed())
+        else if (eNewMoveDirection == eBatMoveDirection::DOWN && abs(fDownSpeed) < pBat->GetTopSpeed())
         { 
             std::cout<<"DownSpeed"<<abs(fDownSpeed)<<"\n";
             pBat->ModifyVelocity( fDownSpeed * abs(pBat->GetAnalogSpeedModifier()/100.0f));
@@ -79,7 +78,7 @@ void BatSystem::CalculateBatSpeed(const DataStruct& rTuple,std::shared_ptr<Bat> 
 
 void BatSystem::NudgeBat(const DataStruct& rTuple , std::shared_ptr<Bat> pBat)
 {
-        //Nudge the bat if its at the top or bottom so it doesnt glitch out
+    //Nudge the bat if its at the top or bottom so it doesnt glitch out
     if( pBat->IsHittingTop() )
     {
         sf::Vector2f nudgeDown = sf::Vector2f(pBat->GetPosition().x,pBat->GetPosition().y+0.1);
@@ -91,5 +90,46 @@ void BatSystem::NudgeBat(const DataStruct& rTuple , std::shared_ptr<Bat> pBat)
         pBat->SetPosition(nudgeUp);
     }
 }
+//-----------------------------------------------------------------
+
+std::shared_ptr<Bat> BatSystem::WhichBatShouldBallAttatchTo(const DataStruct& rTuple)
+{
+    if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1)
+    {
+        return rTuple.pBat1;
+    }
+    else if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2)
+    {
+        return rTuple.pBat2;
+    }
+
+    return nullptr;
+}
 
 //-----------------------------------------------------------------
+
+void BatSystem::HandleBallAttachements(const DataStruct& rTuple)//you spicy boy ;)
+{
+    if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 )
+    {
+        AttachBallToBat(rTuple, rTuple.pBat1);
+    }
+    else
+    {
+        AttachBallToBat(rTuple, rTuple.pBat2);
+    }
+
+}
+
+//-----------------------------------------------------------------
+
+void BatSystem::AttachBallToBat(const DataStruct& rTuple, std::shared_ptr<Bat> pBat)
+{
+    
+    rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+    rTuple.pBall->SetYSpeed(pBat->GetVelocity()*-1.9f);
+
+    const sf::Vector2f vBatPosition = pBat->GetShape().getPosition();
+    const float fOffset = pBat->GetPlayerNumber() == ePlayerNumber::PLAYER1  ? 20.0f : -20.0f;
+    rTuple.pBall->SetBallVector(sf::Vector3f( vBatPosition.x + fOffset, vBatPosition.y, 0.0f));
+}

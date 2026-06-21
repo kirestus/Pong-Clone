@@ -7,7 +7,6 @@
 #include<headers/gameState.h>
 #include<headers/debugText.h>
 #include<memory>
-#include<iostream>
 
 
 struct DataStruct{
@@ -64,7 +63,6 @@ struct DataStruct{
         delete pYouWinSoundEffect;
         delete pGameMusic;
         delete pView;
-        std::cout << "DataStruct Destroyed";
     }
 };
 

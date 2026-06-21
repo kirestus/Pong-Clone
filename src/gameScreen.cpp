@@ -17,7 +17,6 @@ GameScreen::GameScreen(const DataStruct &rTuple)
 {
     CreateGameScreen(rTuple);
     UpdateGamescreen(rTuple,m_hClock);
-    //create a batsystem
 }
 
 //-----------------------------------------------------------------
@@ -111,8 +110,17 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         std::unique_ptr<BatSystem> pBatSystem = std::make_unique<BatSystem>();
         std::unique_ptr<PadUtils> pPadUtils = std::make_unique<PadUtils>();
 
-        pBatSystem->CalculateBatSpeed(rTuple,rTuple.pBat1, fDeltaT);
-        pBatSystem->CalculateBatSpeed(rTuple,rTuple.pBat2, fDeltaT);
+        std::vector<std::shared_ptr<Bat>> pBatArray;
+        pBatArray.push_back(rTuple.pBat1);
+        pBatArray.push_back(rTuple.pBat2);
+
+        for(size_t i = 0 ; i< pBatArray.size() ; i++)
+        {
+            eBatMoveDirection BatMoveDirection = pBatSystem->CaclulateCurrentMoveDirection(rTuple,pBatArray[i]);
+            pBatSystem->CalculateBatSpeed(rTuple,pBatArray[i], fDeltaT);
+            pBatArray[i]->SetCurrentMoveDirection(BatMoveDirection);
+        }
+
         rTuple.pBall->UpdateBallPosition(fDeltaT/10, !bIsRunning); //TODO: make this feel good in the actual values with dividing by 10
         
         const eCollisionType eCollidingWith = CheckCollisions(rTuple);
@@ -123,18 +131,12 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 
         SetLastCollisionType(eCollidingWith);
 
-        ShakeScreen(rTuple,0.5f, eCollidingWith);
+        ShakeScreen(rTuple,0.25f, eCollidingWith);
 
-        if (ShouldAttachBallToBat(rTuple))
+        std::shared_ptr<Bat> pBat =  pBatSystem->WhichBatShouldBallAttatchTo(rTuple);
+        if(pBat != nullptr)
         {
-            if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 )
-            {
-                AttachBallToBat(rTuple.pBat1, rTuple.pBall, rTuple.fScreenWidth);
-            }
-            else
-            {
-                AttachBallToBat(rTuple.pBat2, rTuple.pBall, rTuple.fScreenWidth);
-            }
+            pBatSystem->AttachBallToBat(rTuple,pBat);
         }
 
         const bool bUpdatedUiText = UpdateUIText( GetisWinConditionMet(), !bIsRunning, rTuple );
@@ -151,80 +153,14 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
             rTuple.pBat2->UpdateHitVFX(iSimFrame,rTuple.pBall->IsLastHitOnSweetSpot());  
         }
 
-
-        sf::Event event;
-        while (rTuple.pRenderWindow->pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-            {
-                rTuple.pRenderWindow->close();
-            }
-            Command* command = m_hInputHandler.HandleInput( &event, GetisWinConditionMet());
-            if (command) 
-            {  
-                command->execute(rTuple);
-            }
-        }
-
-        // This Section handles all the rendering for the game TODO: make this its own function
-
-        rTuple.pRenderWindow->clear();
-
-        for(short i = m_iNumberOfLines; i>=0 ; i--)
-        {
-            rTuple.pRenderWindow->draw( m_DashedLineRect[i] );
-        }
-
-        rTuple.pRenderWindow->draw( *rTuple.pMessageText );
-        rTuple.pRenderWindow->draw( *rTuple.pScoreText );
-
-        if (rTuple.pBall->GetCurrentBallState() != eBallState::AtPlayer1 && 
-        rTuple.pBall->GetCurrentBallState() != eBallState::AtPlayer2 )
-        {
-            for (short i = rTuple.pBall->GetTrailShapeArrayLength(); i >= 0; i --)
-            {
-                rTuple.pRenderWindow->draw( rTuple.pBall->GetTrailShapeArray()[i] );
-            }
-        }
-        
-        //TODO: Get the vfx for the edge bounce working better
-        
-        for(short i = m_iBounceVFXArrayLength; i >= 0; i --)
-        {
-            if (rTuple.pBall->GetDesiredBallState() == eBallState::HitBottomWall || rTuple.pBall->GetDesiredBallState() == eBallState::HitTopWall) 
-            {
-                SetBoundryEdgeShapes(rTuple);
-            }
-
-            if (m_iSimFrameTopLastHit + 30 > iSimFrame)
-            {
-                if(rTuple.pWorldState->GetDidBallLastHitScreenTop())
-                {
-                    rTuple.pRenderWindow->draw(m_sTopEdge[i]);
-                }
-                else
-                {
-                    rTuple.pRenderWindow->draw(m_sBottomEdge[i]);
-                }
-            }
-
-        }
-
-        for (int8 i = rTuple.pBat1->GetBatVFXArrayLength(); i >= 0; i --)
-        {
-            rTuple.pRenderWindow->draw( rTuple.pBat1->GetBatVFXShapeArray()[i]);
-            rTuple.pRenderWindow->draw( rTuple.pBat2->GetBatVFXShapeArray()[i]);
-        }
-
-        rTuple.pRenderWindow->draw( rTuple.pBat1->GetShape());
-        rTuple.pRenderWindow->draw( rTuple.pBat2->GetShape());
-
-        rTuple.pRenderWindow->draw( rTuple.pBall->ReferenceShape() );
+        HandleEvents(rTuple);
+        RenderElements(rTuple);
         
         rTuple.pRenderWindow->display();
         if(bIsRunning)
         {
             rTuple.pBall->UpdateBallTrail( iSimFrame );
+            //UpdateWallBounceVFX(rTuple);
             rTuple.pWorldState->IncrimentSimFrame();
         }
     }
@@ -447,17 +383,7 @@ void GameScreen::UpdateHudText(const DataStruct& rTuple, const std::string sDesi
     rTuple.pMessageText->setCharacterSize(50);
 }
 
-//------------------------------------------------------------
-
-void GameScreen::AttachBallToBat(const std::shared_ptr<Bat> pBat, const std::shared_ptr<Ball> pBall, const float fScreenWidth)
-{
-    pBall->StateMachine(fScreenWidth);
-    pBall->SetYSpeed(pBat->GetVelocity()*-1.9f);
-
-    const sf::Vector2f vBatPosition = pBat->GetShape().getPosition();
-    const float fOffset = pBat->GetPlayerNumber() == ePlayerNumber::PLAYER1  ? 20.0f : -20.0f;
-    pBall->SetBallVector(sf::Vector3f( vBatPosition.x + fOffset, vBatPosition.y, 0.0f));
-}
+//-----------------------------------------------------------
 
 //------------------------------------------------------------
 
@@ -684,15 +610,79 @@ void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple)
     }
 }
 
+//------------------------------------------------------------
+
+void GameScreen::HandleEvents(const DataStruct& rTuple)
+{
+    sf::Event event;
+    while (rTuple.pRenderWindow->pollEvent(event))
+    {
+        if (event.type == sf::Event::Closed)
+        {
+            rTuple.pRenderWindow->close();
+        }
+        Command* command = m_hInputHandler.HandleInput( &event, GetisWinConditionMet());
+        if (command) 
+        {  
+            command->execute(rTuple);
+        }
+    }
+}
 
 //------------------------------------------------------------
 
-bool GameScreen::ShouldAttachBallToBat(const DataStruct& rTuple)
+void GameScreen::RenderElements(const DataStruct& rTuple)
 {
-    if ( rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 
-    || rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2)
+rTuple.pRenderWindow->clear();
+
+    for(int8 i = m_iNumberOfLines; i>=0 ; i--)
     {
-        return true;
+        rTuple.pRenderWindow->draw( m_DashedLineRect[i] );
     }
-    return false;
+
+    rTuple.pRenderWindow->draw( *rTuple.pMessageText );
+    rTuple.pRenderWindow->draw( *rTuple.pScoreText );
+
+    if (rTuple.pBall->GetCurrentBallState() != eBallState::AtPlayer1 && 
+    rTuple.pBall->GetCurrentBallState() != eBallState::AtPlayer2 )
+    {
+        for (short i = rTuple.pBall->GetTrailShapeArrayLength(); i >= 0; i --)
+        {
+            rTuple.pRenderWindow->draw( rTuple.pBall->GetTrailShapeArray()[i] );
+        }
+    }
+    
+    //TODO: Get the vfx for the edge bounce working better
+    
+    for(int8 i = m_iBounceVFXArrayLength; i >= 0; i --)
+    {
+        if (rTuple.pBall->GetDesiredBallState() == eBallState::HitBottomWall || rTuple.pBall->GetDesiredBallState() == eBallState::HitTopWall) 
+        {
+            SetBoundryEdgeShapes(rTuple);
+        }
+
+        if (m_iSimFrameTopLastHit + 30 > rTuple.pWorldState->GetCurrentSimFrame())
+        {
+            if(rTuple.pWorldState->GetDidBallLastHitScreenTop())
+            {
+                rTuple.pRenderWindow->draw(m_sTopEdge[i]);
+            }
+            else
+            {
+                rTuple.pRenderWindow->draw(m_sBottomEdge[i]);
+            }
+        }
+
+    }
+
+    for (int8 i = rTuple.pBat1->GetBatVFXArrayLength(); i >= 0; i --)
+    {
+        rTuple.pRenderWindow->draw( rTuple.pBat1->GetBatVFXShapeArray()[i]);
+        rTuple.pRenderWindow->draw( rTuple.pBat2->GetBatVFXShapeArray()[i]);
+    }
+
+    rTuple.pRenderWindow->draw( rTuple.pBat1->GetShape());
+    rTuple.pRenderWindow->draw( rTuple.pBat2->GetShape());
+
+    rTuple.pRenderWindow->draw( rTuple.pBall->ReferenceShape() );
 }

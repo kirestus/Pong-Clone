@@ -16,6 +16,10 @@ public:
 
     GameScreen( const DataStruct& );
 
+
+    void HandleEvents(const DataStruct& rTuple);
+    void RenderElements(const DataStruct& rTuple);
+
     eCollisionType CheckCollisions(const DataStruct &rTuple);
     void HandleCollisions(const DataStruct &rTuple, const eCollisionType, const int64);
     void SetLastCollisionType(eCollisionType eJustHit){m_eLastCollisionType = eJustHit ;}

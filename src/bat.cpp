@@ -36,6 +36,7 @@ eBatMoveDirection Bat::DetermCurrentMoveDirection(const std::shared_ptr<sf::Rend
         default:
             break;   
     }
+    
     SetCurrentMoveDirection(eNewMoveDirection); // should i be setting this here if its returning the value?
     return eNewMoveDirection;
 }

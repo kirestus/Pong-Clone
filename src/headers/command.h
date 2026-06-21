@@ -1,6 +1,7 @@
 #include <headers/dataStruct.h>
 #include <headers/debugText.h>
 #include <headers/alias.h>
+#include <iostream>
 
 class Command
 {  
@@ -314,9 +315,9 @@ public:
        rTuple.pBall->StateMachine(rTuple.fScreenWidth);
        if (rTuple.pWorldState->GetShouldPlaySFX())
        {
-        rTuple.pSpitBallSoundEffect->play();  
-        
-        }    }
+         rTuple.pSpitBallSoundEffect->play();  
+       }    
+    }
   }
 };
 
