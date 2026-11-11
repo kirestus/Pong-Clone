@@ -1,7 +1,7 @@
 #include <headers/inputHandler.h>
 #include <iostream>
 
-static constexpr int g_iStickDeadZone = 20;
+static constexpr int g_iStickDeadZone = 10;
 
 InputHandler::InputHandler()
 {
@@ -70,25 +70,25 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
     {
         if ( pEvent->key.code ==  sf::Keyboard::W )
         {
-            m_pPlayer1ButtonUp_->SetAnalogStrength(100);
+            m_pPlayer1ButtonUp_->SetAnalogStrength(100,true);
             return m_pPlayer1ButtonUp_;
         }
 
         else if ( pEvent->key.code ==  sf::Keyboard::Up ) 
         {
-            m_pPlayer2ButtonUp_->SetAnalogStrength(100);
+            m_pPlayer2ButtonUp_->SetAnalogStrength(100,true);
             return m_pPlayer2ButtonUp_;
         }
 
         else if ( pEvent->key.code ==  sf::Keyboard::S )
         {
-            m_pPlayer1ButtonDown_->SetAnalogStrength(100); 
+            m_pPlayer1ButtonDown_->SetAnalogStrength(100,true); 
             return m_pPlayer1ButtonDown_;
         }
         
         else if ( pEvent->key.code ==  sf::Keyboard::Down )
         {
-            m_pPlayer1ButtonDown_->SetAnalogStrength(100); 
+            m_pPlayer1ButtonDown_->SetAnalogStrength(100,true); 
             return m_pPlayer2ButtonDown_;
         }
 
@@ -124,28 +124,31 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
     if (pEvent->type == pEvent->JoystickMoved && pEvent->joystickMove.axis == sf::Joystick::Axis::Y )
     {
 
-        m_pJoystickMovement->SetAnalogStrength(pEvent->joystickMove.position);
-        if (pEvent->joystickMove.position < -g_iStickDeadZone)
-        return m_pJoystickMovement;
+        const int iSpeed = m_pJoystickMovement->GetIsInverted() ? pEvent->joystickMove.position *= -1 : pEvent->joystickMove.position ;
+        m_pJoystickMovement->SetAnalogStrength(iSpeed, true);
+        if (iSpeed < -g_iStickDeadZone || iSpeed > g_iStickDeadZone)
+        {
+            return m_pJoystickMovement;
+        }
 
-        else if (pEvent->joystickMove.position > g_iStickDeadZone)
-        return m_pJoystickMovement;
-
-        else
+        m_pJoystickMovement->SetAnalogStrength(100, true);
         return m_pReleaseJoyStick_;
     }
         
     if (pEvent->type == pEvent->JoystickMoved && pEvent->joystickMove.axis == sf::Joystick::Axis::V )
     {
 
-        m_pP2JoystickMovement->SetAnalogStrength(pEvent->joystickMove.position);
+        const int iSpeed = m_pP2JoystickMovement->GetIsInverted() ? pEvent->joystickMove.position *= -1 : pEvent->joystickMove.position ;
+        m_pP2JoystickMovement->SetAnalogStrength(pEvent->joystickMove.position, true);
         if (pEvent->joystickMove.position < -g_iStickDeadZone)
-        return m_pP2JoystickMovement;
-
+        {
+            return m_pP2JoystickMovement;
+        }
         else if (pEvent->joystickMove.position > g_iStickDeadZone)
-        return m_pP2JoystickMovement;
+        {
+            return m_pP2JoystickMovement;
+        }
 
-        else
         return m_pP2ReleaseJoyStick_;
     }
 
@@ -153,34 +156,65 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
     {
         std::cout<<"Controller "<< pEvent->joystickButton.joystickId << " Pressed the "<< pEvent->joystickButton.button <<" Button \n";
         if(pEvent->joystickButton.button == 0)
-        return m_pPressActionButton;
-        
-        if(pEvent->joystickButton.button == 1)
-        return m_pPlayer2ButtonShoot;
-            
+        {
+            return m_pPressActionButton;
+        }
+        else if(pEvent->joystickButton.button == 1)
+        {
+            return m_pPlayer2ButtonShoot;
+        }
         else if(pEvent->joystickButton.button == 2)
-        return m_pPressActionButton;
-
+        {
+            return m_pPressActionButton;
+        }
         else if(pEvent->joystickButton.button == 3)
-        return m_pPressActionButton;
-
+        {
+            return m_pPressActionButton;
+        }
         else if(pEvent->joystickButton.button == 4)
-        return m_pPressActionButton;
-
+        {
+            return m_pPressActionButton;
+        }
         else if(pEvent->joystickButton.button == 5)
-        return m_pPressActionButton;
-
+        {
+            return m_pPressActionButton;
+        }
         else if(pEvent->joystickButton.button == 6)
-          return m_pPressActionButton;
-
+        {
+            return m_pPressActionButton;
+        }
         else if(pEvent->joystickButton.button == 7)
-        return m_pPressPauseButton;
-
+        {
+            return m_pPressPauseButton;
+        }
         else if(pEvent->joystickButton.button == 8)
-        return m_pPressActionButton;
+        {
+            return m_pPressActionButton;
+        }
+        else if(pEvent->joystickButton.button == 11)
+        {
+            return m_pPlayer1ButtonUp_;
+        }
+        else if(pEvent->joystickButton.button == 12)
+        {
+            return m_pPlayer1ButtonDown_;
+        }
 
     }
 
+
+    else if (pEvent->type == pEvent->JoystickButtonReleased)
+    {
+        if(pEvent->joystickButton.button == 11)
+        {
+            return m_pReleasePlayer1ButtonUp_;
+        }
+        else if(pEvent->joystickButton.button == 12)
+        {
+            return m_pReleasePlayer1ButtonDown_;
+        }
+
+    }
 
     
     return NULL;

@@ -23,11 +23,8 @@ public:
     void SetLastCollisionType(eCollisionType eJustHit){m_eLastCollisionType = eJustHit ;}
     void ShakeScreen(const DataStruct &rTuple, const float fMagnitude, const eCollisionType eJustHit);
     eCollisionType GetLastCollisionType() const { return m_eLastCollisionType; }
-    
-    //bool GetShouldUpdateScore()const{ return m_bShouldUpdateScore; }
-    //void SetShouldUpdateScore(bool bShouldIt){ m_bShouldUpdateScore = bShouldIt; }
 
-    std::string SetScoreText(const unsigned short &iPlayer1Score, const unsigned short &iPlayer2Score);
+    std::string SetScoreText(const uint8 &iPlayer1Score, const uint8 &iPlayer2Score);
 
     sf::Vector2f CalculateScreenCenter(const std::shared_ptr<sf::RenderWindow> pRenderWindow);
     sf::Vector2f GetScreenCenter() const {return m_vScreenCenter;}
@@ -36,7 +33,7 @@ public:
     void CreateGameScreen(const DataStruct& rTuple); 
     int UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rTimer);
 
-    void UpdateScoreText(const DataStruct& rTuple , unsigned long, bool);
+    void UpdateScoreText(const DataStruct& rTuple);
     void UpdateHudText(const DataStruct& rTuple, std::string);
     bool UpdateUIText(const bool, const bool, const DataStruct& );
 

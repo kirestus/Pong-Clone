@@ -141,10 +141,15 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
             pBatSystem->AttachBallToBat(rTuple,pBat);
         }
 
+        if(rTuple.pBall->GetDesiredBallState() == eBallState::GoalOnPlayer1 || rTuple.pBall->GetDesiredBallState() == eBallState::GoalOnPlayer2)
+        {
+            SetScoreText(rTuple.pWorldState->GetScore()[0],rTuple.pWorldState->GetScore()[1]);
+            UpdateScoreText(rTuple);
+        }
+
         const bool bUpdatedUiText = UpdateUIText( rTuple.pWorldState->GetisWinConditionMet(), !bIsRunning, rTuple );
 
         DimMiddleLine(rTuple, bUpdatedUiText || rTuple.pWorldState->IsScreenShaking());
-        UpdateScoreText(rTuple, iSimFrame, !bIsRunning);
 
         if(rTuple.pBat1->GetLastHitFrame() > rTuple.pBat2->GetLastHitFrame())
         {
@@ -173,16 +178,16 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 
 //----------------------------------------------------------
 
-std::string GameScreen::SetScoreText(const unsigned short &iPlayer1Score, const unsigned short &iPlayer2Score)
+std::string GameScreen::SetScoreText(const uint8 &iPlayer1Score, const uint8 &iPlayer2Score)
 {
    return std::to_string(iPlayer1Score)+"-"+ std::to_string(iPlayer2Score);
 }
 
 //----------------------------------------------------------
 
-void GameScreen::UpdateScoreText(const DataStruct& rTuple, const unsigned long iSimFrame, const bool bIsPaused)
+void GameScreen::UpdateScoreText(const DataStruct& rTuple)
 {
-    if (bIsPaused)
+    if (rTuple.pWorldState->GetCurrentGameState() != eGameState::Running)
     {
         return;
     }

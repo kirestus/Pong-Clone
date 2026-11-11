@@ -8,25 +8,38 @@ class Command
 public:
     virtual ~Command() {std::cout<<"Destroying Command"<<this;}
     virtual void execute(const DataStruct& rTuple) = 0;
-    virtual void SetAnalogStrength(int val){m_iAnalogStrength = val;}
+    virtual void SetAnalogStrength(int val, bool bInvert){m_iAnalogStrength = val,m_bIsInverted = bInvert;}
+    virtual int GetAnalogStrength() const { return m_iAnalogStrength; }
     virtual void SetIsUsingPad(bool bIsUsingPad){m_bIsUsingPad = bIsUsingPad ;}
+    virtual void SetIsUsingStick(bool bIsUsingStick ){m_bIsUsingStick = bIsUsingStick ;}
+    virtual bool GetIsInverted()const {return m_bIsInverted ; }
 
 protected:
   int m_iAnalogStrength = 100;
   bool m_bIsUsingPad = false;
+  bool m_bIsUsingStick = false;
+  bool m_bIsInverted = true;
 };
 
 class Command_Joystick : public Command
 {
-  virtual void SetIsUsingPad(bool bIsUsingPad) override { Command::SetIsUsingPad(true); }
+  virtual void SetIsUsingPad(bool bIsUsingPad) override { Command::SetIsUsingPad(true); Command::SetIsUsingStick(true); }
+};
+
+//----------------------------------------------------------
+
+class Command_DPad : public Command
+{
+  virtual void SetIsUsingPad(bool bIsUsingPad) override { Command::SetIsUsingPad(true);  Command::SetIsUsingStick(true); Command:SetAnalogStrength(100, true) ; }
 };
 //----------------------------------------------------------
 
-class Player1DownCommand : public Command
+class Player1DownCommand : public Command_DPad
 {
 public:
   virtual void execute(const DataStruct& rTuple)
   {
+    rTuple.pBat1->SetAnalogSpeedModifier(Command::GetAnalogStrength());
     rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
   }
 
@@ -34,33 +47,36 @@ public:
 
 //----------------------------------------------------------
 
-class Player1UpCommand : public Command
+class Player1UpCommand : public Command_DPad
 {
 public:
   virtual void execute(const DataStruct& rTuple)
   {
+    rTuple.pBat1->SetAnalogSpeedModifier(Command::GetAnalogStrength());
     rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::UP);
   }
 };
 
 //----------------------------------------------------------
 
-class Player2DownCommand : public Command
+class Player2DownCommand : public Command_DPad
 {
 public:
   virtual void execute(const DataStruct& rTuple)
   {
+    rTuple.pBat2->SetAnalogSpeedModifier(Command::GetAnalogStrength());
     rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
   }
 };
 
 //----------------------------------------------------------
 
-class Player2UpCommand : public Command
+class Player2UpCommand : public Command_DPad
 {
 public:
   virtual void execute(const DataStruct& rTuple)
   {
+    rTuple.pBat2->SetAnalogSpeedModifier(Command::GetAnalogStrength());
     rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::UP);
   }
 };
@@ -96,13 +112,13 @@ class JoystickMovementCommand : public Command_Joystick
     {
       rTuple.pBat1->SetAnalogSpeedModifier(m_iAnalogStrength);
 
-      if (m_iAnalogStrength > 0)
+      if (m_iAnalogStrength > 10)
       {
         rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
       }
-      else if (m_iAnalogStrength < 0 )
+      else if (m_iAnalogStrength < -10 )
       {
-        rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::UP);
+          rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::UP);
       }
       else
       {
@@ -120,11 +136,11 @@ class Player2JoystickMovementCommand : public Command_Joystick
     {
       rTuple.pBat2->SetAnalogSpeedModifier(m_iAnalogStrength);
 
-      if (m_iAnalogStrength > 0)
+      if (m_iAnalogStrength > 10)
       {
         rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
       }
-      else if (m_iAnalogStrength < 0 )
+      else if (m_iAnalogStrength < 10 )
       {
         rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::UP);
       }

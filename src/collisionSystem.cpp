@@ -107,6 +107,18 @@ void CollisionSystem::HandleCollisions(const DataStruct &rTuple, const eCollisio
         {
             rTuple.pScoreGoalSoundEffect->play();
         }
+        
+        uint8 p1Score = rTuple.pWorldState->GetScore()[0];
+        uint8 p2Score = rTuple.pWorldState->GetScore()[1];
+
+        if(bIsleft)
+        {
+            rTuple.pWorldState->SetScore(p1Score,p2Score ++);
+        }
+        else
+        {
+            rTuple.pWorldState->SetScore(p1Score++,p2Score);
+        }
 
         std::unique_ptr<GameStateSystem>pGameStateSystem = std::make_unique<GameStateSystem>();
         pGameStateSystem->ResetGame(rTuple);
