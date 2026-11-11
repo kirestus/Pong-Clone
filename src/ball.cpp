@@ -1,10 +1,12 @@
 #include <headers/ball.h>
 #include <assert.h>
 
+static constexpr float g_BALLSIZE = 15.0f;
 Ball::Ball(std::shared_ptr<sf::RenderWindow> pRenderWindow)
 {
+    
     m_vBallVector = sf::Vector3f( pRenderWindow->getSize().x/2, pRenderWindow->getSize().y/2, 0 );
-    m_sShape.setSize(sf::Vector2f(15.0f,15.0f));
+    m_sShape.setSize(sf::Vector2f(g_BALLSIZE,g_BALLSIZE));
     m_sShape.setFillColor(sf::Color::White);
     m_sShape.setOrigin(sf::Vector2f(m_sShape.getSize().x/2,m_sShape.getSize().y/2));
     m_sShape.setPosition(m_vBallVector.x ,m_vBallVector.y);
@@ -12,7 +14,7 @@ Ball::Ball(std::shared_ptr<sf::RenderWindow> pRenderWindow)
 
 //----------------------------------------------------------
 
-void Ball::StateMachine(const float fScreenWidth)
+void Ball::StateMachine()
 {
     const eBallState eCurrentBallState = GetCurrentBallState();
     const eBallState eDesiredBallState = GetDesiredBallState();
@@ -63,8 +65,8 @@ void Ball::StateMachine(const float fScreenWidth)
     else if(eCurrentBallState == eBallState::LEFT || eCurrentBallState == eBallState::RIGHT )
     {
         //check if our collision valid
-        const bool bIsCollisionValid = eCurrentBallState == eBallState::LEFT && fScreenWidth/2 > GetTranslationPosition().x ||
-        eCurrentBallState == eBallState::RIGHT && fScreenWidth/2 <  m_vBallVector.x ;
+        const bool bIsCollisionValid = eCurrentBallState == eBallState::LEFT && GetLastCollisionType() == eCollisionType::CollisionWithPlayer2 ||
+        eCurrentBallState == eBallState::RIGHT && GetLastCollisionType() == eCollisionType::CollisionWithPlayer1 ;
 
         if ( eDesiredBallState == eBallState::HitBall && bIsCollisionValid )
         {
@@ -122,7 +124,7 @@ void Ball::OnBatCollision(const float fScreenWidth)
 {
 
     SetDesiredBallState(eBallState::HitBall);
-    StateMachine(fScreenWidth);
+    StateMachine();
 
     if(GetCurrentBallState() == eBallState::LEFT)
     {
@@ -136,11 +138,11 @@ void Ball::OnBatCollision(const float fScreenWidth)
 
 //----------------------------------------------------------
 
-void Ball::OnWallCollision(const bool isColliding, const float fScreenWidth)
+void Ball::OnWallCollision(const bool isColliding, const float fScreenHeight)
 {
     if (isColliding)
     {
-        if( m_vBallVector.y < 50.0f) // using 50 to check for a value near the top, kinda a shitty way to do this
+        if( m_vBallVector.y < fScreenHeight/2.0f)
         {
             SetDesiredBallState(eBallState::HitTopWall);
         }
@@ -148,7 +150,7 @@ void Ball::OnWallCollision(const bool isColliding, const float fScreenWidth)
         {
             SetDesiredBallState(eBallState::HitBottomWall);
         }
-        StateMachine(fScreenWidth);
+        StateMachine();
         SetLastCollisiontype( eCollisionType::CollisionWithWall);
 
     }
@@ -156,7 +158,7 @@ void Ball::OnWallCollision(const bool isColliding, const float fScreenWidth)
 
 //----------------------------------------------------------
 
-void Ball::OnScoreGoal(const bool isLeft, const float fScreenWidth)
+void Ball::OnScoreGoal(const bool isLeft)
 {
         if (isLeft)
         {
@@ -166,7 +168,7 @@ void Ball::OnScoreGoal(const bool isLeft, const float fScreenWidth)
         {
             SetDesiredBallState(eBallState::GoalOnPlayer2);
         }
-        StateMachine(fScreenWidth);
+        StateMachine();
         SetLastCollisiontype( eCollisionType::CollisionWithGoalZone);
         
 }

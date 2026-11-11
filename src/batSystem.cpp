@@ -124,7 +124,7 @@ void BatSystem::HandleBallAttachements(const DataStruct& rTuple)//you spicy boy 
 void BatSystem::AttachBallToBat(const DataStruct& rTuple, std::shared_ptr<Bat> pBat)
 {
     
-    rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+    rTuple.pBall->StateMachine();
     rTuple.pBall->SetYSpeed(pBat->GetVelocity()*-1.9f);
 
     const sf::Vector2f vBatPosition = pBat->GetShape().getPosition();

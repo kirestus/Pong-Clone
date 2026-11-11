@@ -92,7 +92,7 @@ void CollisionSystem::HandleCollisions(const DataStruct &rTuple, const eCollisio
     case eCollisionType::CollisionWithGoalZone:
     {
         const bool bIsleft = rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2;
-        rTuple.pBall->OnScoreGoal(bIsleft, rTuple.fScreenWidth);
+        rTuple.pBall->OnScoreGoal(bIsleft);
         rTuple.pWorldState->SetSimFrameOfLastScoredGoal(iSimFrame);
         if ( rTuple.pWorldState->GetisWinConditionMet() )
         {
@@ -149,7 +149,7 @@ void CollisionSystem::HandleCollisions(const DataStruct &rTuple, const eCollisio
         const float fNewYSpeed = bIsHittingSweetSpot ? pBat->GetVelocity()*1.25f + rTuple.pBall->GetYSpeed() : pBat->GetVelocity() + rTuple.pBall->GetYSpeed()+CreateRandomAngle(iRandomSpread) ; 
         rTuple.pBall->SetYSpeed(fNewYSpeed); 
         rTuple.pBall->SetDesiredBallState(eBallGoingDir);
-        rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+        rTuple.pBall->StateMachine();
         pBat->SetLastHitFrame(iSimFrame);
         
         sf::Sound* pPlayThisSound = eBallGoingDir != eBallState::LEFT ? rTuple.pPlayer1SoundEffect :rTuple.pPlayer2SoundEffect;
@@ -162,7 +162,7 @@ void CollisionSystem::HandleCollisions(const DataStruct &rTuple, const eCollisio
     }
     case eCollisionType::CollisionWithWall:
     {
-        rTuple.pBall->OnWallCollision(true, rTuple.fScreenWidth);
+        rTuple.pBall->OnWallCollision(true, rTuple.fScreenHeight);
 
         bool bHitTop =  rTuple.pBall->GetDesiredBallState() == eBallState::HitTopWall;
         rTuple.pWorldState->SetBallLastHitTop(bHitTop);

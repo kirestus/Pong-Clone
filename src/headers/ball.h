@@ -43,12 +43,12 @@ class Ball
         void SetDesiredBallState(eBallState _desiredState){ m_eDesiredBallState = _desiredState ;}
 
 
-        void StateMachine(const float);
+        void StateMachine();
         void UpdateBallPosition(const float, const bool);
 
         void OnBatCollision( const float );
         void OnWallCollision( const bool, const float );
-        void OnScoreGoal( const bool, const float );
+        void OnScoreGoal( const bool );
 
         bool IsLastHitOnSweetSpot() const { return m_bIsLastHitOnSweetSpot ;}
         void SetLastHitOnSweetSpot(bool isSweet){m_bIsLastHitOnSweetSpot = isSweet;}

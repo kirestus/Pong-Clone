@@ -66,7 +66,7 @@ static uint16 CalculateFrameRate(const DataStruct& rTuple)
 {
     if(!rTuple.pRenderWindow->hasFocus())
     {
-        return 10;
+        return 5;
     }
     else if ( rTuple.pWorldState->GetCurrentGameState() != eGameState::Running )
     {

@@ -304,7 +304,7 @@ public:
     {
        rTuple.pBat1->SetLastHitFrame(rTuple.pWorldState->GetCurrentSimFrame());
        rTuple.pBall->SetDesiredBallState(eBallState::RIGHT);
-       rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+       rTuple.pBall->StateMachine();
        if (rTuple.pWorldState->GetShouldPlaySFX())
        {
           rTuple.pSpitBallSoundEffect->play();
@@ -329,7 +329,7 @@ public:
     {
        rTuple.pBat2->SetLastHitFrame(rTuple.pWorldState->GetCurrentSimFrame());
        rTuple.pBall->SetDesiredBallState(eBallState::LEFT);
-       rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+       rTuple.pBall->StateMachine();
        if (rTuple.pWorldState->GetShouldPlaySFX())
        {
           rTuple.pSpitBallSoundEffect->play();

@@ -12,7 +12,7 @@ void GameStateSystem::ResetGame(const DataStruct &rTuple)
     rTuple.pBat2->UpdateShapeToDesiredTransform();
 
     rTuple.pBall->SetBallVector(sf::Vector3f(rTuple.fScreenWidth/2, rTuple.fScreenHeight/2, 0.00f));
-    rTuple.pBall->StateMachine(rTuple.fScreenWidth);
+    rTuple.pBall->StateMachine();
 }
 
 //----------------------------------------------------------

@@ -1,6 +1,5 @@
 #include <headers/gamePadUtils.h>
 #include <SFML/Window.hpp>
-#include <iostream>
 
 enum PadButtons : uint8
 {
