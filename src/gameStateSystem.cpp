@@ -1,8 +1,9 @@
 #include <headers/gameStateSystem.h>
 
 
-void GameStateSystem::ResetGame(const DataStruct &rTuple)
+void GameStateSystem::ResetGame(const DataStruct &rTuple )
 {
+
     rTuple.pBat1->SetPosition(sf::Vector2f(50.0f, rTuple.fScreenHeight/2));
     rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
     rTuple.pBat1->UpdateShapeToDesiredTransform();
@@ -13,6 +14,7 @@ void GameStateSystem::ResetGame(const DataStruct &rTuple)
 
     rTuple.pBall->SetBallVector(sf::Vector3f(rTuple.fScreenWidth/2, rTuple.fScreenHeight/2, 0.00f));
     rTuple.pBall->StateMachine();
+
 }
 
 //----------------------------------------------------------

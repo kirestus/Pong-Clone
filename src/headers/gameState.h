@@ -40,7 +40,7 @@ public:
 
     int64 GetSimFrameOfLastScoredGoal() const {return m_iSimFrameOfLastScoredGoal;}
     void SetSimFrameOfLastScoredGoal(int64 iFrame){m_iSimFrameOfLastScoredGoal = iFrame;}
-    bool GetisWinConditionMet() const {return (m_aScore[0] == m_iScoreLimit || m_aScore[1] == m_iScoreLimit); }
+    bool GetisWinConditionMet() const {return (m_aScore[0] >= m_iScoreLimit || m_aScore[1] >= m_iScoreLimit); }
     
     const uint8* GetScore() const { return m_aScore ;}
     void SetScore(uint8 p1Score, uint8 p2Score){m_aScore[0]=p1Score, m_aScore[1] = p2Score ;}

@@ -103,9 +103,19 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         std::unique_ptr<GameStateSystem>pGameStateSystem = std::make_unique<GameStateSystem>();
 
         const bool bIsRunning = rTuple.pWorldState->GetCurrentGameState() == eGameState::Running;
-        if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Boot )
+        const bool bIsGameOver = rTuple.pWorldState->GetCurrentGameState() == eGameState::GameOver;
+
+        
+        if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Boot 
+        || rTuple.pWorldState->GetCurrentGameState() == eGameState::GameOver )
         {
             pGameStateSystem->ResetGame(rTuple);
+        }
+        
+        if(bIsGameOver)
+        {
+            rTuple.pWorldState->SetDesiredGamestate(eGameState::Reset);
+            rTuple.pWorldState->SetScore(0,0);
         }
         
         std::unique_ptr<BatSystem> pBatSystem = std::make_unique<BatSystem>();
@@ -123,25 +133,25 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
             pBatArray[i]->SetCurrentMoveDirection(BatMoveDirection);
         }
 
-        rTuple.pBall->UpdateBallPosition(fDeltaT/10, !bIsRunning); //TODO: make this feel good in the actual values with dividing by 10
+        rTuple.pBall->UpdateBallPosition(fDeltaT/10, !bIsRunning ); //TODO: make this feel good in the actual values with dividing by 10
         
         const eCollisionType eCollidingWith = pCollisionSystem->CheckCollisions(rTuple);
-        if ( eCollidingWith != eCollisionType::NoCollision )
+        if ( eCollidingWith != eCollisionType::NoCollision && bIsRunning )
         {
             pCollisionSystem->HandleCollisions(rTuple, eCollidingWith, iSimFrame);
         }
         
         ShakeScreen(rTuple,0.25f, eCollidingWith);
 
-        if (eCollidingWith != GetLastCollisionType())
+        if (eCollidingWith != GetLastCollisionType() && bIsRunning)
         {
             SetLastCollisionType(eCollidingWith);
 
-            if (eCollidingWith == eCollisionType::CollisionWithGoalZone)
+            if (eCollidingWith == eCollisionType::CollisionWithGoalZone && !bIsGameOver )
             {
-
                 if ( rTuple.pWorldState->GetisWinConditionMet() )
                 {
+                    rTuple.pWorldState->SetDesiredGamestate(eGameState::GameOver);
                     if (rTuple.pWorldState->GetShouldPlaySFX())
                     {
                         rTuple.pYouWinSoundEffect->play();  
@@ -170,7 +180,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
             UpdateScoreText(rTuple);
         }
 
-        const bool bUpdatedUiText = UpdateUIText( rTuple.pWorldState->GetisWinConditionMet(), !bIsRunning, rTuple );
+        const bool bUpdatedUiText = UpdateUIText( bIsGameOver, !bIsRunning, rTuple );
 
         DimMiddleLine(rTuple, bUpdatedUiText || rTuple.pWorldState->IsScreenShaking());
 
@@ -277,7 +287,7 @@ bool GameScreen::UpdateUIText(const bool bIsGameOver, const bool bIsPaused, cons
         {
             UpdateHudText(rTuple,std::string("PLAYER 1 WINS!:"));
         }
-        else if (bIsPaused)
+        else if (bIsPaused && !bIsGameOver)
         {
             UpdateHudText(rTuple,std::string("SPACE TO UNPAUSE:"));
         }
@@ -523,14 +533,23 @@ rTuple.pRenderWindow->clear();
 
     }
 
-    for (int8 i = rTuple.pBat1->GetBatVFXArrayLength(); i >= 0; i --)
+    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Running)
     {
-        rTuple.pRenderWindow->draw( rTuple.pBat1->GetBatVFXShapeArray()[i]);
-        rTuple.pRenderWindow->draw( rTuple.pBat2->GetBatVFXShapeArray()[i]);
+        // only render paddles ball and effects when the game is running
+        for (int8 i = rTuple.pBat1->GetBatVFXArrayLength(); i >= 0; i -- )
+        {
+            rTuple.pRenderWindow->draw( rTuple.pBat1->GetBatVFXShapeArray()[i]);
+            rTuple.pRenderWindow->draw( rTuple.pBat2->GetBatVFXShapeArray()[i]);
+        }
+
+        rTuple.pRenderWindow->draw( rTuple.pBat1->GetShape());
+        rTuple.pRenderWindow->draw( rTuple.pBat2->GetShape());
+
+        rTuple.pRenderWindow->draw( rTuple.pBall->ReferenceShape() );
+    }
+    else
+    {
+        bool boola=false;
     }
 
-    rTuple.pRenderWindow->draw( rTuple.pBat1->GetShape());
-    rTuple.pRenderWindow->draw( rTuple.pBat2->GetShape());
-
-    rTuple.pRenderWindow->draw( rTuple.pBall->ReferenceShape() );
 }

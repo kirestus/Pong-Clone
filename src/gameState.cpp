@@ -23,16 +23,20 @@ void GameState::DetermineGameState()
             eNewGameState = eGameState::Paused;
         }
     }
+    else if(eCurrentGameState == eGameState::Reset)
+    {
+        eNewGameState = eGameState::Boot;
+    }
     else if ( eCurrentGameState == eGameState::GameOver )
     {
-        if( eDesiredGameState == eGameState::Boot )
+        if( eDesiredGameState == eGameState::Reset )
         {
-            eNewGameState = eGameState::Boot;
+            eNewGameState = eGameState::Reset;
         }
-        else
-        {
-            eNewGameState = eGameState::Paused;
-        }
+        //if(eDesiredGameState == eGameState::Boot)
+        //{
+        //    eNewGameState = eGameState::Boot;
+        //}
     }
     else if ( eCurrentGameState == eGameState::Paused )
     {
@@ -46,6 +50,13 @@ void GameState::DetermineGameState()
         if( eDesiredGameState == eGameState::GameOver )
         {
             eNewGameState = eGameState::GameOver;
+        }
+        else if( eDesiredGameState == eGameState::Reset )
+        {
+            if( eDesiredGameState == eGameState::Boot )
+            {
+                eNewGameState = eGameState::Boot;
+            }
         }
         else if( eDesiredGameState == eGameState::Paused )
         {

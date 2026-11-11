@@ -66,40 +66,40 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
     }
 
     //not an else if because both conditions will be true 
-    if(pEvent->type == sf::Event::KeyPressed && !bIsWinConditionMet )
+    if(pEvent->type == sf::Event::KeyPressed  )
     {
         if ( pEvent->key.code ==  sf::Keyboard::W )
         {
             m_pPlayer1ButtonUp_->SetAnalogStrength(100,true);
             return m_pPlayer1ButtonUp_;
         }
-
         else if ( pEvent->key.code ==  sf::Keyboard::Up ) 
         {
             m_pPlayer2ButtonUp_->SetAnalogStrength(100,true);
             return m_pPlayer2ButtonUp_;
         }
-
         else if ( pEvent->key.code ==  sf::Keyboard::S )
         {
             m_pPlayer1ButtonDown_->SetAnalogStrength(100,true); 
             return m_pPlayer1ButtonDown_;
         }
-        
         else if ( pEvent->key.code ==  sf::Keyboard::Down )
         {
             m_pPlayer1ButtonDown_->SetAnalogStrength(100,true); 
             return m_pPlayer2ButtonDown_;
         }
-
         else if ( pEvent->key.code == sf::Keyboard::Space)
-        return m_pPressSpace;
-
+        {
+            return m_pPressSpace;
+        }
         else if ( pEvent->key.code == sf::Keyboard::F)
-        return m_pPlayer1ButtonShoot;
-
+        {
+            return m_pPlayer1ButtonShoot;
+        }
         else if ( pEvent->key.code == sf::Keyboard::Slash)
-        return m_pPlayer2ButtonShoot;
+        {
+            return m_pPlayer2ButtonShoot;
+        }
 
     }
 
@@ -154,7 +154,6 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
 
     if (pEvent->type == pEvent->JoystickButtonPressed)
     {
-        std::cout<<"Controller "<< pEvent->joystickButton.joystickId << " Pressed the "<< pEvent->joystickButton.button <<" Button \n";
         if(pEvent->joystickButton.button == 0)
         {
             return m_pPressActionButton;
@@ -213,7 +212,6 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
         {
             return m_pReleasePlayer1ButtonDown_;
         }
-
     }
 
     

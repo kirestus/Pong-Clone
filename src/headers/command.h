@@ -297,7 +297,12 @@ public:
   {
     if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused)
     {
-      rTuple.pWorldState->SetCurrentGamestate(eGameState::Running);
+      rTuple.pWorldState->SetDesiredGamestate(eGameState::Running);
+    }
+
+    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::GameOver)
+    {
+      rTuple.pWorldState->SetDesiredGamestate(eGameState::Reset);
     }
 
     if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1)
@@ -322,7 +327,12 @@ public:
   {
     if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused)
     {
-      rTuple.pWorldState->SetCurrentGamestate(eGameState::Running);
+      rTuple.pWorldState->SetDesiredGamestate(eGameState::Running);
+    }
+
+    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::GameOver)
+    {
+      rTuple.pWorldState->SetDesiredGamestate(eGameState::Reset);
     }
 
     if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2)
