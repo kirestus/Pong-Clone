@@ -48,7 +48,7 @@ void Ball::StateMachine(const float fScreenWidth)
         if( eDesiredBallState == eBallState::RIGHT) 
         {
             
-            m_v2CurrentBallSpeed.x = abs(m_v2InitialSpeed.x)*-1;
+            m_v2CurrentBallSpeed.x = abs(m_v2InitialSpeed.x)*-1.0f;
             eNewBallState = eDesiredBallState;
         }
     }
@@ -70,10 +70,10 @@ void Ball::StateMachine(const float fScreenWidth)
         {
             //inverse the desired move state
             eNewBallState = eCurrentBallState == eBallState::LEFT ? eBallState::RIGHT : eBallState::LEFT;
-            m_v2CurrentBallSpeed.x *= -1;
+            m_v2CurrentBallSpeed.x *= -1.0f;
             if (abs(m_v2CurrentBallSpeed.x) < m_fTopSpeed )
             {
-                float fSpeedUpBoost = IsLastHitOnSweetSpot() ? m_fSpeedUpIncriment * 1.1 : m_fSpeedUpIncriment * 0.85f ;
+                float fSpeedUpBoost = IsLastHitOnSweetSpot() ? m_fSpeedUpIncriment * 1.1f : m_fSpeedUpIncriment * 0.85f ;
                 m_v2CurrentBallSpeed.x = m_v2CurrentBallSpeed.x > 0.0f ? m_v2CurrentBallSpeed.x += fSpeedUpBoost : m_v2CurrentBallSpeed.x -= fSpeedUpBoost;
             }
         }
@@ -89,11 +89,11 @@ void Ball::StateMachine(const float fScreenWidth)
         {
             if (m_v2CurrentBallSpeed.y <= m_fTopSpeed)
             {
-                SetYSpeed(GetYSpeed()*-1.1);
+                SetYSpeed(GetYSpeed()*-1.1f);
             }
             else
             {
-                SetYSpeed(GetYSpeed()*-1);
+                SetYSpeed(GetYSpeed()*-1.0f);
             }
             eNewBallState = m_eCurrentBallState;
         }
