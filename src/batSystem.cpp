@@ -3,7 +3,7 @@
 
 BatSystem::BatSystem()
 {
-    //does nothing for now
+    //does nothing for now, maybe does nothing forever, IDK
 }
 
 //-----------------------------------------------------------------

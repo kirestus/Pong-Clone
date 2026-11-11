@@ -46,8 +46,8 @@ eBatMoveDirection Bat::DetermCurrentMoveDirection(const std::shared_ptr<sf::Rend
 bool Bat::IsBouncing()
 {
     const float fSpeed = GetVelocity();
-    return ((GetDesiredMoveDirection() == eBatMoveDirection::UP && fSpeed > 0 )||
-    (GetDesiredMoveDirection() == eBatMoveDirection::DOWN && fSpeed < 0));
+    return ((GetDesiredMoveDirection() == eBatMoveDirection::UP && fSpeed > 0.0f )||
+    (GetDesiredMoveDirection() == eBatMoveDirection::DOWN && fSpeed < 0.0f));
 }
 
 //-----------------------------------------------------------------
@@ -62,7 +62,7 @@ void Bat::UpdateHitVFX(const float fDeltaT, bool bHitSweetSpot )
 
     for(int8 i = m_iHitFXArrayLength; i >= 0 ; i--)
     {
-        if ( m_iLastFrameBallWasHit + iFXFrameTime > fDeltaT)
+        if ( m_iLastFrameBallWasHit + iFXFrameTime > fDeltaT) // TODO: should pass an int of the sim frame not a float
         {
             if(GetPlayerNumber() == ePlayerNumber::PLAYER2)
             {
