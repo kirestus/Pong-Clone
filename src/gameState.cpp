@@ -33,10 +33,6 @@ void GameState::DetermineGameState()
         {
             eNewGameState = eGameState::Reset;
         }
-        //if(eDesiredGameState == eGameState::Boot)
-        //{
-        //    eNewGameState = eGameState::Boot;
-        //}
     }
     else if ( eCurrentGameState == eGameState::Paused )
     {

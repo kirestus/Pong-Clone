@@ -14,71 +14,169 @@ public:
     virtual void SetIsUsingStick(bool bIsUsingStick ){m_bIsUsingStick = bIsUsingStick ;}
     virtual bool GetIsInverted()const {return m_bIsInverted ; }
 
-protected:
+private:
   int m_iAnalogStrength = 100;
   bool m_bIsUsingPad = false;
   bool m_bIsUsingStick = false;
   bool m_bIsInverted = true;
 };
 
+//----------------------------------------------------------
+
 class Command_Joystick : public Command
 {
   virtual void SetIsUsingStick(bool bIsUsingStick) override { Command::SetIsUsingStick(true); }
+  
+  public: 
+    Command_Joystick(ePlayerNumber eBatNumber){ m_ePlayer = eBatNumber; }
+    virtual float GetAnalogStickDeadzone() const { return m_iAnalogDeadzone ;}
+    virtual ePlayerNumber GetPlayerNumberEnum() const { return m_ePlayer; }
+
+  protected:
+    int m_iAnalogDeadzone = 10;
+    ePlayerNumber m_ePlayer = ePlayerNumber::PLAYER1;
+};
+
+//----------------------------------------------------------
+
+//TODO: dont want this in a header file
+class JoystickMovementCommand : public Command_Joystick
+{
+  public:
+    JoystickMovementCommand(ePlayerNumber eBatNumber) : Command_Joystick(eBatNumber){}
+
+    virtual void execute(const DataStruct& rTuple)
+    {
+
+      std::shared_ptr<Bat> pBattPointer = GetPlayerNumberEnum() == ePlayerNumber::PLAYER1 ? rTuple.pBat1 : rTuple.pBat2;
+
+      pBattPointer->SetAnalogSpeedModifier(GetAnalogStrength());
+
+      if (GetAnalogStrength() > GetAnalogStickDeadzone())
+      {
+        pBattPointer->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
+      }
+      else if (GetAnalogStrength() < -1 * GetAnalogStickDeadzone() )
+      {
+          pBattPointer->SetDesiredMoveDirection(eBatMoveDirection::UP);
+      }
+      else
+      {
+        pBattPointer->SetDesiredMoveDirection(eBatMoveDirection::NONE);
+      }
+    }
+};
+
+//----------------------------------------------------------
+
+class ReleaseJoystickCommand : public Command_Joystick
+{
+
+    public:
+    ReleaseJoystickCommand(ePlayerNumber eBatNumber) : Command_Joystick(eBatNumber){}
+
+    virtual void execute( const DataStruct& rTuple )
+    {
+      std::shared_ptr<Bat> pBattPointer = GetPlayerNumberEnum() == ePlayerNumber::PLAYER1 ? rTuple.pBat1 : rTuple.pBat2;
+      pBattPointer->SetDesiredMoveDirection(eBatMoveDirection::NONE);
+    }
 };
 
 //----------------------------------------------------------
 
 class Command_ButtonPress : public Command
 {
-  virtual void SetIsUsingPad(bool bIsUsingPad) override { Command::SetIsUsingPad(true); }
+  public:
+    //Command_ButtonPress(){};
+    Command_ButtonPress(ePlayerNumber eBatNumber, eBatMoveDirection eDirection){ m_ePlayer = eBatNumber; m_eDirection = eDirection ;}
+
+    virtual void SetIsUsingPad(bool bIsUsingPad) override { Command::SetIsUsingPad(true); }
+    virtual ePlayerNumber GetPlayerNumberEnum() const { return m_ePlayer; }
+
+    protected:
+    ePlayerNumber m_ePlayer = ePlayerNumber::PLAYER1;
+    eBatMoveDirection m_eDirection = eBatMoveDirection::NONE;
 };
 
 //----------------------------------------------------------
 
-class Player1DownCommand : public Command_ButtonPress
+class ShootButtonCommand : public Command_ButtonPress
 {
 public:
+  ShootButtonCommand(ePlayerNumber eBatNumber, eBatMoveDirection eDirection)
+    : Command_ButtonPress(eBatNumber, eDirection) {}
+
+  virtual void execute(const DataStruct& rTuple )
+  {
+    std::shared_ptr<Bat> pBattPointer = GetPlayerNumberEnum() == ePlayerNumber::PLAYER1 ? rTuple.pBat1 : rTuple.pBat2;
+
+    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused)
+    {
+      rTuple.pWorldState->SetDesiredGamestate(eGameState::Running);
+    }
+
+    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::GameOver)
+    {
+      rTuple.pWorldState->SetDesiredGamestate(eGameState::Reset);
+    }
+
+    if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 || rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2)
+    {
+      pBattPointer->SetLastHitFrame(rTuple.pWorldState->GetCurrentSimFrame());
+      
+      const bool bIsPlayerOneHoldingBall = m_ePlayer == ePlayerNumber::PLAYER1;
+
+      if(bIsPlayerOneHoldingBall)
+      {
+        rTuple.pBall->SetDesiredBallState(eBallState::RIGHT);
+      }
+      else
+      {
+        rTuple.pBall->SetDesiredBallState(eBallState::LEFT);
+      }
+
+      rTuple.pBall->StateMachine();
+
+      //not crazy about playing the sound effect based on the input::
+      if (rTuple.pWorldState->GetShouldPlaySFX())
+      {
+        rTuple.pSpitBallSoundEffect->play();
+      }
+    }
+  }
+};
+
+//----------------------------------------------------------
+
+class InputDownCommand : public Command_ButtonPress
+{
+  
+public:
+  InputDownCommand(ePlayerNumber eBatNumber, eBatMoveDirection eDirection) : Command_ButtonPress(eBatNumber,eDirection){}
+
   virtual void execute(const DataStruct& rTuple)
   {
-    rTuple.pBat1->SetAnalogSpeedModifier(Command::GetAnalogStrength());
-    rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
+    std::shared_ptr<Bat> pBattPointer = GetPlayerNumberEnum() == ePlayerNumber::PLAYER1 ? rTuple.pBat1 : rTuple.pBat2;
+
+    pBattPointer->SetAnalogSpeedModifier(Command::GetAnalogStrength());
+    pBattPointer->SetDesiredMoveDirection(m_eDirection);
   }
 
 };
 
 //----------------------------------------------------------
 
-class Player1UpCommand : public Command_ButtonPress
+class ReleaseInputCommand : public Command_ButtonPress
 {
 public:
+  ReleaseInputCommand(ePlayerNumber eBatNumber, eBatMoveDirection eDirection) : Command_ButtonPress(eBatNumber,eDirection){}
+
   virtual void execute(const DataStruct& rTuple)
   {
-    rTuple.pBat1->SetAnalogSpeedModifier(Command::GetAnalogStrength());
-    rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::UP);
-  }
-};
+    std::shared_ptr<Bat> pBattPointer = GetPlayerNumberEnum() == ePlayerNumber::PLAYER1 ? rTuple.pBat1 : rTuple.pBat2;
 
-//----------------------------------------------------------
-
-class Player2DownCommand : public Command_ButtonPress
-{
-public:
-  virtual void execute(const DataStruct& rTuple)
-  {
-    rTuple.pBat2->SetAnalogSpeedModifier(Command::GetAnalogStrength());
-    rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
-  }
-};
-
-//----------------------------------------------------------
-
-class Player2UpCommand : public Command_ButtonPress
-{
-public:
-  virtual void execute(const DataStruct& rTuple)
-  {
-    rTuple.pBat2->SetAnalogSpeedModifier(Command::GetAnalogStrength());
-    rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::UP);
+      if (pBattPointer->GetCurrentMoveDirection() == m_eDirection)
+      pBattPointer->SetDesiredMoveDirection(eBatMoveDirection::NONE);
   }
 };
 
@@ -95,7 +193,7 @@ public:
     }
     else if (rTuple.pWorldState->GetCurrentGameState() == eGameState::GameOver)
     {
-        rTuple.pWorldState->SetDesiredGamestate(eGameState::Boot);
+        rTuple.pWorldState->SetDesiredGamestate(eGameState::Reset);
     }
     else
     {
@@ -104,54 +202,6 @@ public:
   }
 
 };
-//----------------------------------------------------------
-
-class JoystickMovementCommand : public Command_Joystick
-{
-  public:
-    virtual void execute(const DataStruct& rTuple)
-    {
-      rTuple.pBat1->SetAnalogSpeedModifier(m_iAnalogStrength);
-
-      if (m_iAnalogStrength > 10)
-      {
-        rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
-      }
-      else if (m_iAnalogStrength < -10 )
-      {
-          rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::UP);
-      }
-      else
-      {
-        rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
-      }
-    }
-};
-
-//----------------------------------------------------------
-
-class Player2JoystickMovementCommand : public Command_Joystick
-{
-  public:
-    virtual void execute(const DataStruct& rTuple)
-    {
-      rTuple.pBat2->SetAnalogSpeedModifier(m_iAnalogStrength);
-
-      if (m_iAnalogStrength > 10)
-      {
-        rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::DOWN);
-      }
-      else if (m_iAnalogStrength < 10 )
-      {
-        rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::UP);
-      }
-      else
-      {
-        rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
-      }
-    }
-};
-
 //----------------------------------------------------------
 
 class DebugTextGameStateCommand : public Command
@@ -202,7 +252,7 @@ class UnlockFPS : public Command
 public:
   virtual void execute(const DataStruct& rTuple)
   {
-    
+    //TODO: Add this feature
   }
 };
 
@@ -226,7 +276,6 @@ public:
   virtual void execute(const DataStruct& rTuple)
   {
       rTuple.pRenderWindow->close();
-      //rTuple.~DataStruct();
   }
 };
 
@@ -242,135 +291,10 @@ public:
   }
 };
 
-//----------------------------------------------------------
-
-class StopPlayer1DownCommand : public Command
-{
-public:
-    virtual void execute(const DataStruct& rTuple )
-    {
-        if (rTuple.pBat1->GetCurrentMoveDirection() == eBatMoveDirection::DOWN)
-        rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
-    }
-};
 
 //----------------------------------------------------------
 
-class StopPlayer2DownCommand : public Command
-{
-public:
-    virtual void execute( const DataStruct& rTuple )
-    {
-        if (rTuple.pBat2->GetCurrentMoveDirection() == eBatMoveDirection::DOWN)
-        rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
-    }
-};
 
-//----------------------------------------------------------
-
-class ReleaseJoystickCommand : public Command
-{
-public:
-    virtual void execute( const DataStruct& rTuple )
-    {
-      rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
-    }
-};
-
-//----------------------------------------------------------
-
-class P2ReleaseJoystickCommand : public Command
-{
-public:
-    virtual void execute( const DataStruct& rTuple )
-    {
-      rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
-    }
-};
-
-//----------------------------------------------------------
-
-class Player1ButtonShootCommand : public Command_Joystick
-{
-public:
-  virtual void execute(const DataStruct& rTuple )
-  {
-    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused)
-    {
-      rTuple.pWorldState->SetDesiredGamestate(eGameState::Running);
-    }
-
-    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::GameOver)
-    {
-      rTuple.pWorldState->SetDesiredGamestate(eGameState::Reset);
-    }
-
-    if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1)
-    {
-       rTuple.pBat1->SetLastHitFrame(rTuple.pWorldState->GetCurrentSimFrame());
-       rTuple.pBall->SetDesiredBallState(eBallState::RIGHT);
-       rTuple.pBall->StateMachine();
-       if (rTuple.pWorldState->GetShouldPlaySFX())
-       {
-          rTuple.pSpitBallSoundEffect->play();
-       }
-    }
-  }
-};
-
-//----------------------------------------------------------
-
-class Player2ButtonShootCommand : public Command
-{
-public:
-  virtual void execute(const DataStruct& rTuple )
-  {
-    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused)
-    {
-      rTuple.pWorldState->SetDesiredGamestate(eGameState::Running);
-    }
-
-    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::GameOver)
-    {
-      rTuple.pWorldState->SetDesiredGamestate(eGameState::Reset);
-    }
-
-    if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2)
-    {
-       rTuple.pBat2->SetLastHitFrame(rTuple.pWorldState->GetCurrentSimFrame());
-       rTuple.pBall->SetDesiredBallState(eBallState::LEFT);
-       rTuple.pBall->StateMachine();
-       if (rTuple.pWorldState->GetShouldPlaySFX())
-       {
-          rTuple.pSpitBallSoundEffect->play();
-       }
-    }
-  }
-};
-
-//----------------------------------------------------------
-
-class StopPlayer1UpCommand : public Command
-{
-public:
-    virtual void execute( const DataStruct& rTuple )
-    {
-        if (rTuple.pBat1->GetCurrentMoveDirection() == eBatMoveDirection::UP)
-        rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
-    }
-};
-
-//----------------------------------------------------------
-
-class StopPlayer2UpCommand : public Command
-{
-public:
-    virtual void execute( const DataStruct& rTuple )
-    {
-        if (rTuple.pBat2->GetCurrentMoveDirection() == eBatMoveDirection::UP)
-        rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
-    }
-};
 
 //----------------------------------------------------------
 

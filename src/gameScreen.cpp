@@ -111,11 +111,10 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         {
             pGameStateSystem->ResetGame(rTuple);
         }
-        
+
         if(bIsGameOver)
         {
-            rTuple.pWorldState->SetDesiredGamestate(eGameState::Reset);
-            rTuple.pWorldState->SetScore(0,0);
+            rTuple.pWorldState->SetScore(0,0); 
         }
         
         std::unique_ptr<BatSystem> pBatSystem = std::make_unique<BatSystem>();
@@ -200,7 +199,6 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         if(bIsRunning)
         {
             rTuple.pBall->UpdateBallTrail( iSimFrame );
-            //UpdateWallBounceVFX(rTuple);
             rTuple.pWorldState->IncrimentSimFrame();
         }
     }

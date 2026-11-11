@@ -10,23 +10,24 @@ public:
     Command* HandleInput( sf::Event* pEvent, bool );
 
 private:
-    Command* m_pPlayer1ButtonUp_ = new Player1UpCommand; 
-    Command* m_pPlayer1ButtonDown_ = new Player1DownCommand; 
-    Command* m_pPlayer2ButtonUp_ = new Player2UpCommand; 
-    Command* m_pPlayer2ButtonDown_ = new Player2DownCommand; 
-    Command* m_pReleasePlayer1ButtonUp_ = new StopPlayer1UpCommand ;
-    Command* m_pReleasePlayer2ButtonUp_ = new StopPlayer2UpCommand; 
-    Command* m_pReleasePlayer1ButtonDown_ = new StopPlayer1DownCommand; 
-    Command* m_pReleasePlayer2ButtonDown_ = new StopPlayer2DownCommand ;
+    Command* m_pPlayer1ButtonUp_ = new InputDownCommand(ePlayerNumber::PLAYER1,eBatMoveDirection::UP); 
+    Command* m_pPlayer1ButtonDown_ = new InputDownCommand(ePlayerNumber::PLAYER1,eBatMoveDirection::DOWN); 
+    Command* m_pPlayer2ButtonUp_ = new InputDownCommand(ePlayerNumber::PLAYER2,eBatMoveDirection::UP);
+    Command* m_pPlayer2ButtonDown_ = new InputDownCommand(ePlayerNumber::PLAYER2,eBatMoveDirection::DOWN);
+
+    Command* m_pReleasePlayer1ButtonUp_ = new ReleaseInputCommand(ePlayerNumber::PLAYER1, eBatMoveDirection::UP);
+    Command* m_pReleasePlayer2ButtonUp_ = new ReleaseInputCommand(ePlayerNumber::PLAYER2, eBatMoveDirection::UP);; 
+    Command* m_pReleasePlayer1ButtonDown_ = new ReleaseInputCommand(ePlayerNumber::PLAYER1,eBatMoveDirection::DOWN); 
+    Command* m_pReleasePlayer2ButtonDown_ = new ReleaseInputCommand(ePlayerNumber::PLAYER2,eBatMoveDirection::DOWN); ;
     
-    Command* m_pJoystickMovement = new JoystickMovementCommand;
-    Command* m_pReleaseJoyStick_ = new ReleaseJoystickCommand ;
+    Command* m_pJoystickMovement = new JoystickMovementCommand(ePlayerNumber::PLAYER1);
+    Command* m_pReleaseJoyStick_ = new ReleaseJoystickCommand(ePlayerNumber::PLAYER1) ;
 
-    Command* m_pP2JoystickMovement = new Player2JoystickMovementCommand;
-    Command* m_pP2ReleaseJoyStick_ = new P2ReleaseJoystickCommand;
+    Command* m_pP2JoystickMovement = new JoystickMovementCommand(ePlayerNumber::PLAYER2);
+    Command* m_pP2ReleaseJoyStick_ = new ReleaseJoystickCommand(ePlayerNumber::PLAYER2);
 
-    Command* m_pPlayer1ButtonShoot = new Player1ButtonShootCommand;
-    Command* m_pPlayer2ButtonShoot = new Player2ButtonShootCommand;
+    Command* m_pPlayer1ButtonShoot = new ShootButtonCommand(ePlayerNumber::PLAYER1, eBatMoveDirection::NONE);
+    Command* m_pPlayer2ButtonShoot = new ShootButtonCommand(ePlayerNumber::PLAYER2, eBatMoveDirection::NONE);;
     
     Command* m_pPressKeyNum1 = new ToggleSFXCommand;
     Command* m_pPressKeyNum2 = new DebugTextBallStateCommand ;
@@ -38,7 +39,7 @@ private:
     Command* m_pPressSpace = new StartCommand ;
     Command* m_pQuitGame_ = new QuitCommand ;
 
-    Command* m_pPressActionButton = new Player1ButtonShootCommand ;
+    Command* m_pPressActionButton = new ShootButtonCommand(ePlayerNumber::PLAYER1, eBatMoveDirection::NONE) ;
     Command* m_pPressPauseButton = new StartCommand ;
 
     Command* m_aCommandArray[20];

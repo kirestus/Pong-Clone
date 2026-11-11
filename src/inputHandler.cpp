@@ -212,6 +212,7 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
         {
             return m_pReleasePlayer1ButtonDown_;
         }
+
     }
 
     
