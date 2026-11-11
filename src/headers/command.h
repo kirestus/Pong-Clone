@@ -295,7 +295,6 @@ class Player1ButtonShootCommand : public Command_Joystick
 public:
   virtual void execute(const DataStruct& rTuple )
   {
-    rTuple.pBat1->IsUsingAnalogControls(true);
     if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused)
     {
       rTuple.pWorldState->SetCurrentGamestate(eGameState::Running);
@@ -303,11 +302,11 @@ public:
 
     if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1)
     {
+       rTuple.pBat1->SetLastHitFrame(rTuple.pWorldState->GetCurrentSimFrame());
        rTuple.pBall->SetDesiredBallState(eBallState::RIGHT);
        rTuple.pBall->StateMachine(rTuple.fScreenWidth);
        if (rTuple.pWorldState->GetShouldPlaySFX())
        {
-          rTuple.pBat1->SetLastHitFrame(rTuple.pWorldState->GetCurrentSimFrame());
           rTuple.pSpitBallSoundEffect->play();
        }
     }
@@ -328,12 +327,13 @@ public:
 
     if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2)
     {
+       rTuple.pBat2->SetLastHitFrame(rTuple.pWorldState->GetCurrentSimFrame());
        rTuple.pBall->SetDesiredBallState(eBallState::LEFT);
        rTuple.pBall->StateMachine(rTuple.fScreenWidth);
        if (rTuple.pWorldState->GetShouldPlaySFX())
        {
-         rTuple.pSpitBallSoundEffect->play();  
-       }    
+          rTuple.pSpitBallSoundEffect->play();
+       }
     }
   }
 };

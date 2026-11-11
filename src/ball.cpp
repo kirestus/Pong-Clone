@@ -120,12 +120,18 @@ void Ball::UpdateBallPosition(const float fDeltaT,  const bool isPaused)
 
 void Ball::OnBatCollision(const float fScreenWidth)
 {
-    if (GetCurrentBallState() == eBallState::HitBall)
-    {
-        return;
-    }
+
     SetDesiredBallState(eBallState::HitBall);
     StateMachine(fScreenWidth);
+
+    if(GetCurrentBallState() == eBallState::LEFT)
+    {
+        SetLastCollisiontype( eCollisionType::CollisionWithPlayer2);
+    }
+    else
+    {
+         SetLastCollisiontype( eCollisionType::CollisionWithPlayer1);
+    }
 }
 
 //----------------------------------------------------------
@@ -143,6 +149,8 @@ void Ball::OnWallCollision(const bool isColliding, const float fScreenWidth)
             SetDesiredBallState(eBallState::HitBottomWall);
         }
         StateMachine(fScreenWidth);
+        SetLastCollisiontype( eCollisionType::CollisionWithWall);
+
     }
 }
 
@@ -159,6 +167,8 @@ void Ball::OnScoreGoal(const bool isLeft, const float fScreenWidth)
             SetDesiredBallState(eBallState::GoalOnPlayer2);
         }
         StateMachine(fScreenWidth);
+        SetLastCollisiontype( eCollisionType::CollisionWithGoalZone);
+        
 }
 
 //----------------------------------------------------------
@@ -173,7 +183,6 @@ void Ball::UpdateBallTrail(const int64 iSimFrame)
             m_sShapeTrail[i] = m_sShapeTrail[i-1];
             const float fScaleModifier = GetTrailShapeArrayLength() - 0.08f;
             
-            const bool bIsGoingLeft = GetCurrentBallState() == eBallState::LEFT;
             const bool bIsGoingRight = GetCurrentBallState() == eBallState::RIGHT;
 
             const sf::Color TrailColor = bIsGoingRight ? sf::Color(255,100,100,230/i) : sf::Color(100,100,255,240/i*2);
