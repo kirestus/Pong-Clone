@@ -52,17 +52,17 @@ bool Bat::IsBouncing()
 
 //-----------------------------------------------------------------
 
-void Bat::UpdateHitVFX(const float fDeltaT, bool bHitSweetSpot )
+void Bat::UpdateHitVFX(const int iSimFrame, bool bHitSweetSpot )
 {
     //pass tuple to this instead of all this other shit
-    constexpr uint8 iFXFrameTime = 20;
+    constexpr int iFXFrameTime = 20;
 
     //todo change color to more of a red the closer to the edge of the paddle that the ball is hit
-    //i will later tie this into ball controll so hits near the edge have more spread and the middle is the sweet spot
+    //i will later tie this into ball control so hits near the edge have more spread and the middle is the sweet spot
 
     for(int8 i = m_iHitFXArrayLength; i >= 0 ; i--)
     {
-        if ( m_iLastFrameBallWasHit + iFXFrameTime > fDeltaT) // TODO: should pass an int of the sim frame not a float
+        if ( m_iLastFrameBallWasHit + iFXFrameTime > iSimFrame && iSimFrame > -1) 
         {
             if(GetPlayerNumber() == ePlayerNumber::PLAYER2)
             {

@@ -50,12 +50,10 @@ void BatSystem::CalculateBatSpeed(const DataStruct& rTuple,std::shared_ptr<Bat> 
 
         if (eNewMoveDirection == eBatMoveDirection::UP && abs(fUpSpeed) < pBat->GetTopSpeed())
         {
-            std::cout<<"UPSpeed"<<abs(fUpSpeed)<<"\n";
             pBat->ModifyVelocity( fUpSpeed * abs(pBat->GetAnalogSpeedModifier()/100.0f));
         }
         else if (eNewMoveDirection == eBatMoveDirection::DOWN && abs(fDownSpeed) < pBat->GetTopSpeed())
         { 
-            std::cout<<"DownSpeed"<<abs(fDownSpeed)<<"\n";
             pBat->ModifyVelocity( fDownSpeed * abs(pBat->GetAnalogSpeedModifier()/100.0f));
         }
 
@@ -81,12 +79,12 @@ void BatSystem::NudgeBat(const DataStruct& rTuple , std::shared_ptr<Bat> pBat)
     //Nudge the bat if its at the top or bottom so it doesnt glitch out
     if( pBat->IsHittingTop() )
     {
-        sf::Vector2f nudgeDown = sf::Vector2f(pBat->GetPosition().x,pBat->GetPosition().y+0.1);
+        sf::Vector2f nudgeDown = sf::Vector2f(pBat->GetPosition().x,pBat->GetPosition().y+0.1f);
         pBat->SetPosition(nudgeDown);
     }
     else if( pBat->IsHittingBottom( rTuple.pRenderWindow->getSize() ) )
     {
-        sf::Vector2f nudgeUp = sf::Vector2f(pBat->GetPosition().x,pBat->GetPosition().y-0.1);
+        sf::Vector2f nudgeUp = sf::Vector2f(pBat->GetPosition().x,pBat->GetPosition().y-0.1f);
         pBat->SetPosition(nudgeUp);
     }
 }
@@ -130,6 +128,7 @@ void BatSystem::AttachBallToBat(const DataStruct& rTuple, std::shared_ptr<Bat> p
     rTuple.pBall->SetYSpeed(pBat->GetVelocity()*-1.9f);
 
     const sf::Vector2f vBatPosition = pBat->GetShape().getPosition();
-    const float fOffset = pBat->GetPlayerNumber() == ePlayerNumber::PLAYER1  ? 20.0f : -20.0f;
+    constexpr float offset = 20.0f;
+    const float fOffset = pBat->GetPlayerNumber() == ePlayerNumber::PLAYER1  ? offset : offset *-1 ;
     rTuple.pBall->SetBallVector(sf::Vector3f( vBatPosition.x + fOffset, vBatPosition.y, 0.0f));
 }

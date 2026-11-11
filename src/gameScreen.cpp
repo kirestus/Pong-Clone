@@ -84,7 +84,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 {
     rTuple.pGameMusic->pause();
     rTuple.pGameMusic->setLoop(true);
-    rTuple.pBall->SetYSpeed(200);
+    rTuple.pBall->SetYSpeed(200.0f);
 
 
     rTuple.pRenderWindow->setMouseCursorVisible(false);
@@ -94,7 +94,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 
         const int64 iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
         const float fDeltaT = rGameClock.restart().asSeconds();
-        const float fFps = 1.0 / fDeltaT;
+        const float fFps = 1.0f / fDeltaT;
         //std::cout << fFps << " Frames Per Second: \n";
         
         rTuple.pWorldState->DetermineGameState();
@@ -155,7 +155,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         {
             rTuple.pBat1->UpdateHitVFX(iSimFrame,rTuple.pBall->IsLastHitOnSweetSpot());
         }
-        else
+        else if(rTuple.pBat1->GetLastHitFrame()>0)
         {
             rTuple.pBat2->UpdateHitVFX(iSimFrame,rTuple.pBall->IsLastHitOnSweetSpot());  
         }
@@ -195,15 +195,15 @@ void GameScreen::UpdateScoreText(const DataStruct& rTuple)
     rTuple.pScoreText->setString(sf::String(scoreString));
     if ( m_lLastGoalScoredFrame+30 >= rTuple.pWorldState->GetCurrentSimFrame() )
     {
-        rTuple.pScoreText->scale(sf::Vector2f(1.0025,1.0025));
+        rTuple.pScoreText->scale(sf::Vector2f(1.0025f,1.0025f));
         rTuple.pScoreText->setFillColor(sf::Color(255,255,255,255));
     }
     else
     {
-        rTuple.pScoreText->setScale(sf::Vector2f(1.0,1.0));
+        rTuple.pScoreText->setScale(sf::Vector2f(1.0f,1.0f));
        rTuple.pScoreText->setCharacterSize(80.0f); 
        rTuple.pScoreText->setFillColor(sf::Color(255,255,255,150));
-       rTuple.pScoreText->setLetterSpacing(0.4);
+       rTuple.pScoreText->setLetterSpacing(0.4f);
     }
     rTuple.pScoreText->setOrigin(rTuple.pScoreText->getLocalBounds().getSize().x/2,rTuple.pScoreText->getLocalBounds().getSize().y/2);
 }
@@ -223,7 +223,7 @@ void GameScreen::UpdateHudText(const DataStruct& rTuple, const std::string sDesi
 
 bool GameScreen::UpdateUIText(const bool bIsGameOver, const bool bIsPaused, const DataStruct& rTuple )
 {
-    sf::Color fadeInColor(255,255,255,GetTextFadeTimer().getElapsedTime().asSeconds()*100);
+    sf::Color fadeInColor(255,255,255,GetTextFadeTimer().getElapsedTime().asSeconds()*100.0f);
 
     const bool bIsDebugging = rTuple.pDebugText->GetIsDebuggingGameState() || rTuple.pDebugText->GetIsDebuggingBallState();
 
@@ -241,9 +241,9 @@ bool GameScreen::UpdateUIText(const bool bIsGameOver, const bool bIsPaused, cons
     }
     else
     {
-        if (GetTextFadeTimer().getElapsedTime().asSeconds()*100 < 225 ) 
+        if (GetTextFadeTimer().getElapsedTime().asSeconds()*100.0f < 225.0f ) 
         {
-            rTuple.pMessageText->setFillColor(sf::Color(255,255,255,m_TextFadeOutTimer.getElapsedTime().asSeconds()*100));
+            rTuple.pMessageText->setFillColor(sf::Color(255,255,255,m_TextFadeOutTimer.getElapsedTime().asSeconds()*100.0f));
         }
 
         if (bIsGameOver && rTuple.pWorldState->GetLastGoalScoredOnP1())
@@ -290,7 +290,7 @@ void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, c
     const int iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
     static constexpr int iTotalSlamFrames = 15;
     static const sf::Vector2 vForceScalingRatio(10,5);
-    static constexpr float fForceScale = 600;
+    static constexpr int fForceScale = 600;
     static const sf::Vector2f vScaledForces(vForceScalingRatio.x*fForceScale,vForceScalingRatio.y*fForceScale);
 
     if (rTuple.pWorldState->GetCurrentGameState() != eGameState::Running)
@@ -328,15 +328,15 @@ void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, c
 
 void GameScreen::CreateMiddleLine(const DataStruct& rTuple)
 {
-    static const float lineHeight = (rTuple.fScreenHeight/m_iNumberOfLines)/2;
+    static const float lineHeight = (rTuple.fScreenHeight/m_iNumberOfLines)/2.0f;
     static const float lineThickness = 7.5f;
 
-    for (short i = m_iNumberOfLines; i >= 0; i--)
+    for (int8 i = m_iNumberOfLines; i >= 0; i--)
     {
         m_DashedLineRect[i].setSize(sf::Vector2f(lineThickness,lineHeight));
         m_DashedLineRect[i].setOrigin(sf::Vector2f(m_DashedLineRect[i].getSize().x/2,0.0f));
         m_DashedLineRect[i].setFillColor(sf::Color( 255,255,225,100));
-        m_DashedLineRect[i].setPosition(sf::Vector2f(rTuple.fScreenWidth/2+7.5f, i*2 *lineHeight - lineHeight*0.5 ));
+        m_DashedLineRect[i].setPosition(sf::Vector2f(rTuple.fScreenWidth/2.0f+7.5f, i*2.0f *lineHeight - lineHeight*0.5f ));
  
     }
 }
@@ -345,9 +345,9 @@ void GameScreen::CreateMiddleLine(const DataStruct& rTuple)
 
 void GameScreen::DimMiddleLine(const DataStruct& rTuple, const bool bShouldDimLine)
 {
-    static const unsigned short iDimValue = 45;
-    static const unsigned int iFullOpacityValue = 100;
-    for (short i = m_iNumberOfLines; i >= 0; i--)
+    static const uint8 iDimValue = 45;
+    static const uint8 iFullOpacityValue = 100;
+    for (int8 i = m_iNumberOfLines; i >= 0; i--)
     {
         //todo make this gradual so that its not so jarring
         if (bShouldDimLine)
@@ -474,7 +474,7 @@ rTuple.pRenderWindow->clear();
     if (rTuple.pBall->GetCurrentBallState() != eBallState::AtPlayer1 && 
     rTuple.pBall->GetCurrentBallState() != eBallState::AtPlayer2 )
     {
-        for (short i = rTuple.pBall->GetTrailShapeArrayLength(); i >= 0; i --)
+        for (int8 i = rTuple.pBall->GetTrailShapeArrayLength(); i >= 0; i --)
         {
             rTuple.pRenderWindow->draw( rTuple.pBall->GetTrailShapeArray()[i] );
         }

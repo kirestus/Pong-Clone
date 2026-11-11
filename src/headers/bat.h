@@ -23,7 +23,7 @@ public:
 
     Bat(sf::Vector2f, ePlayerNumber);
 
-    void UpdateHitVFX(const float fDeltaT, bool bHitSweetSpot);
+    void UpdateHitVFX(const int iSimFrame, bool bHitSweetSpot);
     sf::Vector2f GetPosition() const { return m_vPosition ;}
     void SetPosition(sf::Vector2f _position) { m_vPosition = _position ; }
 
@@ -81,7 +81,7 @@ private:
     sf::RectangleShape m_hRectShape;
 
     static const uint8 m_iHitFXArrayLength = 8;
-    int64 m_iLastFrameBallWasHit = -500;
+    int m_iLastFrameBallWasHit = -1;
     sf::RectangleShape m_FXShape[m_iHitFXArrayLength+1];
     ePlayerNumber m_ePlayerNumber;
 
