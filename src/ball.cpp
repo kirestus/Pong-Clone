@@ -73,7 +73,7 @@ void Ball::StateMachine(const float fScreenWidth)
             m_v2CurrentBallSpeed.x *= -1;
             if (abs(m_v2CurrentBallSpeed.x) < m_fTopSpeed )
             {
-                float fSpeedUpBoost = IsLastHitOnSweetSpot() ? m_fSpeedUpIncriment : m_fSpeedUpIncriment / 2.0f ;
+                float fSpeedUpBoost = IsLastHitOnSweetSpot() ? m_fSpeedUpIncriment * 1.1 : m_fSpeedUpIncriment * 0.85f ;
                 m_v2CurrentBallSpeed.x = m_v2CurrentBallSpeed.x > 0.0f ? m_v2CurrentBallSpeed.x += fSpeedUpBoost : m_v2CurrentBallSpeed.x -= fSpeedUpBoost;
             }
         }
