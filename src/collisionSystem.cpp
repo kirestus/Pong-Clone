@@ -94,19 +94,6 @@ void CollisionSystem::HandleCollisions(const DataStruct &rTuple, const eCollisio
         const bool bIsleft = rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2;
         rTuple.pBall->OnScoreGoal(bIsleft);
         rTuple.pWorldState->SetSimFrameOfLastScoredGoal(iSimFrame);
-        if ( rTuple.pWorldState->GetisWinConditionMet() )
-        {
-            if (rTuple.pWorldState->GetShouldPlaySFX())
-            {
-                rTuple.pYouWinSoundEffect->play();  
-            }
-
-            rTuple.pWorldState->SetDesiredGamestate(eGameState::GameOver);
-        }
-        else if (rTuple.pWorldState->GetShouldPlaySFX())
-        {
-            rTuple.pScoreGoalSoundEffect->play();
-        }
         
         const uint8 p1Score = rTuple.pWorldState->GetScore()[0];
         const uint8 p2Score = rTuple.pWorldState->GetScore()[1];
@@ -119,7 +106,6 @@ void CollisionSystem::HandleCollisions(const DataStruct &rTuple, const eCollisio
         {
             rTuple.pWorldState->SetScore(p1Score +1,p2Score);
         }
-
         std::unique_ptr<GameStateSystem>pGameStateSystem = std::make_unique<GameStateSystem>();
         pGameStateSystem->ResetGame(rTuple);
 

@@ -128,12 +128,35 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         const eCollisionType eCollidingWith = pCollisionSystem->CheckCollisions(rTuple);
         if ( eCollidingWith != eCollisionType::NoCollision )
         {
-             pCollisionSystem->HandleCollisions(rTuple, eCollidingWith, iSimFrame);
+            pCollisionSystem->HandleCollisions(rTuple, eCollidingWith, iSimFrame);
         }
-
-        SetLastCollisionType(eCollidingWith);
-
+        
         ShakeScreen(rTuple,0.25f, eCollidingWith);
+
+        if (eCollidingWith != GetLastCollisionType())
+        {
+            SetLastCollisionType(eCollidingWith);
+
+            if (eCollidingWith == eCollisionType::CollisionWithGoalZone)
+            {
+
+                if ( rTuple.pWorldState->GetisWinConditionMet() )
+                {
+                    if (rTuple.pWorldState->GetShouldPlaySFX())
+                    {
+                        rTuple.pYouWinSoundEffect->play();  
+                    }
+                }
+                else if (rTuple.pWorldState->GetShouldPlaySFX() )
+                {
+                    rTuple.pScoreGoalSoundEffect->play();
+                }
+            }
+        }
+        else
+        {
+            SetLastCollisionType(eCollisionType::NoCollision);
+        }
 
         std::shared_ptr<Bat> pBat =  pBatSystem->WhichBatShouldBallAttatchTo(rTuple);
         if(pBat != nullptr)
@@ -337,7 +360,6 @@ void GameScreen::CreateMiddleLine(const DataStruct& rTuple)
         m_DashedLineRect[i].setOrigin(sf::Vector2f(m_DashedLineRect[i].getSize().x/2,0.0f));
         m_DashedLineRect[i].setFillColor(sf::Color( 255,255,225,100));
         m_DashedLineRect[i].setPosition(sf::Vector2f(rTuple.fScreenWidth/2.0f+7.5f, i*2.0f *lineHeight - lineHeight*0.5f ));
- 
     }
 }
 
@@ -365,7 +387,6 @@ void GameScreen::DimMiddleLine(const DataStruct& rTuple, const bool bShouldDimLi
             {
                 m_DashedLineRect[i].setFillColor(sf::Color( 255,255,225,iFullOpacityValue));
             }
-
         }
     }
 }
@@ -400,7 +421,6 @@ void GameScreen::SetBoundryEdgeShapes(const DataStruct& rTuple)
             return;
         }
     }
-    
 }
 
 //------------------------------------------------------------
@@ -408,7 +428,7 @@ void GameScreen::SetBoundryEdgeShapes(const DataStruct& rTuple)
 void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple)
 {
 
-    constexpr unsigned short iFXFrameTime = 20;
+    constexpr uint8 iFXFrameTime = 20;
     const int64 iSimFrame = rTuple.pWorldState->GetCurrentSimFrame();
 
     const bool bLastHitTop = rTuple.pWorldState->GetDidBallLastHitScreenTop();
@@ -416,7 +436,7 @@ void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple)
     sf::RectangleShape* pFXShape = bLastHitTop ? m_sTopEdge : m_sBottomEdge;
 
     const float fSpeed = rTuple.pBall->GetYSpeed();
-    for(short i = GameScreen::m_iBounceVFXArrayLength; i >= 0 ; i--)
+    for(int8 i = GameScreen::m_iBounceVFXArrayLength; i >= 0 ; i--)
     {
         if (rTuple.pWorldState->GetSimFrameTopLastHit() > 0 && rTuple.pWorldState->GetSimFrameTopLastHit() + iFXFrameTime > rTuple.pWorldState->GetCurrentSimFrame())
         {
