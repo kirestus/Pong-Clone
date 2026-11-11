@@ -23,18 +23,19 @@ protected:
 
 class Command_Joystick : public Command
 {
-  virtual void SetIsUsingPad(bool bIsUsingPad) override { Command::SetIsUsingPad(true); Command::SetIsUsingStick(true); }
+  virtual void SetIsUsingStick(bool bIsUsingStick) override { Command::SetIsUsingStick(true); }
 };
 
 //----------------------------------------------------------
 
-class Command_DPad : public Command
+class Command_ButtonPress : public Command
 {
-  virtual void SetIsUsingPad(bool bIsUsingPad) override { Command::SetIsUsingPad(true);  Command::SetIsUsingStick(true); Command:SetAnalogStrength(100, true) ; }
+  virtual void SetIsUsingPad(bool bIsUsingPad) override { Command::SetIsUsingPad(true); }
 };
+
 //----------------------------------------------------------
 
-class Player1DownCommand : public Command_DPad
+class Player1DownCommand : public Command_ButtonPress
 {
 public:
   virtual void execute(const DataStruct& rTuple)
@@ -47,7 +48,7 @@ public:
 
 //----------------------------------------------------------
 
-class Player1UpCommand : public Command_DPad
+class Player1UpCommand : public Command_ButtonPress
 {
 public:
   virtual void execute(const DataStruct& rTuple)
@@ -59,7 +60,7 @@ public:
 
 //----------------------------------------------------------
 
-class Player2DownCommand : public Command_DPad
+class Player2DownCommand : public Command_ButtonPress
 {
 public:
   virtual void execute(const DataStruct& rTuple)
@@ -71,7 +72,7 @@ public:
 
 //----------------------------------------------------------
 
-class Player2UpCommand : public Command_DPad
+class Player2UpCommand : public Command_ButtonPress
 {
 public:
   virtual void execute(const DataStruct& rTuple)

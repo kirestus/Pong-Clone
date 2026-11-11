@@ -43,7 +43,7 @@ public:
     bool GetisWinConditionMet() const {return (m_aScore[0] == m_iScoreLimit || m_aScore[1] == m_iScoreLimit); }
     
     const uint8* GetScore() const { return m_aScore ;}
-    void SetScore(uint8 p1Score, uint8 p2Score){m_aScore[0]=p1Score, m_aScore[1] = p2Score ;}
+    void SetScore(int p1Score, int p2Score){m_aScore[0]=p1Score, m_aScore[1] = p2Score ;}
 
     void SetSimFrameTopLastHit(uint64 iFrame){m_iSimFrameTopLastHit = iFrame;}
     uint64 GetSimFrameTopLastHit()const {return m_iSimFrameTopLastHit;}
