@@ -103,7 +103,8 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         std::unique_ptr<GameStateSystem>pGameStateSystem = std::make_unique<GameStateSystem>();
 
         const bool bIsRunning = rTuple.pWorldState->GetCurrentGameState() == eGameState::Running;
-        const bool bIsGameOver = rTuple.pWorldState->GetCurrentGameState() == eGameState::GameOver;
+        const bool bIsGameOver = rTuple.pWorldState->GetCurrentGameState() == eGameState::GameOver 
+        || rTuple.pWorldState->GetCurrentGameState() == eGameState::Reset;
 
         
         if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Boot 
@@ -114,8 +115,12 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 
         if(bIsGameOver)
         {
-            rTuple.pWorldState->SetScore(0,0); 
+            if(rTuple.pWorldState->GetDesiredGameState() == eGameState::Reset)
+            {
+                rTuple.pWorldState->SetScore(0,0); 
+            }
         }
+
         
         std::unique_ptr<BatSystem> pBatSystem = std::make_unique<BatSystem>();
         std::unique_ptr<PadUtils> pPadUtils = std::make_unique<PadUtils>();
@@ -249,8 +254,6 @@ void GameScreen::UpdateHudText(const DataStruct& rTuple, const std::string sDesi
 }
 
 //-----------------------------------------------------------
-
-//------------------------------------------------------------
 
 bool GameScreen::UpdateUIText(const bool bIsGameOver, const bool bIsPaused, const DataStruct& rTuple )
 {

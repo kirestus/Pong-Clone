@@ -39,7 +39,7 @@ InputHandler::~InputHandler()
     }
 }
 
-Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
+Command_Input* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
 {
     if (pEvent->type == sf::Event::KeyPressed )
     {
@@ -70,22 +70,18 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
     {
         if ( pEvent->key.code ==  sf::Keyboard::W )
         {
-            m_pPlayer1ButtonUp_->SetAnalogStrength(100,true);
             return m_pPlayer1ButtonUp_;
         }
         else if ( pEvent->key.code ==  sf::Keyboard::Up ) 
         {
-            m_pPlayer2ButtonUp_->SetAnalogStrength(100,true);
             return m_pPlayer2ButtonUp_;
         }
         else if ( pEvent->key.code ==  sf::Keyboard::S )
         {
-            m_pPlayer1ButtonDown_->SetAnalogStrength(100,true); 
             return m_pPlayer1ButtonDown_;
         }
         else if ( pEvent->key.code ==  sf::Keyboard::Down )
         {
-            m_pPlayer1ButtonDown_->SetAnalogStrength(100,true); 
             return m_pPlayer2ButtonDown_;
         }
         else if ( pEvent->key.code == sf::Keyboard::Space)
@@ -123,7 +119,6 @@ Command* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditionMet )
 
     if (pEvent->type == pEvent->JoystickMoved && pEvent->joystickMove.axis == sf::Joystick::Axis::Y )
     {
-
         const int iSpeed = m_pJoystickMovement->GetIsInverted() ? pEvent->joystickMove.position *= -1 : pEvent->joystickMove.position ;
         m_pJoystickMovement->SetAnalogStrength(iSpeed, true);
         if (iSpeed < -g_iStickDeadZone || iSpeed > g_iStickDeadZone)

@@ -8,24 +8,30 @@ class Command
 public:
     virtual ~Command() {std::cout<<"Destroying Command"<<this;}
     virtual void execute(const DataStruct& rTuple) = 0;
+};
+
+//----------------------------------------------------------
+
+class Command_Input : public Command
+{
+  public:
     virtual void SetAnalogStrength(int val, bool bInvert){m_iAnalogStrength = val,m_bIsInverted = bInvert;}
     virtual int GetAnalogStrength() const { return m_iAnalogStrength; }
     virtual void SetIsUsingPad(bool bIsUsingPad){m_bIsUsingPad = bIsUsingPad ;}
     virtual void SetIsUsingStick(bool bIsUsingStick ){m_bIsUsingStick = bIsUsingStick ;}
     virtual bool GetIsInverted()const {return m_bIsInverted ; }
 
-private:
-  int m_iAnalogStrength = 100;
-  bool m_bIsUsingPad = false;
-  bool m_bIsUsingStick = false;
-  bool m_bIsInverted = true;
+    private:
+    int m_iAnalogStrength = 100;
+    bool m_bIsUsingPad = false;
+    bool m_bIsUsingStick = false;
+    bool m_bIsInverted = true;
 };
 
 //----------------------------------------------------------
-
-class Command_Joystick : public Command
+class Command_Joystick : public Command_Input
 {
-  virtual void SetIsUsingStick(bool bIsUsingStick) override { Command::SetIsUsingStick(true); }
+  virtual void SetIsUsingStick(bool bIsUsingStick) override { Command_Input::SetIsUsingStick(true); }
   
   public: 
     Command_Joystick(ePlayerNumber eBatNumber){ m_ePlayer = eBatNumber; }
@@ -84,13 +90,12 @@ class ReleaseJoystickCommand : public Command_Joystick
 
 //----------------------------------------------------------
 
-class Command_ButtonPress : public Command
+class Command_ButtonPress : public Command_Input
 {
   public:
-    //Command_ButtonPress(){};
     Command_ButtonPress(ePlayerNumber eBatNumber, eBatMoveDirection eDirection){ m_ePlayer = eBatNumber; m_eDirection = eDirection ;}
 
-    virtual void SetIsUsingPad(bool bIsUsingPad) override { Command::SetIsUsingPad(true); }
+    virtual void SetIsUsingPad(bool bIsUsingPad) override { Command_Input::SetIsUsingPad(true); }
     virtual ePlayerNumber GetPlayerNumberEnum() const { return m_ePlayer; }
 
     protected:
@@ -113,14 +118,17 @@ public:
     if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused)
     {
       rTuple.pWorldState->SetDesiredGamestate(eGameState::Running);
+      return;
     }
 
     if (rTuple.pWorldState->GetCurrentGameState() == eGameState::GameOver)
     {
       rTuple.pWorldState->SetDesiredGamestate(eGameState::Reset);
+      return;
     }
 
-    if (rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 || rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2)
+    if ((pBattPointer->GetPlayerNumber() == ePlayerNumber::PLAYER1 && rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 )
+    || (pBattPointer->GetPlayerNumber() == ePlayerNumber::PLAYER2 && rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2))
     {
       pBattPointer->SetLastHitFrame(rTuple.pWorldState->GetCurrentSimFrame());
       
@@ -148,17 +156,18 @@ public:
 
 //----------------------------------------------------------
 
-class InputDownCommand : public Command_ButtonPress
+class PressedInputCommand : public Command_ButtonPress
 {
   
 public:
-  InputDownCommand(ePlayerNumber eBatNumber, eBatMoveDirection eDirection) : Command_ButtonPress(eBatNumber,eDirection){}
+  PressedInputCommand(ePlayerNumber eBatNumber, eBatMoveDirection eDirection) : Command_ButtonPress(eBatNumber,eDirection){}
 
   virtual void execute(const DataStruct& rTuple)
   {
+    SetAnalogStrength(100,true);
     std::shared_ptr<Bat> pBattPointer = GetPlayerNumberEnum() == ePlayerNumber::PLAYER1 ? rTuple.pBat1 : rTuple.pBat2;
 
-    pBattPointer->SetAnalogSpeedModifier(Command::GetAnalogStrength());
+    pBattPointer->SetAnalogSpeedModifier(Command_Input::GetAnalogStrength());
     pBattPointer->SetDesiredMoveDirection(m_eDirection);
   }
 
@@ -182,7 +191,7 @@ public:
 
 //----------------------------------------------------------
 
-class StartCommand : public Command
+class StartCommand : public Command_Input
 {
 public:
   virtual void execute(const DataStruct& rTuple)
@@ -204,7 +213,7 @@ public:
 };
 //----------------------------------------------------------
 
-class DebugTextGameStateCommand : public Command
+class DebugTextGameStateCommand : public Command_Input
 {
 public:
   virtual void execute(const DataStruct& rTuple)
@@ -217,7 +226,7 @@ public:
 
 //----------------------------------------------------------
 
-class DebugTextBallStateCommand : public Command
+class DebugTextBallStateCommand : public Command_Input
 {
 public:
   virtual void execute(const DataStruct& rTuple)
@@ -229,7 +238,7 @@ public:
 
 //----------------------------------------------------------
 
-class PauseMusicCommand : public Command
+class PauseMusicCommand : public Command_Input
 {
 public:
   virtual void execute(const DataStruct& rTuple)
@@ -247,7 +256,7 @@ public:
 
 //----------------------------------------------------------
 
-class UnlockFPS : public Command
+class UnlockFPS : public Command_Input
 {
 public:
   virtual void execute(const DataStruct& rTuple)
@@ -258,7 +267,7 @@ public:
 
 //----------------------------------------------------------
 
-class ToggleSFXCommand : public Command
+class ToggleSFXCommand : public Command_Input
 {
 public:
   virtual void execute(const DataStruct& rTuple)
@@ -270,7 +279,7 @@ public:
 
 //----------------------------------------------------------
 
-class QuitCommand : public Command
+class QuitCommand : public Command_Input
 {
 public:
   virtual void execute(const DataStruct& rTuple)
@@ -282,7 +291,7 @@ public:
 //----------------------------------------------------------
 
 
-class ResetGameCommand : public Command
+class ResetGameCommand : public Command_Input
 {
 public:
   virtual void execute(const DataStruct& rTuple)
