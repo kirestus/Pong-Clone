@@ -115,36 +115,23 @@ Command_Input* InputHandler::HandleInput( sf::Event* pEvent, bool bIsWinConditio
     }  
 
 
-    //Handle joystick inputs TODO: lots of duplicated code here, i need to rewrite this later
-
-    if (pEvent->type == pEvent->JoystickMoved && pEvent->joystickMove.axis == sf::Joystick::Axis::Y )
+    if (pEvent->type == pEvent->JoystickMoved 
+    && pEvent->joystickMove.axis == sf::Joystick::Axis::Y || pEvent->joystickMove.axis == sf::Joystick::Axis::V )
     {
-        const int iSpeed = m_pJoystickMovement->GetIsInverted() ? pEvent->joystickMove.position *= -1 : pEvent->joystickMove.position ;
-        m_pJoystickMovement->SetAnalogStrength(iSpeed, true);
+        //i need to ignore the triggers
+        Command_Input* pInputEvent = (pEvent->joystickMove.axis == sf::Joystick::Axis::Y) ? m_pJoystickMovement  : m_pP2JoystickMovement ;
+        Command_Input* pReleaseEvent = (pEvent->joystickMove.axis == sf::Joystick::Axis::Y) ?  m_pReleaseJoyStick_ :  m_pP2ReleaseJoyStick_;
+
+        const int iSpeed = pInputEvent->GetIsInverted() ? pEvent->joystickMove.position *= -1 : pEvent->joystickMove.position ;
+        pInputEvent->SetAnalogStrength(iSpeed, true);
         if (iSpeed < -g_iStickDeadZone || iSpeed > g_iStickDeadZone)
         {
-            return m_pJoystickMovement;
+            return pInputEvent;
         }
 
-        m_pJoystickMovement->SetAnalogStrength(100, true);
-        return m_pReleaseJoyStick_;
-    }
-        
-    if (pEvent->type == pEvent->JoystickMoved && pEvent->joystickMove.axis == sf::Joystick::Axis::V )
-    {
+        pReleaseEvent->SetAnalogStrength(100, true);
 
-        const int iSpeed = m_pP2JoystickMovement->GetIsInverted() ? pEvent->joystickMove.position *= -1 : pEvent->joystickMove.position ;
-        m_pP2JoystickMovement->SetAnalogStrength(pEvent->joystickMove.position, true);
-        if (pEvent->joystickMove.position < -g_iStickDeadZone)
-        {
-            return m_pP2JoystickMovement;
-        }
-        else if (pEvent->joystickMove.position > g_iStickDeadZone)
-        {
-            return m_pP2JoystickMovement;
-        }
-
-        return m_pP2ReleaseJoyStick_;
+        return pReleaseEvent;
     }
 
     if (pEvent->type == pEvent->JoystickButtonPressed)

@@ -10,10 +10,10 @@ public:
     Command_Input* HandleInput( sf::Event* pEvent, bool );
 
 private:
-    Command_Input* m_pPlayer1ButtonUp_ = new PressedInputCommand(ePlayerNumber::PLAYER1,eBatMoveDirection::UP); 
-    Command_Input* m_pPlayer1ButtonDown_ = new PressedInputCommand(ePlayerNumber::PLAYER1,eBatMoveDirection::DOWN); 
-    Command_Input* m_pPlayer2ButtonUp_ = new PressedInputCommand(ePlayerNumber::PLAYER2,eBatMoveDirection::UP);
-    Command_Input* m_pPlayer2ButtonDown_ = new PressedInputCommand(ePlayerNumber::PLAYER2,eBatMoveDirection::DOWN);
+    Command_Input* m_pPlayer1ButtonUp_ = new InputDownCommand(ePlayerNumber::PLAYER1,eBatMoveDirection::UP); 
+    Command_Input* m_pPlayer1ButtonDown_ = new InputDownCommand(ePlayerNumber::PLAYER1,eBatMoveDirection::DOWN); 
+    Command_Input* m_pPlayer2ButtonUp_ = new InputDownCommand(ePlayerNumber::PLAYER2,eBatMoveDirection::UP);
+    Command_Input* m_pPlayer2ButtonDown_ = new InputDownCommand(ePlayerNumber::PLAYER2,eBatMoveDirection::DOWN);
 
     Command_Input* m_pReleasePlayer1ButtonUp_ = new ReleaseInputCommand(ePlayerNumber::PLAYER1, eBatMoveDirection::UP);
     Command_Input* m_pReleasePlayer2ButtonUp_ = new ReleaseInputCommand(ePlayerNumber::PLAYER2, eBatMoveDirection::UP);; 

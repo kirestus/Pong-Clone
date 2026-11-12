@@ -156,11 +156,11 @@ public:
 
 //----------------------------------------------------------
 
-class PressedInputCommand : public Command_ButtonPress
+class InputDownCommand : public Command_ButtonPress
 {
   
 public:
-  PressedInputCommand(ePlayerNumber eBatNumber, eBatMoveDirection eDirection) : Command_ButtonPress(eBatNumber,eDirection){}
+  InputDownCommand(ePlayerNumber eBatNumber, eBatMoveDirection eDirection) : Command_ButtonPress(eBatNumber,eDirection){}
 
   virtual void execute(const DataStruct& rTuple)
   {
