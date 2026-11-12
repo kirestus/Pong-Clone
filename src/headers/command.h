@@ -115,22 +115,22 @@ public:
   {
     std::shared_ptr<Bat> pBattPointer = GetPlayerNumberEnum() == ePlayerNumber::PLAYER1 ? rTuple.pBat1 : rTuple.pBat2;
 
-    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused)
+    if (rTuple.pCurrentWorldState->GetCurrentGameState() == eGameState::Paused)
     {
-      rTuple.pWorldState->SetDesiredGamestate(eGameState::Running);
+      rTuple.pDesiredWorldState->SetDesiredGamestate(eGameState::Running);
       return;
     }
 
-    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::GameOver)
+    if (rTuple.pCurrentWorldState->GetCurrentGameState() == eGameState::GameOver)
     {
-      rTuple.pWorldState->SetDesiredGamestate(eGameState::Reset);
+      rTuple.pDesiredWorldState->SetDesiredGamestate(eGameState::Reset);
       return;
     }
 
     if ((pBattPointer->GetPlayerNumber() == ePlayerNumber::PLAYER1 && rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer1 )
     || (pBattPointer->GetPlayerNumber() == ePlayerNumber::PLAYER2 && rTuple.pBall->GetCurrentBallState() == eBallState::AtPlayer2))
     {
-      pBattPointer->SetLastHitFrame(rTuple.pWorldState->GetCurrentSimFrame());
+      pBattPointer->SetLastHitFrame(rTuple.pCogGameState->GetCurrentSimFrame());
       
       const bool bIsPlayerOneHoldingBall = m_ePlayer == ePlayerNumber::PLAYER1;
 
@@ -146,7 +146,7 @@ public:
       rTuple.pBall->StateMachine();
 
       //not crazy about playing the sound effect based on the input::
-      if (rTuple.pWorldState->GetShouldPlaySFX())
+      if (rTuple.pCogGameState->GetShouldPlaySFX())
       {
         rTuple.pSpitBallSoundEffect->play();
       }
@@ -196,17 +196,17 @@ class StartCommand : public Command_Input
 public:
   virtual void execute(const DataStruct& rTuple)
   {
-    if ( rTuple.pWorldState->GetCurrentGameState() == eGameState::Paused )
+    if ( rTuple.pCurrentWorldState->GetCurrentGameState() == eGameState::Paused )
     {
-        rTuple.pWorldState->SetDesiredGamestate(eGameState::Running);
+        rTuple.pDesiredWorldState->SetDesiredGamestate(eGameState::Running);
     }
-    else if (rTuple.pWorldState->GetCurrentGameState() == eGameState::GameOver)
+    else if (rTuple.pCurrentWorldState->GetCurrentGameState() == eGameState::GameOver)
     {
-        rTuple.pWorldState->SetDesiredGamestate(eGameState::Reset);
+        rTuple.pDesiredWorldState->SetDesiredGamestate(eGameState::Reset);
     }
     else
     {
-        rTuple.pWorldState->SetDesiredGamestate(eGameState::Paused);
+        rTuple.pDesiredWorldState->SetDesiredGamestate(eGameState::Paused);
     }
   }
 
@@ -272,8 +272,8 @@ class ToggleSFXCommand : public Command_Input
 public:
   virtual void execute(const DataStruct& rTuple)
   {
-    const bool toggleSFX = !rTuple.pWorldState->GetShouldPlaySFX();
-    rTuple.pWorldState->SetShouldPlaySFX(toggleSFX);
+    const bool toggleSFX = !rTuple.pCogGameState->GetShouldPlaySFX();
+    rTuple.pCogGameState->SetShouldPlaySFX(toggleSFX);
   }
 };
 
@@ -296,7 +296,7 @@ class ResetGameCommand : public Command_Input
 public:
   virtual void execute(const DataStruct& rTuple)
   {
-    rTuple.pWorldState->SetDesiredGamestate(eGameState::Reset);
+    rTuple.pDesiredWorldState->SetDesiredGamestate(eGameState::Reset);
   }
 };
 

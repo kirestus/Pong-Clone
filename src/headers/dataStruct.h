@@ -20,7 +20,11 @@ struct DataStruct{
     std::shared_ptr<Ball> pBall = std::make_shared<Ball>(pRenderWindow);
 
     //---Text----
-    std::unique_ptr<GameState> pWorldState = std::make_unique<GameState>();
+    //std::unique_ptr<GameState> pWorldState = std::make_unique<GameState>();
+    std::unique_ptr<cogGameState> pCogGameState = std::make_unique<cogGameState>();
+    std::unique_ptr<DesiredGameState> pDesiredWorldState = std::make_unique<DesiredGameState>();
+    std::unique_ptr<CurrentGameState> pCurrentWorldState = std::make_unique<CurrentGameState>();
+
     std::unique_ptr<DebugText> pDebugText = std::make_unique<DebugText>();
     std::unique_ptr<sf::Text> pMessageText = std::make_unique<sf::Text>();
     std::unique_ptr<sf::Text> pScoreText = std::make_unique<sf::Text>();

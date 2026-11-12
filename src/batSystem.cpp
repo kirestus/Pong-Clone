@@ -44,7 +44,7 @@ void BatSystem::CalculateBatSpeed(const DataStruct& rTuple,std::shared_ptr<Bat> 
     const float fDownSpeed = (pBat->GetAccel()+fDistance) * fDeltaT;
     const float fUpSpeed = (-pBat->GetAccel()+fDistance) * fDeltaT;
 
-    if (rTuple.pWorldState->GetCurrentGameState() == eGameState::Running)
+    if (rTuple.pCurrentWorldState->GetCurrentGameState() == eGameState::Running)
     {
         pBat->SetPosition(sf::Vector2f(pBat->GetPosition().x, pBat->GetPosition().y + fDistance ));
 

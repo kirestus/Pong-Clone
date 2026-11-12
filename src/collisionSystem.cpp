@@ -93,18 +93,18 @@ void CollisionSystem::HandleCollisions(const DataStruct &rTuple, const eCollisio
     {
         const bool bIsleft = rTuple.pBall->GetTranslationPosition().x < rTuple.fScreenWidth/2;
         rTuple.pBall->OnScoreGoal(bIsleft);
-        rTuple.pWorldState->SetSimFrameOfLastScoredGoal(iSimFrame);
+        rTuple.pCogGameState->SetSimFrameOfLastScoredGoal(iSimFrame);
         
-        const uint8 p1Score = rTuple.pWorldState->GetScore()[0];
-        const uint8 p2Score = rTuple.pWorldState->GetScore()[1];
+        const uint8 p1Score = rTuple.pCogGameState->GetScore()[0];
+        const uint8 p2Score = rTuple.pCogGameState->GetScore()[1];
 
         if(bIsleft)
         {
-            rTuple.pWorldState->SetScore(p1Score,p2Score +1);
+            rTuple.pCogGameState->SetScore(p1Score,p2Score +1);
         }
         else
         {
-            rTuple.pWorldState->SetScore(p1Score +1,p2Score);
+            rTuple.pCogGameState->SetScore(p1Score +1,p2Score);
         }
         std::unique_ptr<GameStateSystem>pGameStateSystem = std::make_unique<GameStateSystem>();
         pGameStateSystem->ResetGame(rTuple);
@@ -140,7 +140,7 @@ void CollisionSystem::HandleCollisions(const DataStruct &rTuple, const eCollisio
         
         sf::Sound* pPlayThisSound = eBallGoingDir != eBallState::LEFT ? rTuple.pPlayer1SoundEffect :rTuple.pPlayer2SoundEffect;
         pPlayThisSound->setPosition(ballPosition);
-        if (rTuple.pWorldState->GetShouldPlaySFX())
+        if (rTuple.pCogGameState->GetShouldPlaySFX())
         {
             pPlayThisSound->play();
         }
@@ -151,9 +151,9 @@ void CollisionSystem::HandleCollisions(const DataStruct &rTuple, const eCollisio
         rTuple.pBall->OnWallCollision(true, rTuple.fScreenHeight);
 
         bool bHitTop =  rTuple.pBall->GetDesiredBallState() == eBallState::HitTopWall;
-        rTuple.pWorldState->SetBallLastHitTop(bHitTop);
+        rTuple.pCogGameState->SetBallLastHitTop(bHitTop);
 
-        if (rTuple.pWorldState->GetShouldPlaySFX())
+        if (rTuple.pCogGameState->GetShouldPlaySFX())
         {
             const float fPitchShift = 0.8 + (abs(rTuple.pBall->GetYSpeed()/30000));
             rTuple.pHitWallSoundEffect->setVolume(abs(rTuple.pBall->GetYSpeed()/100));

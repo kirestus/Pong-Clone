@@ -2,5 +2,6 @@
 class GameStateSystem
 {
 public:
-    void ResetGame(const DataStruct &rTuple);
+    static void DetermineGameState(const DataStruct &rTuple );
+    static void ResetGame(const DataStruct &rTuple);
 };
