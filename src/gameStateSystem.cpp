@@ -4,13 +4,11 @@
 void GameStateSystem::ResetGame(const DataStruct &rTuple )
 {
 
-    constexpr float fXOffset = 50.0f;
-
-    rTuple.pBat1->SetPosition(sf::Vector2f(fXOffset , rTuple.fScreenHeight/2));
+    rTuple.pBat1->SetPosition(sf::Vector2f(rTuple.g_fBAT_OFFSET , rTuple.fScreenHeight/2));
     rTuple.pBat1->SetDesiredMoveDirection(eBatMoveDirection::NONE);
     rTuple.pBat1->UpdateShapeToDesiredTransform();
 
-    rTuple.pBat2->SetPosition(sf::Vector2f(rTuple.fScreenWidth - fXOffset, rTuple.fScreenHeight / 2 ));
+    rTuple.pBat2->SetPosition(sf::Vector2f(rTuple.fScreenWidth - rTuple.g_fBAT_OFFSET , rTuple.fScreenHeight / 2 ));
     rTuple.pBat2->SetDesiredMoveDirection(eBatMoveDirection::NONE);
     rTuple.pBat2->UpdateShapeToDesiredTransform();
 

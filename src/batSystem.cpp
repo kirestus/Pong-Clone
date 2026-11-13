@@ -21,7 +21,7 @@ eBatMoveDirection BatSystem::CaclulateCurrentMoveDirection(const DataStruct& rTu
             break;
         case eBatMoveDirection::DOWN :
         {
-            eNewMoveDirection = pBat->IsHittingBottom(rTuple.pRenderWindow->getSize() ) ? eBatMoveDirection::UP : eNewMoveDirection = eDesiredMoveDirection;
+            eNewMoveDirection = pBat->IsHittingBottom(*rTuple.pView ) ? eBatMoveDirection::UP : eNewMoveDirection = eDesiredMoveDirection;
             break;
         }
         case eBatMoveDirection::UP :
@@ -60,7 +60,7 @@ void BatSystem::CalculateBatSpeed(const DataStruct& rTuple,std::shared_ptr<Bat> 
         pBat->SetVelocity(pBat->GetVelocity() * pBat->GetDecayRate());
         
 
-        if( ( pBat->IsHittingBottom(rTuple.pRenderWindow->getSize()) || pBat->IsHittingTop() ))
+        if( ( pBat->IsHittingBottom(*rTuple.pView) || pBat->IsHittingTop() ))
         {
             NudgeBat(rTuple, pBat);
             pBat->SetVelocity(0.0f);
@@ -82,7 +82,7 @@ void BatSystem::NudgeBat(const DataStruct& rTuple , std::shared_ptr<Bat> pBat)
         sf::Vector2f nudgeDown = sf::Vector2f(pBat->GetPosition().x,pBat->GetPosition().y+0.1f);
         pBat->SetPosition(nudgeDown);
     }
-    else if( pBat->IsHittingBottom( rTuple.pRenderWindow->getSize() ) )
+    else if( pBat->IsHittingBottom( *rTuple.pView ) )
     {
         sf::Vector2f nudgeUp = sf::Vector2f(pBat->GetPosition().x,pBat->GetPosition().y-0.1f);
         pBat->SetPosition(nudgeUp);

@@ -19,10 +19,10 @@ bool CollisionSystem::isBallCollidingWithTarget(const sf::FloatRect box1, const 
 
 //----------------------------------------------------------
 
-bool CollisionSystem::isBallHittingWall(const sf::FloatRect box1, const std::shared_ptr<sf::RenderWindow> pRenderWindow)
+bool CollisionSystem::isBallHittingWall(const sf::FloatRect box1, const sf::View* pActiveView)
 {
     const float rectTop = 0.0f;
-    const float rectBottom = pRenderWindow->getSize().y - 15.0f;
+    const float rectBottom = pActiveView->getSize().y - 15.0f;
     return box1.top >= rectBottom || box1.top <= rectTop;
 }
 
@@ -58,7 +58,7 @@ eCollisionType CollisionSystem::CheckCollisions(const DataStruct &rTuple)
     //TODO: see if i cant write this to be faster, seems slow to do all the bool checks and then check the if statements but it's easy to read
     const bool bIsCollidingWithP1 = isBallCollidingWithTarget(pBallHitbox, rTuple.pBat1->GetShape().getGlobalBounds());
     const bool bIsCollidingWithP2 = isBallCollidingWithTarget(pBallHitbox, rTuple.pBat2->GetShape().getGlobalBounds());
-    const bool bIsCollidingWithWalls = isBallHittingWall(pBallHitbox, rTuple.pRenderWindow );
+    const bool bIsCollidingWithWalls = isBallHittingWall(pBallHitbox, rTuple.pView );
     const bool bDidPLayerScore = isBallHittingGoal(pBallHitbox,rTuple );
 
     //order here could matter in the rare edge case of a player hitting a wall and hitting the goal

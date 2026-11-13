@@ -4,7 +4,7 @@ Bat::Bat(const sf::Vector2f vPosition , const ePlayerNumber ePlayer)
 {
     m_hRectShape.setPosition(vPosition);
     m_vPosition = vPosition;
-    m_hRectShape.setSize(sf::Vector2f(15.0f,150.0f));
+    m_hRectShape.setSize(sf::Vector2f(20.0f,200.0f));
     m_hRectShape.setFillColor(sf::Color::White);
     m_hRectShape.setOrigin( sf::Vector2f(m_hRectShape.getSize().x/2, m_hRectShape.getSize().y/2));
     m_ePlayerNumber = ePlayer;
@@ -12,7 +12,7 @@ Bat::Bat(const sf::Vector2f vPosition , const ePlayerNumber ePlayer)
 
 //-----------------------------------------------------------------
 
-eBatMoveDirection Bat::DetermCurrentMoveDirection(const std::shared_ptr<sf::RenderWindow> pRenderWindow)
+eBatMoveDirection Bat::DetermCurrentMoveDirection(const sf::View* pView)
 {
     const eBatMoveDirection eCurrentMoveDirection = GetCurrentMoveDirection();
     const eBatMoveDirection eDesiredMoveDirection = GetDesiredMoveDirection();
@@ -25,7 +25,7 @@ eBatMoveDirection Bat::DetermCurrentMoveDirection(const std::shared_ptr<sf::Rend
             break;
         case eBatMoveDirection::DOWN :
         {
-            eNewMoveDirection = IsHittingBottom(pRenderWindow->getSize() ) ? eBatMoveDirection::UP : eNewMoveDirection = eDesiredMoveDirection;
+            eNewMoveDirection = IsHittingBottom(*pView) ? eBatMoveDirection::UP : eNewMoveDirection = eDesiredMoveDirection;
             break;
         }
         case eBatMoveDirection::UP :

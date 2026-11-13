@@ -49,13 +49,13 @@ public:
     void UpdateDesiredToShapeTransform(){m_vPosition = m_hRectShape.getPosition() ;}
 
     bool IsWithinGameBounds(sf::Vector2u vRenderScreenArea)const{ return (m_vPosition.y < vRenderScreenArea.y + 20 && m_vPosition.y > 0.0f - 20) ;}
-    bool IsHittingBottom(sf::Vector2u vRenderScreenArea) const {return m_vPosition.y + (5.0f + m_hRectShape.getSize().y/2 ) >= vRenderScreenArea.y ;}
+    bool IsHittingBottom(const sf::View pView) const {return m_vPosition.y + (5.0f + m_hRectShape.getSize().y/2 ) >= pView.getSize().y ;}
     bool IsHittingTop() const {return m_vPosition.y - (5.0f+ m_hRectShape.getSize().y/2 ) <= 0.0f ;}
 
     bool IsBouncing();
 
 
-    eBatMoveDirection DetermCurrentMoveDirection(std::shared_ptr<sf::RenderWindow> pRenderWindow );
+    eBatMoveDirection DetermCurrentMoveDirection(const sf::View* pView );
 
     eBatMoveDirection GetDesiredMoveDirection() const { return m_eDesiredMoveDirection; }
     void SetDesiredMoveDirection( eBatMoveDirection _direction ){ m_eDesiredMoveDirection = _direction ;}

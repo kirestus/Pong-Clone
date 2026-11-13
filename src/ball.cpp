@@ -1,7 +1,7 @@
 #include <headers/ball.h>
 #include <assert.h>
 
-static constexpr float g_BALLSIZE = 15.0f;
+static constexpr float g_BALLSIZE = 20.0f;
 Ball::Ball(std::shared_ptr<sf::RenderWindow> pRenderWindow)
 {
     

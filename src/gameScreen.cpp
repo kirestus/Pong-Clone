@@ -7,7 +7,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include <cassert>
 
 
 //-----------------------------------------------------------------
@@ -35,13 +34,13 @@ void GameScreen::CreateGameScreen(const DataStruct& rTuple)
     rTuple.pMessageText->setFont(*rTuple.pVectorFont);
     rTuple.pMessageText->setFillColor(sf::Color::White);
     rTuple.pMessageText->setOrigin(rTuple.pMessageText->getLocalBounds().getSize().x/2,rTuple.pMessageText->getLocalBounds().getSize().y/2);
-    rTuple.pMessageText->setPosition(sf::Vector2f(rTuple.fScreenWidth/2, rTuple.fScreenHeight-100.0f) ); // should set this in the middle of the screen will do later
+    rTuple.pMessageText->setPosition(sf::Vector2f(rTuple.fScreenWidth/2, rTuple.fScreenHeight/2) ); // should set this in the middle of the screen will do later
     
     rTuple.pScoreText->setFont(*rTuple.pVectorFont);
     rTuple.pScoreText->setFillColor(sf::Color(255,255,255,200));
     rTuple.pScoreText->setOrigin(rTuple.pScoreText->getLocalBounds().getSize().x/2,rTuple.pScoreText->getLocalBounds().getSize().y/2);
     rTuple.pScoreText->setPosition(sf::Vector2f(rTuple.fScreenWidth/2, 50.0f) ); // should set this in the middle of the screen will do later
-    rTuple.pRenderWindow->setView(*rTuple.pView);
+
     CreateMiddleLine(rTuple);
     SetScoreText(rTuple.pCogGameState->GetScore()[0],rTuple.pCogGameState->GetScore()[1]);
 
@@ -88,6 +87,8 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 
 
     rTuple.pRenderWindow->setMouseCursorVisible(false);
+    rTuple.pRenderWindow->setView(*rTuple.pView);
+
 
     while (rTuple.pRenderWindow->isOpen())
     {
@@ -126,11 +127,9 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         std::unique_ptr<PadUtils> pPadUtils = std::make_unique<PadUtils>();
         std::unique_ptr<CollisionSystem> pCollisionSystem = std::make_unique<CollisionSystem>();
 
-        std::vector<std::shared_ptr<Bat>> pBatArray;
-        pBatArray.push_back(rTuple.pBat1);
-        pBatArray.push_back(rTuple.pBat2);
+        std::shared_ptr<Bat> pBatArray[2]{rTuple.pBat1,rTuple.pBat2};
 
-        for(size_t i = 0 ; i< pBatArray.size() ; i++)
+        for(size_t i = 0 ; i < 2 ; i++)
         {
             eBatMoveDirection BatMoveDirection = pBatSystem->CaclulateCurrentMoveDirection(rTuple,pBatArray[i]);
             pBatSystem->CalculateBatSpeed(rTuple,pBatArray[i], fDeltaT);
@@ -250,7 +249,7 @@ void GameScreen::UpdateHudText(const DataStruct& rTuple, const std::string sDesi
 {
     rTuple.pMessageText->setString(sf::String(sDesiredText));
     rTuple.pMessageText->setOrigin(rTuple.pMessageText->getLocalBounds().getSize().x/2,rTuple.pMessageText->getLocalBounds().getSize().y/2);
-    rTuple.pMessageText->setCharacterSize(50);
+    rTuple.pMessageText->setCharacterSize((rTuple.fScreenHeight)*0.075f);
 }
 
 //-----------------------------------------------------------
@@ -453,7 +452,7 @@ void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple)
         {
             if(rTuple.pCogGameState->GetSimFrameTopLastHit() == iSimFrame)
             {
-                pFXShape[i].setSize(sf::Vector2f (abs(fSpeed)/10, 20.0f));
+                pFXShape[i].setSize(sf::Vector2f (50.0f, 50.0f));
             }
             pFXShape[i].setSize(sf::Vector2f (abs(fSpeed)/(10 - i), 20.0f));
             pFXShape[i].setOrigin(pFXShape->getGlobalBounds().width/2, pFXShape->getGlobalBounds().height/2);
@@ -552,5 +551,4 @@ rTuple.pRenderWindow->clear();
     {
         bool boola=false;
     }
-
 }
