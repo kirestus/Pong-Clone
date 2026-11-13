@@ -56,7 +56,7 @@ class cogGameState : public GameState
      int64 GetCurrentSimFrame()const {return m_iDetermFrame; }
      void IncrimentSimFrame(){m_iDetermFrame ++;}
 
-     bool GetDidBallLastHitScreenTop()const {return m_bBallLastHitScreenTop ;}//TODO: move this into the ball class
+     bool GetDidBallLastHitScreenTop()const {return m_bBallLastHitScreenTop ;}
      void SetBallLastHitTop(bool hitTop){m_bBallLastHitScreenTop = hitTop ;}
 
      bool IsScreenShaking()const {return m_bIsScreenShaking ;}
@@ -69,14 +69,14 @@ class cogGameState : public GameState
      const uint8* GetScore() const { return m_aScore ;}
      void SetScore(uint8 p1Score, uint8 p2Score){m_aScore[0]=p1Score, m_aScore[1] = p2Score ;}
 
-     void SetSimFrameTopLastHit(uint64 iFrame){m_iSimFrameTopLastHit = iFrame;}
-     uint64 GetSimFrameTopLastHit()const {return m_iSimFrameTopLastHit;}
+     void SetSimFrameWallWasHit(uint64 iFrame){m_iSimeFrameWallLastHit = iFrame;}
+     uint64 GetSimFrameWallWasHit()const {return m_iSimeFrameWallLastHit;}
 
 
     private:
         static const uint8 m_iScoreLimit = 10;
         uint8 m_aScore[2] = {0,0};
-        uint16 m_iSimFrameTopLastHit = 0;
+        uint16 m_iSimeFrameWallLastHit = 0;
 
         bool m_bIsScreenShaking = false;
         bool m_bBallLastHitScreenTop = false;

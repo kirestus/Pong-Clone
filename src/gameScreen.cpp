@@ -144,6 +144,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
             pCollisionSystem->HandleCollisions(rTuple, eCollidingWith, iSimFrame);
         }
         
+
         ShakeScreen(rTuple,0.25f, eCollidingWith);
 
         if (eCollidingWith != GetLastCollisionType() && bIsRunning)
@@ -335,7 +336,7 @@ void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, c
 
     if (eJustHit == eCollisionType::CollisionWithWall)
     {
-        rTuple.pCogGameState->SetSimFrameTopLastHit(iSimFrame);
+        rTuple.pCogGameState->SetSimFrameWallWasHit(iSimFrame);
         m_iLastShakeFrame = iSimFrame;
     }
     else if ( eJustHit == eCollisionType::CollisionWithPlayer1 || eJustHit == eCollisionType::CollisionWithPlayer2 )
@@ -412,23 +413,26 @@ void GameScreen::SetBoundryEdgeShapes(const DataStruct& rTuple)
 
     sf::RectangleShape* pShape = bLastHitTop ? m_sTopEdge : m_sBottomEdge;
 
-    for(short i = m_iBounceVFXArrayLength; i >= 0; i --)
+    constexpr float iBounceOffsetLength = 30.0f;
+
+    for(int8 i = m_iBounceVFXArrayLength; i >= 0; i --)
     {
-        sf::Color EdgeColor(120,120,255,50+(i*5));
-        pShape[i].setSize(sf::Vector2f (40.0f*i, 30.0f));
+        sf::Color EdgeColor(0,255,0,30+(i*6));
+        const sf::Vector2f impactSize{280.0f+iBounceOffsetLength*i, iBounceOffsetLength * i};
+        pShape[i].setSize(impactSize);
         pShape[i].setFillColor(EdgeColor);
+
+        pShape[i].setOrigin(impactSize.x/2,impactSize.y/2);
+
 
         if(bLastHitTop)
         {
-            pShape[i].setOrigin(pShape[0].getSize().x/2,pShape[0].getSize().y);
-            pShape[i].setPosition(sf::Vector2f(rTuple.pBall->GetShape().getPosition().x, -30.0f));
-            return;
+            pShape[i].setPosition(sf::Vector2f(rTuple.pBall->GetShape().getPosition().x, 0.0f));
+
         }
         else
-        {
-            pShape[i].setOrigin(pShape[0].getSize().x/2, 0.0f);
-            pShape[i].setPosition(sf::Vector2f(rTuple.pBall->GetShape().getPosition().x, rTuple.fScreenHeight));
-            return;
+        {   
+            pShape[i].setPosition(sf::Vector2f(rTuple.pBall->GetShape().getPosition().x, rTuple.fScreenHeight ));
         }
     }
 }
@@ -437,34 +441,16 @@ void GameScreen::SetBoundryEdgeShapes(const DataStruct& rTuple)
 
 void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple)
 {
-
-    constexpr uint8 iFXFrameTime = 20;
-    const int64 iSimFrame = rTuple.pCogGameState->GetCurrentSimFrame();
-
     const bool bLastHitTop = rTuple.pCogGameState->GetDidBallLastHitScreenTop();
 
     sf::RectangleShape* pFXShape = bLastHitTop ? m_sTopEdge : m_sBottomEdge;
 
-    const float fSpeed = rTuple.pBall->GetYSpeed();
+    const float fSpeed = abs(rTuple.pBall->GetYSpeed() / rTuple.pBall->GetTopSpeed());
     for(int8 i = GameScreen::m_iBounceVFXArrayLength; i >= 0 ; i--)
     {
-        if (rTuple.pCogGameState->GetSimFrameTopLastHit() > 0 && rTuple.pCogGameState->GetSimFrameTopLastHit() + iFXFrameTime > rTuple.pCogGameState->GetCurrentSimFrame())
-        {
-            if(rTuple.pCogGameState->GetSimFrameTopLastHit() == iSimFrame)
-            {
-                pFXShape[i].setSize(sf::Vector2f (50.0f, 50.0f));
-            }
-            pFXShape[i].setSize(sf::Vector2f (abs(fSpeed)/(10 - i), 20.0f));
-            pFXShape[i].setOrigin(pFXShape->getGlobalBounds().width/2, pFXShape->getGlobalBounds().height/2);
-        }
-        else
-        {
-            const sf::Color pLastColor = pFXShape[0].getFillColor();
-            const sf::Color fillColor = sf::Color(pLastColor.r,pLastColor.g,pLastColor.b,pLastColor.a-i);
-            pFXShape[i].setSize(sf::Vector2f (pFXShape->getSize().x /2 ,pFXShape->getSize().y /i));
-            pFXShape[i].setOrigin(pFXShape->getGlobalBounds().width/2, pFXShape->getGlobalBounds().height/2);
-            pFXShape[i].setFillColor(fillColor);
-        }   
+        const sf::Color pLastColor = rTuple.pBall->GetTrailShapeArray()[0].getFillColor();
+        const sf::Color fillColor = sf::Color(pLastColor.r,pLastColor.g,pLastColor.b,pLastColor.a+30+i*fSpeed);
+        pFXShape[i].setFillColor(fillColor);   
     }
 }
 
@@ -479,6 +465,7 @@ void GameScreen::HandleEvents(const DataStruct& rTuple)
         {
             rTuple.pRenderWindow->close();
         }
+
         Command* command = m_hInputHandler.HandleInput( &event, rTuple.pCogGameState->GetisWinConditionMet());
         if (command) 
         {  
@@ -519,8 +506,9 @@ rTuple.pRenderWindow->clear();
             SetBoundryEdgeShapes(rTuple);
         }
 
-        if (rTuple.pCogGameState->GetSimFrameTopLastHit() + 30 > rTuple.pCogGameState->GetCurrentSimFrame())
+        if (rTuple.pCogGameState->GetSimFrameWallWasHit() + 30 > rTuple.pCogGameState->GetCurrentSimFrame())
         {
+            UpdateWallBounceVFX(rTuple);
             if(rTuple.pCogGameState->GetDidBallLastHitScreenTop())
             {
                 rTuple.pRenderWindow->draw(m_sTopEdge[i]);

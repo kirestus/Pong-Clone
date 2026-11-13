@@ -4,14 +4,14 @@
 enum PadButtons : uint8
 {
     //the order of these matters
-    ACTION_BUTTON1,
-    ACTION_BUTTON2,
-    ACTION_BUTTON3,
-    ACTION_BUTTON4,
-    DEBUG_BUTTON,
-    PAUSE_BUTTON,
-    EXIT_BUTTON,
-    length,
+    ACTION_BUTTON1 = 0,
+    ACTION_BUTTON2 = 1,
+    ACTION_BUTTON3 = 2,
+    ACTION_BUTTON4 = 3,
+    DEBUG_BUTTON = 4,
+    PAUSE_BUTTON = 5,
+    EXIT_BUTTON = 6,
+    length = 7,
 };
 
 bool PadUtils::IsConnected(uint8 iPadID)

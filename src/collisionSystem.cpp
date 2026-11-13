@@ -19,7 +19,7 @@ bool CollisionSystem::isBallCollidingWithTarget(const sf::FloatRect box1, const 
 
 //----------------------------------------------------------
 
-bool CollisionSystem::isBallHittingWall(const sf::FloatRect box1, const sf::View* pActiveView)
+bool CollisionSystem::isBallHittingWall(const sf::FloatRect box1, const std::shared_ptr<sf::View> pActiveView )
 {
     const float rectTop = 0.0f;
     const float rectBottom = pActiveView->getSize().y - 15.0f;

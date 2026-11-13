@@ -17,14 +17,15 @@ struct DataStruct{
         unsigned int width = desktop.width;
         unsigned int height = desktop.height;
 
+        const sf::Vector2f baseResolution {static_cast<float>(width),static_cast<float>(height)};
+        const sf::Vector2f screenCenter{ baseResolution.x/2 , baseResolution.y/2 };
+
     public:
     static constexpr float g_fBAT_OFFSET = 100.0f;
 
     std::shared_ptr<sf::RenderWindow> pRenderWindow = std::make_shared<sf::RenderWindow>(sf::VideoMode::getDesktopMode(), "Turbo Pong", sf::Style::Fullscreen);
-    sf::Vector2f* baseResolution = new sf::Vector2f(static_cast<float>(width),static_cast<float>(height)); // need to get this dynamically 
-    sf::Vector2f* emptyRec = new sf::Vector2f(baseResolution->x/2,baseResolution->y/2);
-    sf::View* pView = new sf::View(*emptyRec, *baseResolution);
-
+    
+    std::shared_ptr<sf::View> pView = std::make_shared<sf::View>(sf::View(screenCenter, baseResolution));
 
     std::shared_ptr<Bat> pBat1 = std::make_shared<Bat>(sf::Vector2f(g_fBAT_OFFSET,pView->getSize().y/2), ePlayerNumber::PLAYER1);
     std::shared_ptr<Bat> pBat2 = std::make_shared<Bat>(sf::Vector2f(pView->getSize().x-g_fBAT_OFFSET, pRenderWindow->getSize().y/2), ePlayerNumber::PLAYER2);
@@ -66,6 +67,9 @@ struct DataStruct{
 
     DataStruct(){
         pGameMusic->openFromFile("sfx/song.mp3");
+        //const auto fullscreenModes = sf::VideoMode::getFullscreenModes();
+        //pRenderWindow = std::make_shared<sf::RenderWindow>(fullscreenModes[0], "Turbo Pong", sf::Style::Fullscreen);
+
     }
 
     ~DataStruct() 
@@ -77,7 +81,6 @@ struct DataStruct{
         delete pScoreGoalSoundEffect;
         delete pYouWinSoundEffect;
         delete pGameMusic;
-        delete pView;
     }
 };
 

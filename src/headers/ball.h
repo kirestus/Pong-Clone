@@ -42,6 +42,8 @@ class Ball
         void SetCurrentBallState(eBallState state){ m_eCurrentBallState = state ;}
         void SetDesiredBallState(eBallState _desiredState){ m_eDesiredBallState = _desiredState ;}
 
+        void SetIsGoingLeft(bool bIsLeft){ m_bIsGoingLeft = bIsLeft; }
+        bool GetIsGoingLeft()const { return m_bIsGoingLeft; }
 
         void StateMachine();
         void UpdateBallPosition(const float, const bool);
@@ -61,6 +63,7 @@ class Ball
         eBallState m_eCurrentBallState = eBallState::ResetGamePosition;
         eBallState m_eDesiredBallState = eBallState::None;
         eCollisionType m_eLastCollisionType = eCollisionType::NoCollision;
+        bool m_bIsGoingLeft = false;
 
         sf::Vector3f m_vBallVector;
 
