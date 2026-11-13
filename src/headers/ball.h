@@ -43,7 +43,7 @@ class Ball
         void SetDesiredBallState(eBallState _desiredState){ m_eDesiredBallState = _desiredState ;}
 
         void SetIsGoingLeft(bool bIsLeft){ m_bIsGoingLeft = bIsLeft; }
-        bool GetIsGoingLeft()const { return m_bIsGoingLeft; }
+        bool GetIsGoingLeft()const { return m_bIsGoingLeft ;}
 
         void StateMachine();
         void UpdateBallPosition(const float, const bool);

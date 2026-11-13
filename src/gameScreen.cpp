@@ -104,7 +104,7 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         //std::unique_ptr<GameStateSystem>pGameStateSystem = std::make_unique<GameStateSystem>();
 
         const bool bIsRunning = rTuple.pCurrentWorldState->GetCurrentGameState() == eGameState::Running;
-        const bool bIsGameOver = rTuple.pCurrentWorldState->GetCurrentGameState() == eGameState::GameOver 
+        const bool bIsGameOver = rTuple.pCurrentWorldState->GetCurrentGameState() == eGameState::GameOver
         || rTuple.pCurrentWorldState->GetCurrentGameState() == eGameState::Reset;
 
         
@@ -138,39 +138,6 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
 
         rTuple.pBall->UpdateBallPosition(fDeltaT/10, !bIsRunning ); //TODO: make this feel good in the actual values with dividing by 10
         
-        const eCollisionType eCollidingWith = pCollisionSystem->CheckCollisions(rTuple);
-        if ( eCollidingWith != eCollisionType::NoCollision && bIsRunning )
-        {
-            pCollisionSystem->HandleCollisions(rTuple, eCollidingWith, iSimFrame);
-        }
-        
-
-        ShakeScreen(rTuple,0.25f, eCollidingWith);
-
-        if (eCollidingWith != GetLastCollisionType() && bIsRunning)
-        {
-            SetLastCollisionType(eCollidingWith);
-
-            if (eCollidingWith == eCollisionType::CollisionWithGoalZone && !bIsGameOver )
-            {
-                if ( rTuple.pCogGameState->GetisWinConditionMet() )
-                {
-                    rTuple.pDesiredWorldState->SetDesiredGamestate(eGameState::GameOver);
-                    if (rTuple.pCogGameState->GetShouldPlaySFX())
-                    {
-                        rTuple.pYouWinSoundEffect->play();  
-                    }
-                }
-                else if (rTuple.pCogGameState->GetShouldPlaySFX() )
-                {
-                    rTuple.pScoreGoalSoundEffect->play();
-                }
-            }
-        }
-        else
-        {
-            SetLastCollisionType(eCollisionType::NoCollision);
-        }
 
         std::shared_ptr<Bat> pBat =  pBatSystem->WhichBatShouldBallAttatchTo(rTuple);
         if(pBat != nullptr)
@@ -201,8 +168,47 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         RenderElements(rTuple);
         
         rTuple.pRenderWindow->display();
+
+
+
+        //Update collisions and VFX
         if(bIsRunning)
         {
+            const eCollisionType eCollidingWith = pCollisionSystem->CheckCollisions(rTuple);
+            if ( eCollidingWith != eCollisionType::NoCollision )
+            {
+                pCollisionSystem->HandleCollisions(rTuple, eCollidingWith, iSimFrame);
+            }
+            
+            ShakeScreen(rTuple,0.25f, eCollidingWith);
+
+            if (eCollidingWith != GetLastCollisionType() && bIsRunning)
+            {
+                SetLastCollisionType(eCollidingWith);
+
+                if (eCollidingWith == eCollisionType::CollisionWithGoalZone && !bIsGameOver )
+                {
+                    if ( rTuple.pCogGameState->GetisWinConditionMet() )
+                    {
+                        rTuple.pDesiredWorldState->SetDesiredGamestate(eGameState::GameOver);
+                        if (rTuple.pCogGameState->GetShouldPlaySFX())
+                        {
+                            rTuple.pYouWinSoundEffect->play();  
+                        }
+                    }
+                    else if (rTuple.pCogGameState->GetShouldPlaySFX() )
+                    {
+                        rTuple.pScoreGoalSoundEffect->play();
+                    }
+                }
+            }
+            else
+            {
+                SetLastCollisionType(eCollisionType::NoCollision);
+            }
+
+
+
             rTuple.pBall->UpdateBallTrail( iSimFrame );
             rTuple.pCogGameState->IncrimentSimFrame();
         }
