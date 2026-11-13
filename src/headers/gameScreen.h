@@ -44,7 +44,8 @@ public:
     void DimMiddleLine(const DataStruct& rTuple,const bool bShouldDimLine);
 
     void SetBoundryEdgeShapes(const DataStruct& rTuple);
-    void UpdateWallBounceVFX(const DataStruct& rTuple);
+    void UpdateWallBounceVFX(const DataStruct& rTuple, int iTotalFramesVisible);
+
 
 
 private:
