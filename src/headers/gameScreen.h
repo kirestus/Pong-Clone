@@ -44,7 +44,7 @@ public:
     void DimMiddleLine(const DataStruct& rTuple,const bool bShouldDimLine);
 
     void SetBoundryEdgeShapes(const DataStruct& rTuple);
-    void UpdateWallBounceVFX(const DataStruct& rTuple, int iTotalFramesVisible);
+    void UpdateWallBounceVFX(const DataStruct& rTuple, uint8 iTotalFramesVisible);
 
 
 
@@ -60,7 +60,7 @@ private:
     static const uint8 m_iNumberOfLines = 6;
     sf::RectangleShape m_DashedLineRect[m_iNumberOfLines+1];
 
-    static constexpr uint8 m_iBounceVFXArrayLength = 3;
+    static constexpr uint8 m_iBounceVFXArrayLength = 8;
     uint8 pBounceWallVFXSpriteArray[m_iBounceVFXArrayLength];
     sf::RectangleShape m_sTopEdge[m_iBounceVFXArrayLength+1];
     sf::RectangleShape m_sBottomEdge[m_iBounceVFXArrayLength+1];

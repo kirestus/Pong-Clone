@@ -6,76 +6,78 @@
 
 class Ball
 {
-    public:
+public:
 
-        Ball(std::shared_ptr<sf::RenderWindow> pRenderWindow);
+    Ball(std::shared_ptr<sf::RenderWindow> pRenderWindow);
 
-        sf::RectangleShape& ReferenceShape(){return m_sShape ;}
+    sf::RectangleShape& ReferenceShape(){return m_sShape ;}
 
-        sf::RectangleShape GetShape() const { return m_sShape; }
-        void SetShape( sf::RectangleShape _shape ) { m_sShape = _shape ;}
+    sf::RectangleShape GetShape() const { return m_sShape; }
+    void SetShape( sf::RectangleShape _shape ) { m_sShape = _shape ;}
 
-        sf::RectangleShape* GetTrailShapeArray(){ return m_sShapeTrail ;}
-        uint8 GetTrailShapeArrayLength()const{ return m_iShapeTrailLen; }
+    sf::RectangleShape* GetTrailShapeArray(){ return m_sShapeTrail ;}
+    uint8 GetTrailShapeArrayLength()const{ return m_iShapeTrailLen; }
 
-        float GetXSpeed() const { return m_v2CurrentBallSpeed.x ;}
-        void SetXSpeed( float _speed) { m_v2CurrentBallSpeed.x = _speed ;}
+    float GetXSpeed() const { return m_v2CurrentBallSpeed.x ;}
+    void SetXSpeed( float _speed) { m_v2CurrentBallSpeed.x = _speed ;}
 
-        float GetYSpeed() const { return m_v2CurrentBallSpeed.y ;}
-        void SetYSpeed( float _speed) { m_v2CurrentBallSpeed.y = _speed ;}
+    float GetYSpeed() const { return m_v2CurrentBallSpeed.y ;}
+    void SetYSpeed( float _speed) { m_v2CurrentBallSpeed.y = _speed ;}
 
-        float GetTopSpeed() const { return m_fTopSpeed; }
+    float GetTopSpeed() const { return m_fTopSpeed; }
 
-        sf::Vector2f GetInitialSpeed() const { return m_v2InitialSpeed ;}
+    sf::Vector2f GetInitialSpeed() const { return m_v2CurrentBallSpeed ;}
+    sf::Vector2f GetSpeedAfterServe() const { return m_SpeedAfterServing ;}
 
-        sf::Vector2f GetTranslationPosition() const {return sf::Vector2f(m_vBallVector.x, m_vBallVector.y) ;}
-        float GetBallRotation() const {return m_vBallVector.z ;}
+    sf::Vector2f GetTranslationPosition() const {return sf::Vector2f(m_vBallVector.x, m_vBallVector.y) ;}
+    float GetBallRotation() const {return m_vBallVector.z ;}
 
-        void SetBallVector(sf::Vector3f _vector){m_vBallVector = _vector ;}
+    void SetBallVector(sf::Vector3f _vector){m_vBallVector = _vector ;}
 
-        eBallState GetCurrentBallState() const { return m_eCurrentBallState ;}
-        eBallState GetDesiredBallState() const { return m_eDesiredBallState ;}
+    eBallState GetCurrentBallState() const { return m_eCurrentBallState ;}
+    eBallState GetDesiredBallState() const { return m_eDesiredBallState ;}
 
-        eCollisionType GetLastCollisionType() const { return m_eLastCollisionType ;}
-        void SetLastCollisiontype(eCollisionType type){m_eLastCollisionType = type;}
+    eCollisionType GetLastCollisionType() const { return m_eLastCollisionType ;}
+    void SetLastCollisiontype(eCollisionType type){m_eLastCollisionType = type;}
 
-        void SetCurrentBallState(eBallState state){ m_eCurrentBallState = state ;}
-        void SetDesiredBallState(eBallState _desiredState){ m_eDesiredBallState = _desiredState ;}
+    void SetCurrentBallState(eBallState state){ m_eCurrentBallState = state ;}
+    void SetDesiredBallState(eBallState _desiredState){ m_eDesiredBallState = _desiredState ;}
 
-        void SetIsGoingLeft(bool bIsLeft){ m_bIsGoingLeft = bIsLeft; }
-        bool GetIsGoingLeft()const { return m_bIsGoingLeft ;}
+    void SetIsGoingLeft(bool bIsLeft){ m_bIsGoingLeft = bIsLeft; }
+    bool GetIsGoingLeft()const { return m_bIsGoingLeft ;}
 
-        void StateMachine();
-        void UpdateBallPosition(const float, const bool);
+    void StateMachine();
+    void UpdateBallPosition(const float, const bool);
 
-        void OnBatCollision( const float );
-        void OnWallCollision( const bool, const float );
-        void OnScoreGoal( const bool );
+    void OnBatCollision( const float );
+    void OnWallCollision( const bool, const float );
+    void OnScoreGoal( const bool );
 
-        bool IsLastHitOnSweetSpot() const { return m_bIsLastHitOnSweetSpot ;}
-        void SetLastHitOnSweetSpot(bool isSweet){m_bIsLastHitOnSweetSpot = isSweet;}
+    bool IsLastHitOnSweetSpot() const { return m_bIsLastHitOnSweetSpot ;}
+    void SetLastHitOnSweetSpot(bool isSweet){m_bIsLastHitOnSweetSpot = isSweet;}
 
-        void UpdateBallTrail(int64);
+    void UpdateBallTrail(int64);
 
 
-    private:
-        static constexpr uint8 m_iShapeTrailLen = 6;
-        eBallState m_eCurrentBallState = eBallState::ResetGamePosition;
-        eBallState m_eDesiredBallState = eBallState::None;
-        eCollisionType m_eLastCollisionType = eCollisionType::NoCollision;
-        bool m_bIsGoingLeft = false;
+private:
+    static constexpr uint8 m_iShapeTrailLen = 6;
+    eBallState m_eCurrentBallState = eBallState::ResetGamePosition;
+    eBallState m_eDesiredBallState = eBallState::None;
+    eCollisionType m_eLastCollisionType = eCollisionType::NoCollision;
+    bool m_bIsGoingLeft = false;
 
-        sf::Vector3f m_vBallVector;
+    sf::Vector3f m_vBallVector;
 
-        sf::RectangleShape m_sShape;
-        sf::RectangleShape m_sShapeTrail[m_iShapeTrailLen+1];
-        //+1 is so i can use the single length value for both creating the array and accesing the elements
+    sf::RectangleShape m_sShape;
+    sf::RectangleShape m_sShapeTrail[m_iShapeTrailLen+1];
+    //+1 is so i can use the single length value for both creating the array and accesing the elements
 
-        static constexpr float m_fTopSpeed = 15500.00f;
-        const sf::Vector2f m_v2InitialSpeed = sf::Vector2f(4000.0f,00.0f);
-        sf::Vector2f m_v2CurrentBallSpeed = m_v2InitialSpeed;
-        static constexpr float m_fSpeedUpIncriment = 600.0f;
+    static constexpr float m_fTopSpeed = 15500.00f; //TODO: make this a vector so i can scale the y speed
+    const sf::Vector2f m_v2InitialSpeed = sf::Vector2f(5000.0f,00.0f);
+    const sf::Vector2f m_SpeedAfterServing = sf::Vector2f(8000.0f,00.0f);
+    sf::Vector2f m_v2CurrentBallSpeed = m_v2InitialSpeed;
+    static constexpr float m_fSpeedUpIncriment = 600.0f;
 
-        bool m_bIsLastHitOnSweetSpot = false;
+    bool m_bIsLastHitOnSweetSpot = false;
 
 };

@@ -101,8 +101,6 @@ int GameScreen::UpdateGamescreen(const DataStruct& rTuple, sf::Clock &rGameClock
         GameStateSystem::DetermineGameState(rTuple);
         rTuple.pRenderWindow->setFramerateLimit(CalculateFrameRate(rTuple));
         
-        //std::unique_ptr<GameStateSystem>pGameStateSystem = std::make_unique<GameStateSystem>();
-
         const bool bIsRunning = rTuple.pCurrentWorldState->GetCurrentGameState() == eGameState::Running;
         const bool bIsGameOver = rTuple.pCurrentWorldState->GetCurrentGameState() == eGameState::GameOver
         || rTuple.pCurrentWorldState->GetCurrentGameState() == eGameState::Reset;
@@ -321,10 +319,10 @@ bool GameScreen::UpdateUIText(const bool bIsGameOver, const bool bIsPaused, cons
 
 void GameScreen::ShakeScreen(const DataStruct &rTuple, const float fMagnitude, const eCollisionType eJustHit )
 {
-    const int iSimFrame = rTuple.pCogGameState->GetCurrentSimFrame();
-    static constexpr int iTotalSlamFrames = 15;
+    const int64 iSimFrame = rTuple.pCogGameState->GetCurrentSimFrame();
+    static constexpr int8 iTotalSlamFrames = 15;
     static const sf::Vector2 vForceScalingRatio(10,5);
-    static constexpr int fForceScale = 600;
+    static constexpr uint16 fForceScale = 600;
     static const sf::Vector2f vScaledForces(vForceScalingRatio.x*fForceScale,vForceScalingRatio.y*fForceScale);
 
     if (rTuple.pCurrentWorldState->GetCurrentGameState() != eGameState::Running)
@@ -413,12 +411,12 @@ void GameScreen::SetBoundryEdgeShapes(const DataStruct& rTuple)
 
     sf::RectangleShape* pShape = bLastHitTop ? m_sTopEdge : m_sBottomEdge;
 
-    constexpr float iBounceOffsetLength = 30.0f;
+    constexpr float iBounceOffsetLengthY = 50.0f / GameScreen::m_iBounceVFXArrayLength;
+    const float iBounceOffsetLengthX = rTuple.fScreenWidth / GameScreen::m_iBounceVFXArrayLength;
 
     for(int8 i = m_iBounceVFXArrayLength; i >= 0; i --)
     {
-        sf::Color EdgeColor(0,255,0,30+(i*6));
-        const sf::Vector2f impactSize{280.0f+iBounceOffsetLength*i, iBounceOffsetLength * i};
+        const sf::Vector2f impactSize{500.0f+iBounceOffsetLengthX*i, iBounceOffsetLengthY * i};
         pShape[i].setSize(impactSize);
 
         pShape[i].setOrigin(impactSize.x/2,impactSize.y/2);
@@ -438,23 +436,26 @@ void GameScreen::SetBoundryEdgeShapes(const DataStruct& rTuple)
 
 //------------------------------------------------------------
 
-void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple, int iTotalFramesVisible)
+void GameScreen::UpdateWallBounceVFX(const DataStruct& rTuple, uint8 iTotalFramesVisible)
 {
     const int iFrameLastHitWall = rTuple.pCogGameState->GetSimFrameWallWasHit();
     const int iSimFrame = rTuple.pCogGameState->GetCurrentSimFrame();
 
-    if (iTotalFramesVisible+iFrameLastHitWall > iSimFrame )
+    if (iTotalFramesVisible + iFrameLastHitWall > iSimFrame )
     {       
-        uint8 fEffectOpacity = (static_cast<float>(iFrameLastHitWall) / static_cast<float>(iSimFrame ) *255) ;
+        const uint8 fMaxEffectOpacity = 40 ;
         const bool bLastHitTop = rTuple.pCogGameState->GetDidBallLastHitScreenTop();
 
         sf::RectangleShape* pFXShape = bLastHitTop ? m_sTopEdge : m_sBottomEdge;
 
-        const float fSpeed = abs(rTuple.pBall->GetYSpeed() / rTuple.pBall->GetTopSpeed());
         const sf::Color pLastColor = rTuple.pBall->GetTrailShapeArray()[0].getFillColor();
         for(int8 i = GameScreen::m_iBounceVFXArrayLength; i >= 0 ; i--)
         {
-            fEffectOpacity = (fEffectOpacity / i) *0.6f;
+            //underflowing the uint here so i can count down, its a hack but it works
+            const uint8 iPercentageLeft = ((iFrameLastHitWall + iTotalFramesVisible - iSimFrame ) * 100) / iTotalFramesVisible;
+            const float fAlphaFalloff = 0.6f * i  / GameScreen::m_iBounceVFXArrayLength;
+            std::cout<<static_cast<float>(iPercentageLeft)<<" "<<fAlphaFalloff<<std::endl;
+            const uint8 fEffectOpacity = (fMaxEffectOpacity * fAlphaFalloff * iPercentageLeft / 100)  ;
             const sf::Color fillColor = sf::Color(pLastColor.r,pLastColor.g,pLastColor.b,fEffectOpacity);
             pFXShape[i].setFillColor(fillColor);   
         }
@@ -505,23 +506,24 @@ rTuple.pRenderWindow->clear();
         }
     }
     
-    //TODO: Get the vfx for the edge bounce working better
-    
     for(int8 i = m_iBounceVFXArrayLength; i >= 0; i --)
     {
-        if (rTuple.pBall->GetDesiredBallState() == eBallState::HitBottomWall || rTuple.pBall->GetDesiredBallState() == eBallState::HitTopWall) 
-        {
-            SetBoundryEdgeShapes(rTuple);
-        }
-
-
-        constexpr int iTotalFramesBounceEffectUpdates = 30;
         const int iCurrentSimFrame = rTuple.pCogGameState->GetCurrentSimFrame();
+        const int iSimFrameBallWasHit = rTuple.pCogGameState->GetSimFrameWallWasHit();
 
-        if (rTuple.pCogGameState->GetSimFrameWallWasHit() + iTotalFramesBounceEffectUpdates > iCurrentSimFrame 
+        constexpr int iTotalFramesBounceEffectUpdates = 100;
+
+        if (iSimFrameBallWasHit + iTotalFramesBounceEffectUpdates > iCurrentSimFrame 
         && iCurrentSimFrame > iTotalFramesBounceEffectUpdates)
         {
+
+            if(rTuple.pCogGameState->GetCurrentSimFrame() == rTuple.pCogGameState->GetSimFrameWallWasHit())
+            {
+                SetBoundryEdgeShapes(rTuple);
+            }
+
             UpdateWallBounceVFX(rTuple,iTotalFramesBounceEffectUpdates);
+            
             if(rTuple.pCogGameState->GetDidBallLastHitScreenTop())
             {
                 rTuple.pRenderWindow->draw(m_sTopEdge[i]);
